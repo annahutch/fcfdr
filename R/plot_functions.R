@@ -5,6 +5,8 @@
 #' @param ylim y-axis (-log10) limits
 #'
 #' @return ggplot object
+#' @import ggplot2
+#' @import cowplot
 #' @export
 #'
 #' @examples
@@ -55,6 +57,8 @@ corr_plot <- function(p, q, ylim = c(0, 1.5)){
 #' @param output Output from flexible_cfdr function
 #'
 #' @return ggplot object
+#' @import ggplot2
+#' @import cowplot
 #' @export
 #'
 #' @examples
@@ -73,6 +77,8 @@ pv_plot <- function(output){
 #' @param output Output from flexible_cfdr function
 #'
 #' @return ggplot object
+#' @import ggplot2
+#' @import cowplot
 #' @export
 #'
 #' @examples

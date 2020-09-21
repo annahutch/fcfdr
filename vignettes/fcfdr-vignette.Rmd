@@ -1,0 +1,116 @@
+---
+title: "Vignette: Flexible cFDR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette: Flexible cFDR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+---
+
+The `fcfdr` R package implements "Flexible cFDR", a method used to re-weight GWAS $p$-values by leveraging relevant auxiliary data.
+
+Unlike empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr), flexible cFDR supports auxiliary data from any arbitrary distribution. A direct utility of flexible cFDR is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. Flexible cFDR can also be applied iteratively, whereby the $v$-values from the previous iteration are used as the $p$-values in the next iteration. This allows additional layers of information to be incorporated into the analysis.
+
+To use this software, users must supply (i) GWAS $p$-values measuring the evidence of association between SNPs and the phenotype of interest (ii) auxiliary data to condition on (e.g. functional scores for each SNP) and (iii) the indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK. There are additional optional parameters which are explained in the function code.
+
+---
+
+Firstly, we load the flexible cFDR package:
+
+```{r}
+library(fcfdr)
+
+set.seed(1)
+```
+
+---
+
+Next, we simulate $p$-values for 50,000 genetic variants, including 500 associated variants.
+
+```{r}
+n = 50000
+n1p = 500 # associated variants
+zp = c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1)) # z-scores
+p = 2*pnorm(-abs(zp)) # convert to p-values
+```
+
+---
+
+We simulate relevant auxiliary data from a mixture normal distribution ($q$). The associated SNPs (with indices 1-500) are sampled from $N(-0.5, 0.5^2)$ and the non-associated SNPs (with indices 500-50000) are sampled from $N(2,1)$.
+
+```{r}
+mixture_comp1 <- function(x) rnorm(x, mean = -0.5, sd = 0.5)
+mixture_comp2 <- function(x) rnorm(x, mean = 2, sd = 1)
+n = length(p)
+z = runif(n)
+
+q <- c(mixture_comp1(n1p), mixture_comp2(n-n1p))
+hist(q)
+```
+
+---
+
+We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (high $-log10(p)$) are enriched for low $q$ values.
+
+```{r}
+corr_plot(p, q)
+```
+
+---
+
+We are now ready to use the `flexible_cfdr` function to derive the $v$-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the [vignette for deriving LDAK weights here](http://dougspeed.com/calculate-weightings/). 
+
+This line of code will take approximately 4 minutes.
+
+```{r}
+res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1), rmseg = TRUE)
+```
+
+---
+
+We can visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $p$-values for SNPs with low $q$ have been down-weighted appropriately.
+
+```{r}
+pv_plot(res)
+log10pv_plot(res)
+```
+
+---
+
+Finally, we run the Benjamini-Hochberg procedure on the $v$-values and control the FDR at 0.05.
+
+```{r}
+hit = which(p.adjust(res[[1]]$v, method = "BH")<= 0.05)
+```
+
+For comparison, we do the same to the raw p-values:
+
+```{r}
+hit_p = which(p.adjust(p, method = "BH")<= 0.05)
+```
+
+'True' associations are those with indices 1-500, so the proportions of false discoveries are
+
+```{r}
+# cFDR
+1- (length(intersect(hit,c(1:500)))/length(hit)) 
+
+# P-value
+1- (length(intersect(hit_p,c(1:500)))/length(hit_p))
+```
+
+Altogether, flexible cFDR correctly identifies many more newly FDR significant SNPs that are truly associated whilst controlling FDR.
+
+```{r}
+# number of extra true associations identified by flexible cFDR
+length(which(hit[!hit %in% hit_p]<=500))
+```

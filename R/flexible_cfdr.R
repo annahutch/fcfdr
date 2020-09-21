@@ -11,9 +11,22 @@
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
 #'
+#' @import stats
+#' @import locfdr
+#' @import spatstat
+#' @import cfdr
+#' @import fields
+#' @import dplyr
+#' @import polyCub
+#' @import hexbin
+#' @import bigsplines
+#' @imports data.table
+#' @imports MASS
+#' @imports grDevices
+#'
 #' @return list of length two. (1) dataframe of p-values, q-values and v-values before and after spline correction (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-functional_cFDR_v8 <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, rmseg = TRUE, dist_thr = 0.5){
+flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, rmseg = TRUE, dist_thr = 0.5){
 
   if( sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
 
@@ -33,7 +46,7 @@ functional_cFDR_v8 <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res
   q_ind <- q[indep_index]
 
   # bivariate density of zp and q
-  kpq <- kde2d(c(zp_ind, -zp_ind), c(q_ind, q_ind), n = c(res_p, res_q), lims = lims)
+  kpq <- MASS::kde2d(c(zp_ind, -zp_ind), c(q_ind, q_ind), n = c(res_p, res_q), lims = lims)
 
   ### estimate P(Q<=q|H0)
 
@@ -103,7 +116,7 @@ functional_cFDR_v8 <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res
   ccut <- interp.surface(cgrid, bins) # cFDR values for binned data
 
   # L-curves are contours of cFDR curves
-  cl <- lapply(ccut, function(l) contourLines(x=cgrid, levels=l))
+  cl <- lapply(ccut, function(l) grDevices::contourLines(x=cgrid, levels=l))
 
   cl_basic <- cl
 
@@ -164,12 +177,7 @@ functional_cFDR_v8 <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res
   if(splinecorr == TRUE){ # spline correction
 
     spline_fit <- bigspline(x = q, y = log10(v/p), nknots = 5, rparm = NA)
-    pred_out <- predict.bigspline(spline_fit, newdata = seq(min(q), max(q), 0.05))
-
-    jpeg(paste0("Iteration ", i))
-    plot(x = q, y = log10(v/p), xlab = "q", ylab = "log10(v/p)", main = "spline correction")
-    lines(seq(min(q), max(q), 0.05), pred_out, col = "red")
-    dev.off()
+    #pred_out <- predict.bigspline(spline_fit, newdata = seq(min(q), max(q), 0.05))
 
     distances <- abs(log10(v/p)-spline_fit$fitted.values)
 
