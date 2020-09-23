@@ -1,0 +1,37 @@
+Package: fcfdr
+Title: Flexible cFDR
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Anna",
+           family = "Hutchinson",
+           role = c("aut", "cre"),
+           email = "anna.hutchinson@mrc-bsu.cam.ac.uk",
+           comment = c(ORCID = "0000-0002-9224-4410"))
+Description: An R Package to implement flexible cFDR. That is, leveraging auxiliary data from any arbitrary distribution with GWAS p-values to generate reweighted $p$-values.
+Imports:
+  locfdr,
+  MASS,
+  ggplot2,
+  cowplot,
+  spatstat,
+  cfdr,
+  fields,
+  dplyr,
+  polyCub,
+  hexbin,
+  bigsplines,
+  data.table,
+  grDevices
+Suggests:
+    magrittr,
+    factoextra,
+    stats,
+    knitr,
+    rmarkdown
+License: `use_mit_license()`, `use_gpl3_license()` or friends to
+    pick a license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr

@@ -1,0 +1,36 @@
+## ---- include = FALSE---------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+## -----------------------------------------------------------------------------
+library(fcfdr)
+
+set.seed(1)
+
+## -----------------------------------------------------------------------------
+n = 50000
+n1p = 500 # associated variants
+zp = c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1)) # z-scores
+p = 2*pnorm(-abs(zp)) # convert to p-values
+
+## -----------------------------------------------------------------------------
+mixture_comp1 <- function(x) rnorm(x, mean = -0.5, sd = 0.5)
+mixture_comp2 <- function(x) rnorm(x, mean = 2, sd = 1)
+n = length(p)
+z = runif(n)
+
+q <- c(mixture_comp1(n1p), mixture_comp2(n-n1p))
+hist(q)
+
+## -----------------------------------------------------------------------------
+corr_plot(p, q)
+
+## -----------------------------------------------------------------------------
+res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1), rmseg = TRUE)
+
+## -----------------------------------------------------------------------------
+pv_plot(res)
+log10pv_plot(res)
+
