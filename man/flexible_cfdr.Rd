@@ -20,7 +20,7 @@ flexible_cfdr(
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{auxillary functional data values (vector of length n)}
+\item{q}{continuous auxillary data values (vector of length n)}
 
 \item{indep_index}{indices of independent SNPs}
 
@@ -37,8 +37,9 @@ flexible_cfdr(
 \item{dist_thr}{distance threshold for spline correction}
 }
 \value{
-list of length two. (1) dataframe of p-values, q-values and v-values before and after spline correction (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 }
 \description{
-Flexible cFDR
+Function to perform cFDR for continuous auxiliary covariates
+sampled from arbitrary distributions
 }

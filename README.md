@@ -7,7 +7,11 @@
 
 <!-- badges: end -->
 
-`fcfdr` is an R package to implement flexible cFDR.
+`fcfdr` is an R package that implements cFDR to generate GWAS
+\(p\)-values that have been adjusted using auxiliary covariates. It
+supports auxiliary covariates from any arbitrary distribution, enabling
+researchers to leverage a wide variety of auxiliary data types with GWAS
+\(p\)-values.
 
 -----
 

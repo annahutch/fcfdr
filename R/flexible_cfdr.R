@@ -1,8 +1,9 @@
-#' Flexible cFDR
+#' Function to perform cFDR for continuous auxiliary covariates
+#' sampled from arbitrary distributions
 #'
 #' @title flexible_cfdr
 #' @param p p values for principal trait (vector of length n)
-#' @param q auxillary functional data values (vector of length n)
+#' @param q continuous auxillary data values (vector of length n)
 #' @param indep_index indices of independent SNPs
 #' @param nxbin number of bins in zp direction for hex-binning
 #' @param res_p number of test points in x-direction (p)
@@ -24,7 +25,7 @@
 #' @imports MASS
 #' @imports grDevices
 #'
-#' @return list of length two. (1) dataframe of p-values, q-values and v-values before and after spline correction (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+#' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
 flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, rmseg = TRUE, dist_thr = 0.5){
 
@@ -189,7 +190,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   v[which(v>1)] <- 1 # fix bug where some v vals = 1 + 2.220446e-16
 
-  df <- data.frame(p, q, v, v_b4spline, distances)
+  df <- data.frame(p, q, v)
 
   return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = length(corrected_ind))))
 }
