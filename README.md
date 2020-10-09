@@ -13,6 +13,8 @@ supports auxiliary covariates from any arbitrary distribution, enabling
 researchers to leverage a wide variety of auxiliary data types with GWAS
 \(p\)-values.
 
+Webpage: <https://annahutch.github.io/fcfdr/>
+
 -----
 
 ## Installation
