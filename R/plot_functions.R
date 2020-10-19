@@ -8,9 +8,7 @@
 #' @return ggplot object
 #' @import ggplot2
 #' @import cowplot
-<<<<<<< HEAD
 #' @export
-=======
 #'
 #' @examples
 #' # simulate p
@@ -27,7 +25,6 @@
 #' q <- ifelse(z2 < p, mixture_comp1(n), mixture_comp2(n))
 #'
 #' corr_plot(p, q, ylim = c(0, 3))
->>>>>>> 9f4d11885d8c88bf477fe8dd9ee1195da98da514
 corr_plot <- function(p, q, ylim = c(0, 1.5)){
   
   quantiles <- quantile(q, probs = seq(0, 1, 0.2))
