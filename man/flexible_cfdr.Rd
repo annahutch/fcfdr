@@ -41,3 +41,7 @@ list of length two: (1) dataframe of p-values, q-values and v-values (2) datafra
 \description{
 Function to perform cFDR for continuous auxiliary covariates
 }
+\examples{
+see vignette
+
+}

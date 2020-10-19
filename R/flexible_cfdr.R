@@ -21,7 +21,15 @@
 #' @import polyCub
 #' @import hexbin
 #' @import bigsplines
+<<<<<<< HEAD
 #' @import grDevices
+=======
+#' @imports data.table
+#' @imports MASS
+#' @imports grDevices
+#' 
+#' @examples see vignette
+>>>>>>> 9f4d11885d8c88bf477fe8dd9ee1195da98da514
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export

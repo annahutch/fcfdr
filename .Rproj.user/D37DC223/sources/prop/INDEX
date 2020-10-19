@@ -7,7 +7,13 @@
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2FREADME.Rmd="BAE103FA"
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2FREADME.md="C3BE00"
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2F_pkgdown.yml="25AC85BA"
+<<<<<<< HEAD
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Fman%2Fcorr_plot.Rd="A2F43BCE"
+=======
+~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Ffcfdr%2F.gitignore="A9D8F7CB"
+~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Ffcfdr%2FR%2Fflexible_cfdr.R="4A7FDAEA"
+~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Ffcfdr%2FR%2Fplot_functions.R="E05F3548"
+>>>>>>> 9f4d11885d8c88bf477fe8dd9ee1195da98da514
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Fvignettes%2Ffcfdr-vignette.R="12CF52A4"
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Fvignettes%2Ffcfdr-vignette.Rmd="CF608AE"
 ~%2FGoogle%20Drive%2FPhD%2FR_packages%2Ffcfdr%2Fvignettes%2Ft1d_app.Rmd="550B333B"
