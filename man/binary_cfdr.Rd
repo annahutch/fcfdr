@@ -2,16 +2,16 @@
 % Please edit documentation in R/binary_cfdr.R
 \name{binary_cfdr}
 \alias{binary_cfdr}
-\title{binary_cfdr}
+\title{Function to perform cFDR for binary auxiliary covariates}
 \usage{
 binary_cfdr(p, q, chr)
 }
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{binary auxiliary data values (vector of length n)}
+\item{q}{binary auxillary data values (vector of length n)}
 
-\item{chr}{SNP chromosomes (vector of length n)}
+\item{chr}{chromosome each SNP resides (vector of length n)}
 }
 \value{
 dataframe of p, q and v values

@@ -1,7 +1,5 @@
 #' Function to perform cFDR for continuous auxiliary covariates
-#' sampled from arbitrary distributions
 #'
-#' @title flexible_cfdr
 #' @param p p values for principal trait (vector of length n)
 #' @param q continuous auxillary data values (vector of length n)
 #' @param indep_index indices of independent SNPs
@@ -12,22 +10,22 @@
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
 #'
-#' @import stats
+#' @rawNamespace import(dplyr, except = c(filter, lag))
+#' @rawNamespace import(data.table, except = c(last, first, between, shift))
+#' @rawNamespace import(MASS, except = c(select, area))
 #' @import locfdr
 #' @import spatstat
 #' @import cfdr
 #' @import fields
-#' @import dplyr
+#' @import stats
 #' @import polyCub
 #' @import hexbin
 #' @import bigsplines
-#' @imports data.table
-#' @imports MASS
-#' @imports grDevices
+#' @import grDevices
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, rmseg = TRUE, dist_thr = 0.5){
+flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5){
 
   if( sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
 
@@ -129,11 +127,9 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   }
 
   # remove contour coords in problematic low q regions
-  if(rmseg == TRUE){
-    for(i in which(lengths>1)){
+  for(i in which(lengths>1)){
       cl[[i]][[1]] <- NULL
     }
-  }
 
   # define newx and newy as joined segments
   for(i in 1:length(cl)){

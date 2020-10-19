@@ -2,18 +2,22 @@
 % Please edit documentation in R/plot_functions.R
 \name{pv_plot}
 \alias{pv_plot}
-\title{pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.}
+\title{ggplot to visualise fcfdr results}
 \usage{
-pv_plot(output)
+pv_plot(p, q, v, axis_lim = c(0, 1))
 }
 \arguments{
-\item{output}{Output from flexible_cfdr function}
+\item{p}{p values for principal trait (vector of length n)}
+
+\item{q}{auxillary data values (vector of length n)}
+
+\item{v}{v values from cFDR}
+
+\item{axis_lim}{Optional axis limits}
 }
 \value{
 ggplot object
 }
 \description{
-pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.
+ggplot to visualise fcfdr results
 }
