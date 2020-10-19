@@ -3,5 +3,6 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   fcfdr-vignette: fcfdr-vignette.html
-last_built: 2020-10-09T09:44Z
+  t1d_app: t1d_app.html
+last_built: 2020-10-19T12:42Z
 

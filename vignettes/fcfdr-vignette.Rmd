@@ -1,5 +1,5 @@
 ---
-title: "Vignette: Flexible cFDR"
+title: "Flexible cFDR"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette: Flexible cFDR}
@@ -10,21 +10,30 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = 'png'
 )
 ```
 
----
-
-The `fcfdr` R package implements "Flexible cFDR", a method used to re-weight GWAS $p$-values by leveraging relevant auxiliary data.
+The `fcfdr` R package implements "Flexible cFDR", a method used to generate "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to auxiliary data values.
 
 Unlike empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr), flexible cFDR supports auxiliary data from any arbitrary distribution. A direct utility of flexible cFDR is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. Flexible cFDR can also be applied iteratively, whereby the $v$-values from the previous iteration are used as the $p$-values in the next iteration. This allows additional layers of information to be incorporated into the analysis.
 
-To use this software, users must supply (i) GWAS $p$-values measuring the evidence of association between SNPs and the phenotype of interest (ii) auxiliary data to condition on (e.g. functional scores for each SNP) and (iii) the indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK. There are additional optional parameters which are explained in the function code.
+To use this software, users must supply:
+
+1. GWAS $p$-values measuring the evidence of association between SNPs and the phenotype of interest (parameter `p` in `fcfdr::flexible_cfdr`)
+
+2. Auxiliary data to condition on, e.g. functional scores for each SNP (parameter `q` in `fcfdr::flexible_cfdr`)
+
+3. The indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK (parameter `indep_index` in `fcfdr::flexible_cfdr`).
+
+There are additional optional parameters which are explained in the function documentation.
+
+\textit{When leveraging binary covariates, use the `fcfdr::binary_cfdr` function, which requires chromosomes for each SNP rather than the indices of independent SNPs.}
 
 ---
 
-Firstly, we load the flexible cFDR package:
+Firstly, load the flexible cFDR package:
 
 ```{r}
 library(fcfdr)
@@ -34,7 +43,7 @@ set.seed(1)
 
 ---
 
-Next, we simulate $p$-values for 50,000 genetic variants, including 500 associated variants.
+Next, simulate $p$-values for 50,000 genetic variants, including 500 associated variants.
 
 ```{r}
 n = 50000
@@ -59,9 +68,9 @@ hist(q)
 
 ---
 
-We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (high $-log10(p)$) are enriched for low $q$ values.
+We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
 
-```{r}
+```{r, fig.width = 6, fig.height = 6}
 corr_plot(p, q)
 ```
 
@@ -69,19 +78,20 @@ corr_plot(p, q)
 
 We are now ready to use the `flexible_cfdr` function to derive the $v$-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the [vignette for deriving LDAK weights here](http://dougspeed.com/calculate-weightings/). 
 
-This line of code will take approximately 4 minutes.
+This line of code will take approximately 4 minutes to run.
 
 ```{r}
-res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1), rmseg = TRUE)
+res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1))
 ```
 
 ---
 
-We can visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $p$-values for SNPs with low $q$ have been down-weighted appropriately.
+We can visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
 
 ```{r}
-pv_plot(res)
-log10pv_plot(res)
+pv_plot(p = res[[1]]$p, q = res[[1]]$q, v = res[[1]]$v)
+log10pv_plot(p = res[[1]]$p, q = res[[1]]$q, v = res[[1]]$v, 
+             axis_lim = c(0, 10)) # zoom in to interesting region
 ```
 
 ---

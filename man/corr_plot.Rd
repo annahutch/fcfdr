@@ -2,36 +2,22 @@
 % Please edit documentation in R/plot_functions.R
 \name{corr_plot}
 \alias{corr_plot}
-\title{corr_plot}
+\title{Plot relationship between p and q
+Plot -log10(p) values for quantiles of q}
 \usage{
 corr_plot(p, q, ylim = c(0, 1.5))
 }
 \arguments{
-\item{p}{p-values measuring associations between SNPs and the phenotype of interest}
+\item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{continuous values representing auxilliary data to leverage}
+\item{q}{auxillary data values (vector of length n)}
 
-\item{ylim}{y-axis (-log10) limits}
+\item{ylim}{y-axis limits (-log10)}
 }
 \value{
 ggplot object
 }
 \description{
-corr_plot
-}
-\examples{
-# simulate p
-n = 10000
-mixture_comp1 <- function(x) exp(-rexp(x, rate = 1))
-mixture_comp2 <- function(x) exp(-rexp(x, rate = 1/2))
-z1 <- runif(n)
-p <- ifelse(z1 < 0.1, mixture_comp1(n), mixture_comp2(n))
-
-# simulate q
-mixture_comp1 <- function(x) rbeta(x, shape1 = 2, shape2 = 1)
-mixture_comp2 <- function(x) rbeta(x, shape1 = 1, shape2 = 2)
-z2 <- runif(n)
-q <- ifelse(z2 < p, mixture_comp1(n), mixture_comp2(n))
-
-corr_plot(p, q, ylim = c(0, 3))
+Plot relationship between p and q
+Plot -log10(p) values for quantiles of q
 }

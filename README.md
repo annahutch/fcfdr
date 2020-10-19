@@ -3,9 +3,7 @@
 
 # fcfdr
 
-<!-- badges: start -->
-
-<!-- badges: end -->
+<img src="man/figures/logo.png" align="right" />
 
 `fcfdr` is an R package that implements cFDR to generate GWAS
 \(p\)-values that have been adjusted using auxiliary covariates. It

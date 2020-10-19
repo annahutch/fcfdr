@@ -2,18 +2,22 @@
 % Please edit documentation in R/plot_functions.R
 \name{log10pv_plot}
 \alias{log10pv_plot}
-\title{log10pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.}
+\title{ggplot to visualise fcfdr results (-log10)}
 \usage{
-log10pv_plot(output)
+log10pv_plot(p, q, v, axis_lim = c(0, 20))
 }
 \arguments{
-\item{output}{Output from flexible_cfdr function}
+\item{p}{p values for principal trait (vector of length n)}
+
+\item{q}{auxillary data values (vector of length n)}
+
+\item{v}{v values from cFDR}
+
+\item{axis_lim}{Optional axis limits}
 }
 \value{
 ggplot object
 }
 \description{
-log10pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.
+ggplot to visualise fcfdr results (-log10)
 }

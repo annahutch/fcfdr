@@ -8,6 +8,13 @@
 
 <title>Function reference • fcfdr</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -40,6 +47,7 @@
 
 
 <meta property="og:title" content="Function reference" />
+<meta property="og:image" content="/logo.png" />
 
 
 
@@ -60,7 +68,7 @@
   <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
-      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -79,7 +87,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -94,13 +102,21 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/fcfdr-vignette.html">Vignette: Flexible cFDR</a>
+      <a href="../articles/fcfdr-vignette.html">Vignette</a>
+    </li>
+    <li>
+      <a href="../articles/t1d_app.html">T1D Application</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/annahutch/fcfdr">
+    <span class=" github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -128,7 +144,32 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <h2 id="section-flexible-cfdr-functions" class="hasAnchor"><a href="#section-flexible-cfdr-functions" class="anchor"></a>Flexible cFDR functions</h2>
+          <p class="section-desc"><p>Functions to perform cFDR for a range of auxilliary covariates</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="flexible_cfdr.html">flexible_cfdr()</a></code> </p>
+        </td>
+        <td><p>Function to perform cFDR for continuous auxiliary covariates</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="binary_cfdr.html">binary_cfdr()</a></code> </p>
+        </td>
+        <td><p>Function to perform cFDR for binary auxiliary covariates</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-functions-to-generate-plots" class="hasAnchor"><a href="#section-functions-to-generate-plots" class="anchor"></a>Functions to generate plots</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -140,35 +181,22 @@
       <tr>
         
         <td>
-          <p><code><a href="binary_cfdr.html">binary_cfdr()</a></code> </p>
-        </td>
-        <td><p>binary_cfdr</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="corr_plot.html">corr_plot()</a></code> </p>
         </td>
-        <td><p>corr_plot</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="flexible_cfdr.html">flexible_cfdr()</a></code> </p>
-        </td>
-        <td><p>flexible_cfdr</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="log10pv_plot.html">log10pv_plot()</a></code> </p>
-        </td>
-        <td><p>log10pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.</p></td>
+        <td><p>Plot relationship between p and q
+Plot -log10(p) values for quantiles of q</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="pv_plot.html">pv_plot()</a></code> </p>
         </td>
-        <td><p>pv_plot
-ggplot to visualise the results from the re-weighting, coloured by the value of q.</p></td>
+        <td><p>ggplot to visualise fcfdr results</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="log10pv_plot.html">log10pv_plot()</a></code> </p>
+        </td>
+        <td><p>ggplot to visualise fcfdr results (-log10)</p></td>
       </tr>
     </tbody>
     </table>
@@ -184,7 +212,7 @@ ggplot to visualise the results from the re-weighting, coloured by the value of 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Anna Hutchinson.</p>
+  <p>Developed by Anna Hutchinson, Chris Wallace.</p>
 </div>
 
 <div class="pkgdown">

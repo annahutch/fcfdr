@@ -2,7 +2,7 @@
 % Please edit documentation in R/flexible_cfdr.R
 \name{flexible_cfdr}
 \alias{flexible_cfdr}
-\title{flexible_cfdr}
+\title{Function to perform cFDR for continuous auxiliary covariates}
 \usage{
 flexible_cfdr(
   p,
@@ -13,7 +13,6 @@ flexible_cfdr(
   res_q = 500,
   gridp = 50,
   splinecorr = TRUE,
-  rmseg = TRUE,
   dist_thr = 0.5
 )
 }
@@ -41,7 +40,6 @@ list of length two: (1) dataframe of p-values, q-values and v-values (2) datafra
 }
 \description{
 Function to perform cFDR for continuous auxiliary covariates
-sampled from arbitrary distributions
 }
 \examples{
 see vignette

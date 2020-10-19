@@ -1,0 +1,29 @@
+URL: https://annahutch.github.io/fcfdr/
+navbar:
+  type: inverse
+  left:
+  - icon: fa-home fa-lg
+    href: index.html
+  - text: Reference
+    href: reference/index.html
+  - text: Articles
+    menu:
+      - text: Vignette
+        href: articles/fcfdr-vignette.html
+      - text: T1D Application
+        href: articles/t1d_app.html
+  right:
+  - icon: github
+    href: https://github.com/annahutch/fcfdr
+    
+reference:
+- title: "Flexible cFDR functions"
+  desc:  Functions to perform cFDR for a range of auxilliary covariates
+  contents:
+  - flexible_cfdr
+  - binary_cfdr
+- title: "Functions to generate plots"
+  contents:
+  - corr_plot
+  - pv_plot
+  - log10pv_plot

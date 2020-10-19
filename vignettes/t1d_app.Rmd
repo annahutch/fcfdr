@@ -1,0 +1,100 @@
+---
+title: "T1D Application"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cFDR T1D application}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = 'pdf',
+  eval = FALSE
+)
+```
+
+In this vignette, we walk through an example to illustrate how the flexible cFDR software can be used to leverage various functional genomic data with GWAS $p$ values for Type 1 Diabetes (T1D) to generate $v$-values.
+
+The data required for this example is available to download within the `fcfdr` R package and includes:
+
+1. GWAS $p$-values for T1D (Onengut-Gumuscu et al. (2015), https://www.nature.com/articles/ng.3245) downloaded from the GWAS Catalog (https://www.ebi.ac.uk/gwas/publications/25751624)
+
+2. GWAS $p$-values for Rheumatoid Arthritis (RA) (Eyre et al. (2012), https://www.nature.com/articles/ng.2462) downloaded from the GWAS Catalog (https://www.ebi.ac.uk/gwas/publications/23143596)
+
+3. Binary measure of general chromatin accessibility at each SNP, derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the LDSC data repository (https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
+
+4. Fold-enrichment ratio of H3K27ac ChIP-seq counts relative to expected background counts in naive CD4+ T helper cells (https://www.nature.com/articles/nbt1010-1045). Downloaded from https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig.
+
+---
+
+First, we download the data:
+
+```{r}
+set.seed(1)
+data <- readRDS("T1D_application_data.RDS")
+```
+
+In this application we leverage GWAS $p$-values for RA (`q1`), binary chromatin accessibility data (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate $v$-values. 
+
+```{r}
+orig_p <- data$p
+chr <- data$chrom
+q1 <- data$RA_p
+q2 <- data$DGF_ENCODE
+q3 <- log(data$Th_H3K27ac+1)
+```
+
+The data contains a column of LDAK weights for each SNP (http://dougspeed.com/calculate-weightings/). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.
+
+```{r}
+ind_snps <- which(data$ldak_weight != 0)
+```
+
+---
+
+We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values leveraging GWAS $p$-values for RA. 
+
+```{r}
+iter1_res <- flexible_cfdr(p = orig_p, 
+                           q = q1, 
+                           indep_index = ind_snps)
+v1 <- iter1_res[[1]]$v
+```
+
+---
+
+The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary chromatin accessibility data.
+
+```{r}
+iter2_res <- binary_cfdr(p = v1,
+                         q = q2,
+                         chr = chr)
+
+v2 <- iter2_res$v
+```
+
+---
+
+The resultant $v$-values for this second iteration (`v2`) are then used in the next iteration to leverage H3K27ac counts.
+
+```{r}
+iter3_res <- flexible_cfdr(p = v2, 
+                           q = q3, 
+                           indep_index = ind_snps)
+
+v3 <- iter3_res[[1]]$v
+```
+
+---
+
+We then create a final data frame for the `fcfdr` results.
+
+```{r}
+res <- data.frame(data, q1, q2, q3, v1, v2, v3)
+
+head(res)
+```
+
