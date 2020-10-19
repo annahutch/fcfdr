@@ -22,9 +22,6 @@
 #' @import hexbin
 #' @import bigsplines
 #' @import grDevices
-#' @import data.table
-#' @import MASS
-#' @import grDevices
 #' 
 #' @examples see vignette
 #'
