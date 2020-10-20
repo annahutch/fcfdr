@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ggplot to visualise fcfdr results — pv_plot • fcfdr</title>
+<title>T1D Application data — df • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,12 @@
 
 
 
-<meta property="og:title" content="ggplot to visualise fcfdr results — pv_plot" />
-<meta property="og:description" content="ggplot to visualise fcfdr results" />
+<meta property="og:title" content="T1D Application data — df" />
+<meta property="og:description" content="A dataframe containing the chromosome (chrom), base pair position (pos),
+rsid, major (other_allele) and minor (effect_allele) allele, T1D GWAS p-value (p),
+binary chromatin accessibility measure (DGF_ENCODE), H3K27ac fold change value
+in naive CD4+ T helper cells (Th_H3K27ac), RA GWAS p-value (RA_p) and ldak weight
+for 114,641 SNPs in the T1D GWAS (https://www.nature.com/articles/ng.3245)" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,41 +135,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>ggplot to visualise fcfdr results</h1>
+    <h1>T1D Application data</h1>
     
-    <div class="hidden name"><code>pv_plot.Rd</code></div>
+    <div class="hidden name"><code>df.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>ggplot to visualise fcfdr results</p>
+    <p>A dataframe containing the chromosome (chrom), base pair position (pos),
+rsid, major (other_allele) and minor (effect_allele) allele, T1D GWAS p-value (p),
+binary chromatin accessibility measure (DGF_ENCODE), H3K27ac fold change value
+in naive CD4+ T helper cells (Th_H3K27ac), RA GWAS p-value (RA_p) and ldak weight
+for 114,641 SNPs in the T1D GWAS (https://www.nature.com/articles/ng.3245)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pv_plot</span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span>, <span class='va'>v</span>, axis_lim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='va'>df</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>p</th>
-      <td><p>p values for principal trait (vector of length n)</p></td>
-    </tr>
-    <tr>
-      <th>q</th>
-      <td><p>auxillary data values (vector of length n)</p></td>
-    </tr>
-    <tr>
-      <th>v</th>
-      <td><p>v values from cFDR</p></td>
-    </tr>
-    <tr>
-      <th>axis_lim</th>
-      <td><p>Optional axis limits</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>ggplot object</p>
+    <p>A data frame with 114641 rows and 10 variables:</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
