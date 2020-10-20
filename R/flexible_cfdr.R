@@ -23,7 +23,6 @@
 #' @import bigsplines
 #' @import grDevices
 #' 
-#' @examples see vignette
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export

@@ -9,22 +9,6 @@
 #' @import ggplot2
 #' @import cowplot
 #' @export
-#'
-#' @examples
-#' # simulate p
-#' n = 10000
-#' mixture_comp1 <- function(x) exp(-rexp(x, rate = 1))
-#' mixture_comp2 <- function(x) exp(-rexp(x, rate = 1/2))
-#' z1 <- runif(n)
-#' p <- ifelse(z1 < 0.1, mixture_comp1(n), mixture_comp2(n))
-#'
-#' # simulate q
-#' mixture_comp1 <- function(x) rbeta(x, shape1 = 2, shape2 = 1)
-#' mixture_comp2 <- function(x) rbeta(x, shape1 = 1, shape2 = 2)
-#' z2 <- runif(n)
-#' q <- ifelse(z2 < p, mixture_comp1(n), mixture_comp2(n))
-#'
-#' corr_plot(p, q, ylim = c(0, 3))
 corr_plot <- function(p, q, ylim = c(0, 1.5)){
   
   quantiles <- quantile(q, probs = seq(0, 1, 0.2))
