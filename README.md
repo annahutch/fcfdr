@@ -34,22 +34,4 @@ See the vignettes for examples of usage.
 
 ## Abstract
 
-Genome-wide association studies (GWAS) have identified thousands of
-genetic variants that are associated with complex traits. However,
-erroneous associations become more likely when conducting many tests in
-parallel, and consequently a stringent significance threshold is
-required to identify robust genetic associations. Leveraging relevant
-auxiliary data has the potential to boost the statistical power required
-to exceed the significance threshold. Particularly, abundant pleiotropy
-and the non-random distribution of GWAS SNPs across various functional
-categories suggests that leveraging test statistics from related traits
-and/or functional genomic data may boost GWAS discovery. The conditional
-false discovery rate (cFDR) extends the standard FDR framework by
-conditioning on auxiliary data to call significant associations. Current
-methods estimate cFDR values using empirical cumulative distributions
-and are restricted to leveraging auxiliary data such as \(p\)-values
-measuring associations for related traits, which are expected to have a
-known statistical distribution. Utilising bivariate kernel density
-estimates (KDEs) rather than empirical estimates, we relax the
-distributional assumptions, enabling an extension of the cFDR framework
-that supports auxiliary data from any distribution (“Flexible cFDR”).
+Genome-wide association studies (GWAS) have identified thousands of genetic variants that are associated with complex traits. However, a stringent significance threshold is required to identify robust genetic associations. Leveraging relevant auxiliary data has the potential to boost statistical power to exceed the significance threshold. Particularly, abundant pleiotropy and the non-random distribution of SNPs across various functional categories suggests that leveraging GWAS test statistics from related traits and/or functional genomic data may boost GWAS discovery. While type 1 error rate control has become standard in GWAS, control of the false discovery rate (FDR) can be a more powerful approach as sample sizes increase and many associations are expected in each study. The conditional false discovery rate (cFDR) extends the standard FDR framework by conditioning on auxiliary data to call significant associations, but current implementations are restricted to auxiliary data satisfying specific parametric distributions. We relax the distributional assumptions, enabling an extension of the cFDR framework that supports auxiliary data from any continuous distribution (“Flexible cFDR”). Our method is iterative, whereby additional layers of auxiliary data can be leveraged in turn. Through simulations we show that flexible cFDR increases sensitivity whilst controlling FDR after one or several iterations. We further demonstrate its practical potential through application to an asthma GWAS, leveraging various functional data to find additional genetic associations for asthma which we validated in the larger UK Biobank data resource.
