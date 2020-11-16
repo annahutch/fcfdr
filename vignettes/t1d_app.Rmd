@@ -7,7 +7,22 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-In this vignette, we walk through an example to illustrate how the flexible cFDR software can be used to leverage various functional genomic data with GWAS $p$ values for Type 1 Diabetes (T1D) to generate $v$-values.
+```{r, echo = FALSE}
+embed_png <- function(path, dpi = NULL) {
+  meta <- attr(png::readPNG(path, native = TRUE, info = TRUE), "info")
+  if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
+  knitr::asis_output(paste0(
+    "<img src='", path, "'",
+    " width=", round(meta$dim[1] / (meta$dpi[1] / 96)),
+    " height=", round(meta$dim[2] / (meta$dpi[2] / 96)),
+    " />"
+  ))
+}
+
+knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
+```
+
+In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations.
 
 **This example uses real GWAS and functional genomic data to generate $v$-values for ~114,000 SNPs and can therefore take up to 2 hours to run.**
 
@@ -110,13 +125,17 @@ mid1 <- median(res$q1)
 ggplot(res, aes(x = orig_p, y = v1, col = q1)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("P") + ylab("V1") + ggtitle(paste0("Iteration 1")) + scale_color_gradient2(midpoint = mid1, low = "blue", mid = "white", high = "red", space = "Lab")
 ```
 
-![](iter1_plot.png)
+```{r, echo = FALSE}
+embed_png("iter1_plot.png")
+```
 
 ```{r eval = FALSE}
 ggplot(res, aes(x = v1, y = v2, col = q2)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V1") + ylab("V2") + ggtitle(paste0("Iteration 2"))
 ```
 
-![](iter2_plot.png)
+```{r, echo = FALSE}
+embed_png("iter2_plot.png")
+```
 
 ```{r eval = FALSE}
 mid3 <- median(res$q3)
@@ -124,7 +143,9 @@ mid3 <- median(res$q3)
 ggplot(res, aes(x = v2, y = v3, col = q3)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V2") + ylab("V3") + ggtitle(paste0("Iteration 3")) + scale_color_gradient2(midpoint = mid3, low = "blue", mid = "white", high = "red", space = "Lab")
 ```
 
-![](iter3_plot.png)
+```{r, echo = FALSE}
+embed_png("iter3_plot.png")
+```
 
 ---
 
@@ -136,13 +157,17 @@ mid1 <- median(res$q1)
 ggplot(res, aes(x = orig_p, y = v3)) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P") + ylab("V3") + ggtitle(paste0("V3 against original p-values"))
 ```
 
-![](v3_p.png)
+```{r, echo = FALSE}
+embed_png("v3_p.png")
+```
 
 ```{r eval = FALSE}
 ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P (-log10)") + ylab("V3 (-log10)") + ggtitle(paste0("V3 against original p-values (-log10)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
 ```
 
-![](log10_v3_p.png)
+```{r, echo = FALSE}
+embed_png("log10_v3_p.png")
+```
 
 ---
 

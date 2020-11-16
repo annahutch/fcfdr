@@ -17,7 +17,9 @@ knitr::opts_chunk$set(
 
 <img src="man/figures/logo.png" align="right" />
 
-`fcfdr` is an R package that implements cFDR to generate GWAS $p$-values that have been adjusted using auxiliary covariates. It supports auxiliary covariates from any arbitrary distribution, enabling researchers to leverage a wide variety of auxiliary data types with GWAS $p$-values. 
+`fcfdr` is an R package that implements cFDR to generate GWAS $p$-values that have been adjusted using auxiliary covariates. It supports auxiliary covariates from any arbitrary distribution, enabling researchers to leverage a wide variety of auxiliary data types with GWAS $p$-values to boost power for discovery. 
+
+If you have any questions please do not hesitate to contact me: `anna.hutchinson@mrc-bsu.cam.ac.uk`
 
 Webpage: https://annahutch.github.io/fcfdr/
 

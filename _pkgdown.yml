@@ -8,16 +8,18 @@ navbar:
     href: reference/index.html
   - text: Articles
     menu:
-      - text: Vignette
+      - text: Introductory vignette
         href: articles/fcfdr-vignette.html
-      - text: T1D Application
+      - text: T1D application
         href: articles/t1d_app.html
+      - text: Extra information
+        href: articles/extra-information.html
   right:
   - icon: github
     href: https://github.com/annahutch/fcfdr
     
 reference:
-- title: "Flexible cFDR functions"
+- title: "cFDR functions"
   desc:  Functions to perform cFDR for a range of auxilliary covariates
   contents:
   - flexible_cfdr

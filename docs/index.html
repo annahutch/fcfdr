@@ -61,10 +61,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/fcfdr-vignette.html">Vignette</a>
+      <a href="articles/fcfdr-vignette.html">Introductory vignette</a>
     </li>
     <li>
-      <a href="articles/t1d_app.html">T1D Application</a>
+      <a href="articles/t1d_app.html">T1D application</a>
+    </li>
+    <li>
+      <a href="articles/extra-information.html">Extra information</a>
     </li>
   </ul>
 </li>
@@ -92,7 +95,8 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#fcfdr" class="anchor"></a>fcfdr</h1></div>
 <p><img src="reference/figures/logo.png" align="right"></p>
-<p><code>fcfdr</code> is an R package that implements cFDR to generate GWAS <span class="math inline"><em>p</em></span>-values that have been adjusted using auxiliary covariates. It supports auxiliary covariates from any arbitrary distribution, enabling researchers to leverage a wide variety of auxiliary data types with GWAS <span class="math inline"><em>p</em></span>-values.</p>
+<p><code>fcfdr</code> is an R package that implements cFDR to generate GWAS <span class="math inline"><em>p</em></span>-values that have been adjusted using auxiliary covariates. It supports auxiliary covariates from any arbitrary distribution, enabling researchers to leverage a wide variety of auxiliary data types with GWAS <span class="math inline"><em>p</em></span>-values to boost power for discovery.</p>
+<p>If you have any questions please do not hesitate to contact me: <code>anna.hutchinson@mrc-bsu.cam.ac.uk</code></p>
 <p>Webpage: <a href="https://annahutch.github.io/fcfdr/" class="uri">https://annahutch.github.io/fcfdr/</a></p>
 <hr>
 <div id="installation" class="section level2">
@@ -113,7 +117,7 @@
 <div id="abstract" class="section level2">
 <h2 class="hasAnchor">
 <a href="#abstract" class="anchor"></a>Abstract</h2>
-<p>Genome-wide association studies (GWAS) have identified thousands of genetic variants that are associated with complex traits. However, erroneous associations become more likely when conducting many tests in parallel, and consequently a stringent significance threshold is required to identify robust genetic associations. Leveraging relevant auxiliary data has the potential to boost the statistical power required to exceed the significance threshold. Particularly, abundant pleiotropy and the non-random distribution of GWAS SNPs across various functional categories suggests that leveraging test statistics from related traits and/or functional genomic data may boost GWAS discovery. The conditional false discovery rate (cFDR) extends the standard FDR framework by conditioning on auxiliary data to call significant associations. Current methods estimate cFDR values using empirical cumulative distributions and are restricted to leveraging auxiliary data such as <span class="math inline"><em>p</em></span>-values measuring associations for related traits, which are expected to have a known statistical distribution. Utilising bivariate kernel density estimates (KDEs) rather than empirical estimates, we relax the distributional assumptions, enabling an extension of the cFDR framework that supports auxiliary data from any distribution (“Flexible cFDR”).</p>
+<p>Genome-wide association studies (GWAS) have identified thousands of genetic variants that are associated with complex traits. However, a stringent significance threshold is required to identify robust genetic associations. Leveraging relevant auxiliary data has the potential to boost statistical power to exceed the significance threshold. Particularly, abundant pleiotropy and the non-random distribution of SNPs across various functional categories suggests that leveraging GWAS test statistics from related traits and/or functional genomic data may boost GWAS discovery. While type 1 error rate control has become standard in GWAS, control of the false discovery rate (FDR) can be a more powerful approach as sample sizes increase and many associations are expected in each study. The conditional false discovery rate (cFDR) extends the standard FDR framework by conditioning on auxiliary data to call significant associations, but current implementations are restricted to auxiliary data satisfying specific parametric distributions. We relax the distributional assumptions, enabling an extension of the cFDR framework that supports auxiliary data from any continuous distribution (“Flexible cFDR”). Our method is iterative, whereby additional layers of auxiliary data can be leveraged in turn. Through simulations we show that flexible cFDR increases sensitivity whilst controlling FDR after one or several iterations. We further demonstrate its practical potential through application to an asthma GWAS, leveraging various functional data to find additional genetic associations for asthma which we validated in the larger UK Biobank data resource.</p>
 </div>
 </div>
   </div>

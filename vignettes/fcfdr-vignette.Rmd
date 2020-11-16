@@ -1,8 +1,8 @@
 ---
-title: "Flexible cFDR"
+title: "Introductory vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette: Flexible cFDR}
+  %\VignetteIndexEntry{Introductory vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,30 +15,40 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `fcfdr` R package implements "Flexible cFDR", a method used to generate "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to auxiliary data values.
+The `fcfdr` R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values, and can be readily FDR controlled. 
 
-Unlike empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr), flexible cFDR supports auxiliary data from any arbitrary distribution. A direct utility of flexible cFDR is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. Flexible cFDR can also be applied iteratively, whereby the $v$-values from the previous iteration are used as the $p$-values in the next iteration. This allows additional layers of information to be incorporated into the analysis.
+The `fcfdr` R package contains two key functions:
 
-To use this software, users must supply:
+1. [`flexible_cfdr()`](https://annahutch.github.io/fcfdr/reference/flexible_cfdr.html): Implements cFDR leveraging $\textbf{continuous}$ auxiliary covariates.
 
-1. GWAS $p$-values measuring the evidence of association between SNPs and the phenotype of interest (parameter `p` in `fcfdr::flexible_cfdr`)
-
-2. Auxiliary data to condition on, e.g. functional scores for each SNP (parameter `q` in `fcfdr::flexible_cfdr`)
-
-3. The indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK (parameter `indep_index` in `fcfdr::flexible_cfdr`).
-
-There are additional optional parameters which are explained in the function documentation.
-
-\textit{When leveraging binary covariates, use the `fcfdr::binary_cfdr` function, which requires chromosomes for each SNP rather than the indices of independent SNPs.}
+2. [`binary_cfdr()`](https://annahutch.github.io/fcfdr/reference/binary_cfdr.html): Implements cFDR leveraging $\textbf{binary}$ auxiliary covariates.
 
 ---
+
+Both functions require 3 parameters to be specified:
+
+* `p`: GWAS $p$-values for the trait of interest (vector of per-SNP $p$-values)
+
+* `q`: Auxiliary data values (vector of per-SNP auxiliary data values)
+
+* `indep_index` in `flexible_cfdr()` or `chr` in `binary_cfdr()`
+
+    * `indep_index`: The indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK.
+    * `chr`: The chromosome that each SNP resides (vector of per-SNP chromosome values)
+    
+---
+
+For further details, including instructions to generate `indep_index`, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the [Extra Information vignette](https://annahutch.github.io/fcfdr/articles/extra-information.html)
+
+---
+
+#### Simple walk-through example
 
 Firstly, load the flexible cFDR package:
 
 ```{r}
-library(fcfdr)
-
 set.seed(1)
+library(fcfdr)
 ```
 
 ---
@@ -50,6 +60,7 @@ n = 50000
 n1p = 500 # associated variants
 zp = c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1)) # z-scores
 p = 2*pnorm(-abs(zp)) # convert to p-values
+hist(p)
 ```
 
 ---
@@ -70,7 +81,7 @@ hist(q)
 
 We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
 
-```{r, fig.width = 6, fig.height = 6}
+```{r, fig.width = 6, fig.height = 5}
 corr_plot(p, q)
 ```
 
@@ -84,43 +95,57 @@ This line of code will take approximately 4 minutes to run.
 res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1))
 ```
 
+```{r}
+str(res)
+
+p = res[[1]]$p
+q = res[[1]]$q
+v = res[[1]]$v
+```
+
+The output from the function is a list of length two. The first element is a data.frame containing the $p$-values (input parameter `p`), the auxiliary data values (input parameter `q`) and the generated $v$-values. The second element contains auxiliary data, such as how many data-points were left-censored in the method and/or spline corrected.
+
+**Note that the cFDR framework requires that low $p$-values are enriched for low $q$ values, so that if the correlation between $p$ and $q$ is negative then the function intrinsically flips the sign of $q$, meaning that the $q$ values reported in the data.frame output may be $q:=-q$.**
+
 ---
 
-We can visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
+We can then visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
 
 ```{r}
-pv_plot(p = res[[1]]$p, q = res[[1]]$q, v = res[[1]]$v)
-log10pv_plot(p = res[[1]]$p, q = res[[1]]$q, v = res[[1]]$v, 
+pv_plot(p = p, q = q, v = v)
+log10pv_plot(p = p, q = q, v = v, 
              axis_lim = c(0, 10)) # zoom in to interesting region
 ```
 
 ---
 
-Finally, we run the Benjamini-Hochberg procedure on the $v$-values and control the FDR at 0.05.
+Finally, we run the Benjamini-Hochberg procedure on the $v$-values and control the FDR at 0.05. This means that we are willing to accept up to 5% of the associations to be false positives.
 
 ```{r}
-hit = which(p.adjust(res[[1]]$v, method = "BH")<= 0.05)
+hit = which(p.adjust(v, method = "BH") <= 0.05)
 ```
 
 For comparison, we do the same to the raw p-values:
 
 ```{r}
-hit_p = which(p.adjust(p, method = "BH")<= 0.05)
+hit_p = which(p.adjust(p, method = "BH") <= 0.05)
 ```
 
 'True' associations are those with indices 1-500, so the proportions of false discoveries are
 
 ```{r}
 # cFDR
-1- (length(intersect(hit,c(1:500)))/length(hit)) 
+1 - (length(intersect(hit,c(1:500)))/length(hit)) 
 
-# P-value
-1- (length(intersect(hit_p,c(1:500)))/length(hit_p))
+# p-value
+1 - (length(intersect(hit_p,c(1:500)))/length(hit_p))
 ```
 
-Altogether, flexible cFDR correctly identifies many more newly FDR significant SNPs that are truly associated whilst controlling FDR.
+---
+
+Altogether, the cFDR method has found 47 new associations that are true whilst controlling the FDR.
 
 ```{r}
 # number of extra true associations identified by flexible cFDR
-length(which(hit[!hit %in% hit_p]<=500))
+length(which(hit[!hit %in% hit_p] <= 500))
 ```

@@ -1,0 +1,59 @@
+---
+title: "Extra Information"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extra Information}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = 'png'
+)
+```
+
+This vignette contains additional details for the `fcfdr` R package.
+
+### Contents
+
+1. [Genomic control](#GC)
+2. [Auxiliary data](#AD)
+3. [Finding independent SNPs](#ind)
+4. [Applying cFDR iteratively](#iter)
+
+---
+
+### Genomic control {#GC}
+
+A key assumption in the cFDR methodology is that the $p$-values are uniformly distributed under the null hypothesis of no association. Therefore, prior to applying cFDR, users should check that this assumption is satisfied by calculating the genomic inflation factor, $\lambda$, and applying genomic control if necessary. 
+
+---
+
+### Auxiliary data {#AD}
+
+The distinguishing feature of `fcfdr` compared to earlier cFDR methods is that it can leverage auxiliary data from any arbitrary distribution. Some examples of auxiliary covariates to leverage include:
+
+* **Functional genomic assays.** It is known that GWAS SNPs are not randomly distributed across functional categories, for example GWAS SNPs are typically enriched in enhancer and open chromatin regions in relevant cell types. This suggests that leveraging (e.g.) ATAC-seq data or CHiP-Seq data for histone modifications (e.g. H3K27ac marking enhancer regions) in relevant cell types may be useful. If the relevant cell types are known then we found the [consolidated fold change values from NIH Roadmap](https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/) to be useful (epigenome ID to cell type conversion available [here](https://docs.google.com/spreadsheets/d/1yikGx4MsO9Ei36b64yOy9Vb6oPC5IBGlFbYEt-N6gOM/edit#gid=15)). GWAS SNPs can easily be matched to the fold change value using the bedtools intersect function with the `-wb` tag.
+
+* **Per-SNP scores of pathogenicity/ functionality/ deleteriousness.** Many tools have been developed that integrate various genomic and epigenomic annotation data to quantify the pathogenicity, functionality and/or deleteriousness of both coding and non-coding GWAS variants. For example tissue-specific [GenoSkyline scores](https://pubmed.ncbi.nlm.nih.gov/28742084/]) or [PINES scoring](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1546-6).
+
+* **LD score annotations** The latest and recommended baseline-LD model v2.2 contains 97 annotations ranging from binary synonymous/non-synonymous annotations to continuous functional genomic annotations. The annotations for all 1000 genomes phase 3 SNPs (note: now extended to 19,476,620 UK Biobank SNPs with $MAF\geq 0.1%$) can be downloaded from [https://alkesgroup.broadinstitute.org/LDSCORE/](https://alkesgroup.broadinstitute.org/LDSCORE/).
+
+---
+
+### Finding independent subsets of SNPs {#ind}
+
+The `flexible_cfdr()` function requires the indices of an independent subset of the GWAS SNPs to ensure non-biased bandwidth estimation for the KDE. In practice, we use SNPs allocated a non-zero LDAK weight as our subset of independent SNPs. Instructions to generate LDAK weights can be found [here](http://dougspeed.com/calculate-weightings/) (note that genotype data is required but this can be estimated from a reference panel). PLINK can also be used (see [here](https://www.cog-genomics.org/plink/1.9/ld)).
+
+The binary cFDR method does not fit a KDE and instead uses empirical CDFs. For this reason, a leave-one-chromosome-out procedure is implemented intrinsically in the `binary_cfdr()` function. Therefore, the `binary_cfdr()` function requires per-SNP chromosomes as input.
+
+---
+
+### Applying cFDR iteratively {#iter}
+
+Our cFDR method can be applied iteratively, whereby the $v$-values from the previous iteration are used as the $p$-values in the next iteration. This allows additional layers of information to be incorporated into the analysis.
+
+An example of this is shown in the [type 1 diabetes vignette](https://annahutch.github.io/fcfdr/articles/t1d_app.html).
