@@ -25,18 +25,13 @@ The `fcfdr` R package contains two key functions:
 
 ---
 
-Both functions require 3 parameters to be specified:
+Both functions require 2 parameters to be specified:
 
 * `p`: GWAS $p$-values for the trait of interest (vector of per-SNP $p$-values)
 
 * `q`: Auxiliary data values (vector of per-SNP auxiliary data values)
 
-* `indep_index` in `flexible_cfdr()` or `chr` in `binary_cfdr()`
-
-    * `indep_index`: The indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK.
-    * `chr`: The chromosome that each SNP resides (vector of per-SNP chromosome values)
-    
----
+along with either the indices of a subset of independent SNPs (`indep_index`) in `flexible_cfdr()` or the chromsome for which each SNP resides (`chr`) in `binary_cfdr()`.
 
 For further details, including instructions to generate `indep_index`, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the [Extra Information vignette](https://annahutch.github.io/fcfdr/articles/extra-information.html)
 

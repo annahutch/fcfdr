@@ -22,9 +22,7 @@ embed_png <- function(path, dpi = NULL) {
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
-In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations.
-
-**This example uses real GWAS and functional genomic data to generate $v$-values for ~114,000 SNPs and can therefore take up to 2 hours to run.**
+In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations. This application takes about 30 minutes to run.
 
 ---
 
@@ -34,7 +32,7 @@ The data required for this example is available to download within the `fcfdr` R
 
 2. GWAS $p$-values for Rheumatoid Arthritis (RA) (Eyre et al. (2012), https://www.nature.com/articles/ng.2462) downloaded from the GWAS Catalog (https://www.ebi.ac.uk/gwas/publications/23143596)
 
-3. Binary measure of general chromatin accessibility at each SNP, derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the LDSC data repository (https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
+3. Binary measure of SNP overlap with transcription factor binding site (TFBS), derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the LDSC data repository (https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
 
 4. Fold-enrichment ratio of H3K27ac ChIP-seq counts relative to expected background counts in naive CD4+ T helper cells (https://www.nature.com/articles/nbt1010-1045). Downloaded from https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig.
 
@@ -49,7 +47,7 @@ data(df, package = "fcfdr")
 head(df)
 ```
 
-In this application we leverage GWAS $p$-values for RA (`q1`), binary chromatin accessibility data (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate $v$-values. 
+In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overlap with TFBS (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate $v$-values. 
 
 ```{r eval = FALSE}
 orig_p <- df$p
@@ -80,7 +78,7 @@ v1 <- iter1_res[[1]]$v
 
 ---
 
-The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary chromatin accessibility data. Note that the binary cFDR function implements a leave-one-chromosome out procedure and therefore requires the chromosomes for each SNP rather than an independent subset.
+The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-chromosome out procedure and therefore requires the chromosomes for each SNP rather than an independent subset.
 
 ```{r eval = FALSE}
 iter2_res <- binary_cfdr(p = v1,
@@ -171,7 +169,7 @@ embed_png("log10_v3_p.png")
 
 ---
 
-Finally, we find that flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in open chromatin regions and have relatively high H3K27ac counts in a T1D relevant cell type.
+Finally, we find that flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
 
 ```{r eval = FALSE}
 fdr_thr <- 4*10^-6

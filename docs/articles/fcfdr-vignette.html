@@ -109,21 +109,12 @@
 <li><p><a href="https://annahutch.github.io/fcfdr/reference/binary_cfdr.html"><code>binary_cfdr()</code></a>: Implements cFDR leveraging <span class="math inline">\(\textbf{binary}\)</span> auxiliary covariates.</p></li>
 </ol>
 <hr>
-<p>Both functions require 3 parameters to be specified:</p>
+<p>Both functions require 2 parameters to be specified:</p>
 <ul>
 <li><p><code>p</code>: GWAS <span class="math inline">\(p\)</span>-values for the trait of interest (vector of per-SNP <span class="math inline">\(p\)</span>-values)</p></li>
 <li><p><code>q</code>: Auxiliary data values (vector of per-SNP auxiliary data values)</p></li>
-<li>
-<p><code>indep_index</code> in <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> or <code>chr</code> in <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code></p>
-<ul>
-<li>
-<code>indep_index</code>: The indices of the subset of independent SNPs, which can be readily found using various software such as LDAK or PLINK.</li>
-<li>
-<code>chr</code>: The chromosome that each SNP resides (vector of per-SNP chromosome values)</li>
 </ul>
-</li>
-</ul>
-<hr>
+<p>along with either the indices of a subset of independent SNPs (<code>indep_index</code>) in <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> or the chromsome for which each SNP resides (<code>chr</code>) in <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code>.</p>
 <p>For further details, including instructions to generate <code>indep_index</code>, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the <a href="https://annahutch.github.io/fcfdr/articles/extra-information.html">Extra Information vignette</a></p>
 <hr>
 <div id="simple-walk-through-example" class="section level4">
