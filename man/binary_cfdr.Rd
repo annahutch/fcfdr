@@ -4,7 +4,7 @@
 \alias{binary_cfdr}
 \title{Function to perform cFDR for binary auxiliary covariates}
 \usage{
-binary_cfdr(p, q, chr, p.thr = 0.01, digits_highp = 1, digits_lowp = 2)
+binary_cfdr(p, q, chr)
 }
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
@@ -12,12 +12,6 @@ binary_cfdr(p, q, chr, p.thr = 0.01, digits_highp = 1, digits_lowp = 2)
 \item{q}{binary auxillary data values (vector of length n)}
 
 \item{chr}{chromosome each SNP resides (vector of length n)}
-
-\item{p.thr}{p-value threshold for interpolation based on digits_highp and digits_lowp}
-
-\item{digits_highp}{digits for rounding for p >= p.thr}
-
-\item{digits_lowp}{digits for rounding for p < p.thr}
 }
 \value{
 dataframe of p, q and v values
