@@ -9,6 +9,7 @@
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
+#' @param plot_KDE logical value for whether to plot the fitted KDE
 #'
 #' @rawNamespace import(dplyr, except = c(filter, lag))
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
@@ -26,7 +27,7 @@
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5){
+flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, plot_KDE = FALSE){
 
   if( sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
 
@@ -82,6 +83,11 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # avoid 0-0 errors
   kgrid$z[which(kgrid$z==0)] <- min(kgrid$z[which(kgrid$z>0)])
+  
+  if(plot_KDE == TRUE){
+    hist(q_ind, freq = FALSE, xlab = "q", main = "Histogram of q with\nestimated density in red")
+    lines(kpq$y, kpq_norm[1,], col =  "red")
+  }
 
   # cgrid is grid of cFDR values
   # estimated by p/kgrid

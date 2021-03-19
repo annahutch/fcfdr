@@ -13,7 +13,8 @@ flexible_cfdr(
   res_q = 500,
   gridp = 50,
   splinecorr = TRUE,
-  dist_thr = 0.5
+  dist_thr = 0.5,
+  plot_KDE = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ flexible_cfdr(
 \item{splinecorr}{logical value for whether spline correction should be implemented}
 
 \item{dist_thr}{distance threshold for spline correction}
+
+\item{plot_KDE}{logical value for whether to plot the fitted KDE}
 }
 \value{
 list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
