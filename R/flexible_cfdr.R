@@ -9,6 +9,7 @@
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
+#' @param match_maf logical value for whether to match minor allele frequency distribution of independent SNPs to that of whole set of SNPs 
 #'
 #' @rawNamespace import(dplyr, except = c(filter, lag))
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
@@ -26,12 +27,17 @@
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5){
+flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, match_maf = TRUE){
 
   if( sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
 
   # ensure low q enriched for low p
   if(cor(p[indep_index], q[indep_index], method="spearman") < 0) q <- -q
+
+  # match MAF distribution of independent SNPs to that of whole
+  if(match_maf) {
+    
+  }
 
   zp = -qnorm(p/2) # convert p-vals to z-scores
 
@@ -190,4 +196,36 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   df <- data.frame(p, q, v)
 
   return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = length(corrected_ind))))
+}
+
+#' Function to downsample independent SNPs 
+#'
+#' @param maf minor allele frequencies for SNPs  
+#' @param indep_index indices of independent SNPs
+#'
+#' @return 
+match_ind_maf <- function(maf, indep_index) {
+  breaks <- seq(0, 0.5, length=51)
+
+  daf <- data.frame(indep_index = indep_index, maf = maf[indep_index])
+
+  maf_interval <- as.character(cut(maf, breaks = breaks, include.lowest = T))
+
+  daf$maf_interval <- maf_interval[indep_index]
+
+  maf_interval_freq.whole <- table(maf_interval)
+
+  maf_interval_freq.ind <- table(daf$maf_interval)
+
+  maf_interval_freq.whole.relative <- maf_interval_freq.whole/sum(maf_interval_freq.whole)
+
+  maf_interval_freq.ind.relative <- maf_interval_freq.ind/sum(maf_interval_freq.ind)
+
+  max_sample_size <- floor(min(maf_interval_freq.ind/maf_interval_freq.whole.relative))
+
+  scaled_interval_sample_sizes <- floor(maf_interval_freq.whole.relative*max_sample_size)
+
+  indep_sample_index <- unlist(lapply(unique(maf_interval[indep_index]), function(x) sample(subset(daf, maf_interval==x)$indep_index, size=scaled_interval_sample_sizes[x])))
+
+  indep_sample_index
 }
