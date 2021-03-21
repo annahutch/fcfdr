@@ -1,4 +1,8 @@
-#' Function to perform cFDR for continuous auxiliary covariates
+#' @title Function to perform cFDR for continuous auxiliary covariates
+#'
+#' @description 
+#'
+#' @details If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution. 
 #'
 #' @param p p values for principal trait (vector of length n)
 #' @param q continuous auxillary data values (vector of length n)
@@ -9,7 +13,9 @@
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
-#' @param maf logical value for whether to match minor allele frequency distribution of independent SNPs to that of whole set of SNPs 
+#' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate
+#' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
+#' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
 #'
 #' @rawNamespace import(dplyr, except = c(filter, lag))
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
@@ -23,14 +29,13 @@
 #' @import hexbin
 #' @import bigsplines
 #' @import grDevices
-#' 
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, maf = NULL){
+flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
-
     if(length(maf) != length(p)) {
       stop("Mismatch in lengths of p and maf vectors") 
     }
@@ -38,10 +43,15 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
     indep_index <- match_ind_maf(maf, indep_index)
   }
 
-  if( sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
-  
+  # Suitable for auxiliary covariates other than p-values
+  if(check_indep_cor) {
+    if(sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
+  }
+
   # ensure low q enriched for low p
-  if(cor(p[indep_index], q[indep_index], method="spearman") < 0) q <- -q
+  if(enforce_p_q_cor) {
+    if(cor(p[indep_index], q[indep_index], method="spearman") < 0) q <- -q
+  }
 
   zp = -qnorm(p/2) # convert p-vals to z-scores
 
@@ -202,12 +212,16 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = length(corrected_ind))))
 }
 
-#' Function to downsample independent SNPs 
+#' @title Function to downsample independent SNPs to match MAF distribution of whole set.
+#'
+#' @description Matches MAF distribution of independent set of SNPs to MAF distribution of whole set of SNPs to avoid MAF-based confounding.
+#'
+#' @details Must supply maf values from the whole data set, not just the independent SNPs.
 #'
 #' @param maf minor allele frequencies of (all) SNPs  
 #' @param indep_index indices of independent SNPs
 #'
-#' @return indices of independent SNP in sample 
+#' @return indices of independent SNP in chosen in sample
 match_ind_maf <- function(maf, indep_index) {
   breaks <- seq(0, 0.5, length=51)
 
