@@ -73,8 +73,7 @@ test_that("flexible_cfdr throws an error with flipped sign of principal-auxiliar
   # If X is uniform, then 1-X is negatively correlated with X
   q[4001:5000] <- 1-p[4001:5000]
 
-  p <- 2*pnorm(-abs(p))
-  q <- 2*pnorm(-abs(q))
+  q <- -qnorm(q/2)
   
   expect_error(flexible_cfdr(p, q, indep_index = 4001:5000), "Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs")
 })
@@ -86,7 +85,7 @@ test_that("flexible_cfdr runs on subset of package sample data when matching MAF
 
   res <- flexible_cfdr(df$p, q = -qnorm(df$RA_p/2), indep_index = which(df$ldak_weight != 0), maf = df$maf, check_indep_cor = FALSE, enforce_p_q_cor = FALSE)
   
-  expect_equal(digest::digest(res), "460e2430cda7da53d66e45c8ccaf1093")
+  expect_equal(digest::digest(res), "f07705b80f5fc87fbed00872158046ad")
 })
 
 test_that("match_ind_maf runs on package sample data", {
