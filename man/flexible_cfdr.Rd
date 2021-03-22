@@ -13,7 +13,10 @@ flexible_cfdr(
   res_q = 500,
   gridp = 50,
   splinecorr = TRUE,
-  dist_thr = 0.5
+  dist_thr = 0.5,
+  maf = NULL,
+  check_indep_cor = TRUE,
+  enforce_p_q_cor = TRUE
 )
 }
 \arguments{
@@ -34,10 +37,19 @@ flexible_cfdr(
 \item{splinecorr}{logical value for whether spline correction should be implemented}
 
 \item{dist_thr}{distance threshold for spline correction}
+
+\item{maf}{minor allele frequencies for SNPs to which \code{p} and \code{q} relate}
+
+\item{check_indep_cor}{check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole}
+
+\item{enforce_p_q_cor}{if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values}
 }
 \value{
 list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 }
 \description{
-Function to perform cFDR for continuous auxiliary covariates
+
+}
+\details{
+If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution.
 }
