@@ -1,0 +1,101 @@
+     checking for file ‘/rds/user/tw395/hpc-work/fcfdr/DESCRIPTION’ ...  ✔  checking for file ‘/rds/user/tw395/hpc-work/fcfdr/DESCRIPTION’
+  ─  preparing ‘fcfdr’:
+     checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+  ─  installing the package to build vignettes
+     creating vignettes ...  E  creating vignettes (3m 42.4s)
+     --- re-building ‘extra-information.Rmd’ using rmarkdown
+   --- finished re-building ‘extra-information.Rmd’
+   
+   --- re-building ‘fcfdr-vignette.Rmd’ using rmarkdown
+   Quitting from lines 90-91 (fcfdr-vignette.Rmd) 
+   Error: processing vignette 'fcfdr-vignette.Rmd' failed with diagnostics:
+   inapplicable choice of bandwidth (eps=NULL) in midpoint rule:
+   Error in owin(poly = list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], : could not find function "owin"
+   
+   --- failed re-building ‘fcfdr-vignette.Rmd’
+   
+   --- re-building ‘t1d_app.Rmd’ using rmarkdown
+   Warning: The vignette title specified in \VignetteIndexEntry{} is different from the title in the YAML metadata. The former is "cFDR T1D application", and the latter is "T1D Application". If that is intentional, you may set options(rmarkdown.html_vignette.check_title = FALSE) to suppress this check.
+   --- finished re-building ‘t1d_app.Rmd’
+   
+   SUMMARY: processing the following file failed:
+     ‘fcfdr-vignette.Rmd’
+   
+   Error: Vignette re-building failed.
+   Execution halted
+
+Error: System command 'R' failed, exit status: 1, stdout + stderr:
+E> * checking for file ‘/rds/user/tw395/hpc-work/fcfdr/DESCRIPTION’ ... OK
+E> * preparing ‘fcfdr’:
+E> * checking DESCRIPTION meta-information ... OK
+E> * installing the package to build vignettes
+E> * creating vignettes ... ERROR
+E> --- re-building ‘extra-information.Rmd’ using rmarkdown
+E> --- finished re-building ‘extra-information.Rmd’
+E> 
+E> --- re-building ‘fcfdr-vignette.Rmd’ using rmarkdown
+E> Quitting from lines 90-91 (fcfdr-vignette.Rmd) 
+E> Error: processing vignette 'fcfdr-vignette.Rmd' failed with diagnostics:
+E> inapplicable choice of bandwidth (eps=NULL) in midpoint rule:
+E> Error in owin(poly = list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], : could not find function "owin"
+E> 
+E> --- failed re-building ‘fcfdr-vignette.Rmd’
+E> 
+E> --- re-building ‘t1d_app.Rmd’ using rmarkdown
+E> Warning: The vignette title specified in \VignetteIndexEntry{} is different from the title in the YAML metadata. The former is "cFDR T1D application", and the latter is "T1D Application". If that is intentional, you may set options(rmarkdown.html_vignette.check_title = FALSE) to suppress this check.
+E> --- finished re-building ‘t1d_app.Rmd’
+E> 
+E> SUMMARY: processing the following file failed:
+E>   ‘fcfdr-vignette.Rmd’
+E> 
+E> Error: Vignette re-building failed.
+E> Execution halted
+
+ Stack trace:
+
+ 1. devtools::build()
+ 2. pkgbuild::build(path = pkg, dest_path = path, binary = binary,  ...
+ 3. withr::with_temp_libpaths(rcmd_build_tools(options$cmd, c(options$path,  ...
+ 4. base:::force(code)
+ 5. pkgbuild:::rcmd_build_tools(options$cmd, c(options$path, options$args),  ...
+ 6. pkgbuild:::with_build_tools(callr::rcmd_safe(..., env = env,  ...
+ 7. callr::rcmd_safe(..., env = env, spinner = FALSE, show = FALSE,  ...
+ 8. callr:::run_r(options)
+ 9. base:::with(options, with_envvar(env, do.call(processx::run,  ...
+ 10. base:::with.default(options, with_envvar(env, do.call(processx::run,  ...
+ 11. base:::eval(substitute(expr), data, enclos = parent.frame())
+ 12. base:::eval(substitute(expr), data, enclos = parent.frame())
+ 13. callr:::with_envvar(env, do.call(processx::run, c(list(bin, args = real_cmd ...
+ 14. base:::force(code)
+ 15. base:::do.call(processx::run, c(list(bin, args = real_cmdargs,  ...
+ 16. (function (command = NULL, args = character(), error_on_status = TRUE,  ...
+ 17. throw(new_process_error(res, call = sys.call(), echo = echo,  ...
+
+ x System command 'R' failed, exit status: 1, stdout + stderr:
+E> * checking for file ‘/rds/user/tw395/hpc-work/fcfdr/DESCRIPTION’ ... OK
+E> * preparing ‘fcfdr’:
+E> * checking DESCRIPTION meta-information ... OK
+E> * installing the package to build vignettes
+E> * creating vignettes ... ERROR
+E> --- re-building ‘extra-information.Rmd’ using rmarkdown
+E> --- finished re-building ‘extra-information.Rmd’
+E> 
+E> --- re-building ‘fcfdr-vignette.Rmd’ using rmarkdown
+E> Quitting from lines 90-91 (fcfdr-vignette.Rmd) 
+E> Error: processing vignette 'fcfdr-vignette.Rmd' failed with diagnostics:
+E> inapplicable choice of bandwidth (eps=NULL) in midpoint rule:
+E> Error in owin(poly = list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], : could not find function "owin"
+E> 
+E> --- failed re-building ‘fcfdr-vignette.Rmd’
+E> 
+E> --- re-building ‘t1d_app.Rmd’ using rmarkdown
+E> Warning: The vignette title specified in \VignetteIndexEntry{} is different from the title in the YAML metadata. The former is "cFDR T1D application", and the latter is "T1D Application". If that is intentional, you may set options(rmarkdown.html_vignette.check_title = FALSE) to suppress this check.
+E> --- finished re-building ‘t1d_app.Rmd’
+E> 
+E> SUMMARY: processing the following file failed:
+E>   ‘fcfdr-vignette.Rmd’
+E> 
+E> Error: Vignette re-building failed.
+E> Execution halted 
+
+Execution halted

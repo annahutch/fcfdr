@@ -21,7 +21,7 @@
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
 #' @rawNamespace import(MASS, except = c(select, area))
 #' @import locfdr
-#' @import spatstat
+#' @import spatstat.geom 
 #' @import cfdr
 #' @import fields
 #' @import stats
@@ -36,6 +36,8 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
+    # TODO remove
+    print("Matching MAF")
     if(length(maf) != length(p)) {
       stop("Mismatch in lengths of p and maf vectors") 
     }
@@ -45,12 +47,16 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # Suitable for auxiliary covariates other than p-values
   if(check_indep_cor) {
-    if(sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman")) ) stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
+    if(sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman"))) {
+      stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
+      }
   }
 
   # ensure low q enriched for low p
   if(enforce_p_q_cor) {
-    if(cor(p[indep_index], q[indep_index], method="spearman") < 0) q <- -q
+    if(cor(p[indep_index], q[indep_index], method="spearman") < 0) {
+      q <- -q
+      }
   }
 
   zp = -qnorm(p/2) # convert p-vals to z-scores
@@ -174,7 +180,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   }
 
   # normalise so integral is 1 over full region
-  fullint <- polyCub(owin(poly=list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], lims[3])), check = FALSE, fix = FALSE), fpqh0, method = "midpoint")
+  fullint <- polyCub(spatstat.geom::owin(poly=list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], lims[3])), check = FALSE, fix = FALSE), fpqh0, method = "midpoint")
 
   fpqh0 <- function(s){
     fph0(s[,1])*fqh0(s[,2])/fullint
@@ -182,7 +188,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # integrate bivariate null over L region to get v-vals
   v_tmp <- mapply(function(X, Y){
-    polyCub(owin(poly=list(x = c(X[length(X)], 0,0, c(X[1],X)), y = c(lims[4], lims[4], lims[3], c(lims[3],Y))), check = FALSE, fix  = FALSE), fpqh0, method = "midpoint")
+    polyCub(spatstat.geom::owin(poly=list(x = c(X[length(X)], 0,0, c(X[1],X)), y = c(lims[4], lims[4], lims[3], c(lims[3],Y))), check = FALSE, fix  = FALSE), fpqh0, method = "midpoint")
   }, X = Lx, Y = Ly)
 
   # map back binned data to original data points
