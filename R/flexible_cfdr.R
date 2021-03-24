@@ -21,7 +21,7 @@
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
 #' @rawNamespace import(MASS, except = c(select, area))
 #' @import locfdr
-#' @import spatstat.geom 
+#' @import spatstat.geom
 #' @import cfdr
 #' @import fields
 #' @import stats
@@ -36,8 +36,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
-    # TODO remove
-    print("Matching MAF")
+
     if(length(maf) != length(p)) {
       stop("Mismatch in lengths of p and maf vectors") 
     }
