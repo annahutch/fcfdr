@@ -15,7 +15,7 @@
 #' @rawNamespace import(data.table, except = c(last, first, between, shift))
 #' @rawNamespace import(MASS, except = c(select, area))
 #' @import locfdr
-#' @import spatstat
+#' @import spatstat.geom
 #' @import cfdr
 #' @import fields
 #' @import stats
