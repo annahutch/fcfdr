@@ -15,7 +15,7 @@ Imports:
   MASS,
   ggplot2,
   cowplot,
-  spatstat,
+  spatstat.geom,
   cfdr,
   fields,
   dplyr,
