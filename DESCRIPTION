@@ -26,11 +26,11 @@ Imports:
   grDevices,
   Hmisc
 Suggests:
-    magrittr,
-    factoextra,
     stats,
     knitr,
-    rmarkdown
+    rmarkdown,
+    digest,
+    testthat (>= 3.0.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -38,4 +38,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
+Config/testthat/edition: 3

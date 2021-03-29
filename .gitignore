@@ -4,3 +4,8 @@ inst/doc
 .Rbuildignore
 .Rhistory
 .Rproj.user
+.Rdata
+.DS_Store
+..Rcheck
+fcfdr.Rcheck
+fcfdr_*.tar.gz
