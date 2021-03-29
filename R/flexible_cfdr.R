@@ -17,18 +17,14 @@
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
 #' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
 #'
-#' @rawNamespace import(dplyr, except = c(filter, lag))
-#' @rawNamespace import(data.table, except = c(last, first, between, shift))
-#' @rawNamespace import(MASS, except = c(select, area))
-#' @import locfdr
-#' @import spatstat.geom
-#' @import cfdr
-#' @import fields
+#' @importFrom locfdr locfdr
+#' @importFrom spatstat.geom owin
+#' @importFrom fields interp.surface
+#' @importFrom polyCub polyCub
+#' @importFrom hexbin hexbin
+#' @importFrom bigsplines bigspline
+#' @importFrom grDevices contourLines
 #' @import stats
-#' @import polyCub
-#' @import hexbin
-#' @import bigsplines
-#' @import grDevices
 #'
 #' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
@@ -148,7 +144,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   # rearrage L-curves so they are defined anticlockwise
   lengths <- lapply(cl, length)
   for(i in which(lengths>1)){
-    first = lapply(cl[[i]], function(x) x$y[1]) %>% unlist()
+    first = unlist(lapply(cl[[i]], function(x) x$y[1]))
     cl[[i]] = cl[[i]][order(first)]
   }
 
@@ -179,7 +175,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   }
 
   # normalise so integral is 1 over full region
-  fullint <- polyCub(spatstat.geom::owin(poly=list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], lims[3])), check = FALSE, fix = FALSE), fpqh0, method = "midpoint")
+  fullint <- polyCub(owin(poly=list(x = c(1, 0, 0, 1), y = c(lims[4], lims[4], lims[3], lims[3])), check = FALSE, fix = FALSE), fpqh0, method = "midpoint")
 
   fpqh0 <- function(s){
     fph0(s[,1])*fqh0(s[,2])/fullint
@@ -187,7 +183,7 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   # integrate bivariate null over L region to get v-vals
   v_tmp <- mapply(function(X, Y){
-    polyCub(spatstat.geom::owin(poly=list(x = c(X[length(X)], 0,0, c(X[1],X)), y = c(lims[4], lims[4], lims[3], c(lims[3],Y))), check = FALSE, fix  = FALSE), fpqh0, method = "midpoint")
+    polyCub(owin(poly=list(x = c(X[length(X)], 0,0, c(X[1],X)), y = c(lims[4], lims[4], lims[3], c(lims[3],Y))), check = FALSE, fix  = FALSE), fpqh0, method = "midpoint")
   }, X = Lx, Y = Ly)
 
   # map back binned data to original data points
