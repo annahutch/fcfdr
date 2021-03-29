@@ -216,7 +216,14 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
 
   df <- data.frame(p, q, v)
 
-  return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = length(corrected_ind))))
+  if(splinecorr == TRUE){
+    
+    return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = length(corrected_ind))))
+    
+  } else
+    
+    return(list(df, data.frame(q_low = q_low, left_cens = length(which(q < q_low)), splinecorr = NA)))
+  
 }
 
 #' @title Function to downsample independent SNPs to match MAF distribution of whole set.
