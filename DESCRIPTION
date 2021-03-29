@@ -30,7 +30,9 @@ Suggests:
     factoextra,
     stats,
     knitr,
-    rmarkdown
+    rmarkdown,
+    digest,
+    testthat (>= 3.0.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -39,3 +41,4 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
+Config/testthat/edition: 3
