@@ -27,5 +27,6 @@ reference:
 - title: "Functions to generate plots"
   contents:
   - corr_plot
+  - stratified_qqplot
   - pv_plot
   - log10pv_plot
