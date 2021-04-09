@@ -2,14 +2,14 @@
 % Please edit documentation in R/plot_functions.R
 \name{log10pv_plot}
 \alias{log10pv_plot}
-\title{ggplot to visualise fcfdr results (-log10)}
+\title{Writes out a plot of -log10(p) against -log10(v) coloured by q}
 \usage{
 log10pv_plot(p, q, v, axis_lim = c(0, 20))
 }
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{auxillary data values (vector of length n)}
+\item{q}{auxiliary data values (vector of length n)}
 
 \item{v}{v values from cFDR}
 
@@ -19,5 +19,5 @@ log10pv_plot(p, q, v, axis_lim = c(0, 20))
 ggplot object
 }
 \description{
-ggplot to visualise fcfdr results (-log10)
+
 }

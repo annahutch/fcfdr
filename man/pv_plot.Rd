@@ -2,14 +2,14 @@
 % Please edit documentation in R/plot_functions.R
 \name{pv_plot}
 \alias{pv_plot}
-\title{ggplot to visualise fcfdr results}
+\title{Writes out a plot of p against v coloured by q}
 \usage{
 pv_plot(p, q, v, axis_lim = c(0, 1))
 }
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{auxillary data values (vector of length n)}
+\item{q}{auxiliary data values (vector of length n)}
 
 \item{v}{v values from cFDR}
 
@@ -19,5 +19,5 @@ pv_plot(p, q, v, axis_lim = c(0, 1))
 ggplot object
 }
 \description{
-ggplot to visualise fcfdr results
+
 }

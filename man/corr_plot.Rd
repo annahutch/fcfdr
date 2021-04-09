@@ -2,15 +2,14 @@
 % Please edit documentation in R/plot_functions.R
 \name{corr_plot}
 \alias{corr_plot}
-\title{Plot relationship between p and q
-Plot -log10(p) values for quantiles of q}
+\title{Writes out a violin plot of -log10(p) values for quantiles of q}
 \usage{
 corr_plot(p, q, ylim = c(0, 1.5))
 }
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{auxillary data values (vector of length n)}
+\item{q}{auxiliary data values (vector of length n)}
 
 \item{ylim}{y-axis limits (-log10)}
 }
@@ -18,6 +17,5 @@ corr_plot(p, q, ylim = c(0, 1.5))
 ggplot object
 }
 \description{
-Plot relationship between p and q
-Plot -log10(p) values for quantiles of q
+Can be used to investigate the relationship between p and q
 }

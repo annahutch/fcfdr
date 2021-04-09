@@ -1,8 +1,9 @@
-#' Plot relationship between p and q
-#' Plot -log10(p) values for quantiles of q
+#' @title Writes out a violin plot of -log10(p) values for quantiles of q
+#'
+#' @description Can be used to investigate the relationship between p and q
 #'
 #' @param p p values for principal trait (vector of length n)
-#' @param q auxillary data values (vector of length n)
+#' @param q auxiliary data values (vector of length n)
 #' @param ylim y-axis limits (-log10)
 #'
 #' @return ggplot object
@@ -37,10 +38,12 @@ corr_plot <- function(p, q, ylim = c(0, 1.5)){
     theme_cowplot(12) + background_grid(major = "xy", minor = "xy") + xlab("q") + ylab("p (-log10)") + theme(legend.text=element_text(size=8)) + geom_boxplot(aes(fill=quantiles), width = 0.1) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + coord_cartesian(ylim = ylim)
 }
 
-#' ggplot to visualise fcfdr results
+#' @title Writes out a plot of p against v coloured by q
+#'
+#' @description
 #' 
 #' @param p p values for principal trait (vector of length n)
-#' @param q auxillary data values (vector of length n)
+#' @param q auxiliary data values (vector of length n)
 #' @param v v values from cFDR
 #' @param axis_lim Optional axis limits
 #'
@@ -57,10 +60,12 @@ pv_plot <- function(p, q, v, axis_lim = c(0, 1)){
   ggplot(df, aes(x = p, y = v, col = q)) + geom_point() + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("raw p-values") + ylab("v-values") + ggtitle(paste0("Flexible cFDR results")) + scale_color_gradient2(midpoint = mid, low = "blue", mid = "white", high = "red", space = "Lab") + coord_cartesian(ylim = axis_lim, xlim = axis_lim)
 }
 
-#' ggplot to visualise fcfdr results (-log10)
+#' @title Writes out a plot of -log10(p) against -log10(v) coloured by q
+#'
+#' @description
 #'
 #' @param p p values for principal trait (vector of length n)
-#' @param q auxillary data values (vector of length n)
+#' @param q auxiliary data values (vector of length n)
 #' @param v v values from cFDR
 #' @param axis_lim Optional axis limits
 #'
@@ -75,4 +80,50 @@ log10pv_plot <- function(p, q, v, axis_lim = c(0, 20)){
   df <- data.frame(p, q, v)
 
   ggplot(df, aes(x = -log10(p), y = -log10(v), col = q)) + geom_point() + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("raw p-values (-log10)") + ylab("v-values (-log10)") + ggtitle(paste0("Flexible cFDR results")) + scale_color_gradient2(midpoint = mid, low = "blue", mid = "white", high = "red", space = "Lab") + coord_cartesian(ylim = axis_lim, xlim = axis_lim)
+}
+
+#' @title Writes out a stratified Q-Q plot.
+#'
+#' @description
+#'
+#' @details Note that this function does not do the heavy lifting of styling the plot's aesthetics.
+#' 
+#' @param data_frame \code{data.frame} containing p-values and auxiliary data values
+#' @param prin_value_label label of principal p-value column in \code{data_frame}
+#' @param cond_value_label label of conditional trait column in \code{data_frame}
+#' @param thresholds threshold values to define strata
+#'
+#' @import ggplot2 
+#' @import cowplot
+#'
+#' @return ggplot object 
+#' @export
+#' 
+stratified_qqplot <- function(data_frame, prin_value_label, cond_value_label = NULL, thresholds = c(1, 1e-1, 1e-2, 1e-3, 1e-4)) {
+  
+  data_frame$negLogP <- -log10(data_frame[, prin_value_label])
+  
+  if(is.null(cond_value_label)) {
+    daf <- data_frame[, c(prin_value_label, 'negLogP')]
+    daf <- daf[order(daf[,prin_value_label]), ]
+    daf$pp <- -log10(ppoints(nrow(daf)))
+    daf$threshold <- factor(c(1))
+  } else {
+    data_frame <- data_frame[, c(prin_value_label, cond_value_label, 'negLogP')]
+    
+    dafs <- list()
+    
+    for(i in seq_along(thresholds)) {
+      daf <- subset(data_frame, get(cond_value_label) < thresholds[i])
+      daf <- daf[order(daf[ , prin_value_label]) , ]
+      daf$pp <- -log10(ppoints(nrow(daf)))
+      daf$threshold <- factor(thresholds)[i]
+      dafs[[i]] <- daf
+    }
+    
+    daf <- do.call(rbind, dafs)
+  }
+  
+  ggplot(data=daf) + geom_line(aes(x = pp, y = negLogP, group = threshold, colour = threshold)) + geom_abline(intercept=0,slope=1, linetype="dashed") + theme_cowplot(12) + background_grid(major = "xy", minor = "none")
+
 }

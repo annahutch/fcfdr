@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `fcfdr` R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values, and can be readily FDR controlled. 
+The `fcfdr` R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values. Since the v-values are analogous to p-values, they can be used directly in any error-rate controlling procedure.
 
 The `fcfdr` R package contains two key functions:
 
@@ -31,7 +31,7 @@ Both functions require 2 parameters to be specified:
 
 * `q`: Auxiliary data values (vector of per-SNP auxiliary data values)
 
-along with either the indices of a subset of independent SNPs (`indep_index`) in `flexible_cfdr()` or the chromsome for which each SNP resides (`chr`) in `binary_cfdr()`.
+along with either the indices of a subset of independent SNPs (`indep_index`) in `flexible_cfdr()` or the chromosome for which each SNP resides (`chr`) in `binary_cfdr()`.
 
 For further details, including instructions to generate `indep_index`, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the [Extra Information vignette](https://annahutch.github.io/fcfdr/articles/extra-information.html)
 
@@ -74,10 +74,11 @@ hist(q)
 
 ---
 
-We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
+We can use the `corr_plot` and the `stratified_qqplot` functions to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
 
 ```{r, fig.width = 6, fig.height = 5}
 corr_plot(p, q)
+stratified_qqplot(data_frame = data.frame(p, q), "p", "q", thresholds = c(round(quantile(q, probs = c(0.25, 0.5, 0.75, 1)), 3)))
 ```
 
 ---
