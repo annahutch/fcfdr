@@ -65,7 +65,13 @@ plink --bfile chrX --keep euro.fam --make-bed --silent --out euro_only/chrX
 plink --bfile chrY --keep euro.fam --make-bed --silent --out euro_only/chrY
 ```
 
-We then use a function from the R package `bigsnpr` to carry out some basic QC on the 1000G data and write out the duly filtered data to another directory, `euro_only/qc`. 
+The `fam` files omit sex information. This is problematic only when we wish to carry out QC on the Y chromosome SNPs: PLINK drops heterozygous Y genotypes if we do not affirm the sex of the samples in `chrY.fam`. We do this by changing the values in the sex code column from 0 ('unknown') to 1 ('male'). 
+
+```{bash}
+sed -i 's/0 0 0 -9/0 0 1 -9/' euro_only/chrY.fam
+```
+
+We then use a function from the R package `bigsnpr` to carry out some basic QC on the 1000G data and write out the duly filtered data to another directory, `euro_only/qc`.
 
 ```{r plink_qc}
 for(i in 1:22) {
@@ -76,6 +82,7 @@ for(i in 1:22) {
 bigsnpr::snp_plinkQC(plink.path = '/bin/plink', prefix.in = 'euro_only/chrX',
                         prefix.out = 'euro_only/qc/chrX',
                         geno = 0, maf = 0.01, hwe = 1e-10)
+
 bigsnpr::snp_plinkQC(plink.path = '/bin/plink', prefix.in = 'euro_only/chrY',
                         prefix.out = 'euro_only/qc/chrY',
                         geno = 0, maf = 0.01, hwe = 1e-10)
