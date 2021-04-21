@@ -16,7 +16,6 @@ Imports:
   ggplot2,
   cowplot,
   spatstat.geom,
-  cfdr,
   fields,
   dplyr,
   polyCub,
