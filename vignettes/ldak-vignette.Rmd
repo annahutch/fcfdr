@@ -20,18 +20,17 @@ The `flexible_cfdr` function requires as input the indices of an independent sub
 
 In practice, we identify independent SNPs as those assigned a non-zero weighting by the [LDAK package's](http://dougspeed.com/ldak/) weighting calculation [procedure](http://dougspeed.com/calculate-weightings/). These weightings were originally developed as a means of adjusting for the unequal tagging of (causal) SNPs across the genome when estimating heritability. The calculation procedure requires haplotype information, which we obtain in the form of the 1000 Genomes (1000G) Phase 3 data. 
 
-The purpose of this vignette is to sketch out our own approach to generating LDAK weightings for use in `fcfdr`. Note that whilst RMarkdown was used to generate this HTML document, the code snippets contained in this vignette are intended to serve as static illustrations and are not intended to be run without further modification.
+The purpose of this vignette is to sketch out our own approach to generating LDAK weightings for use in `fcfdr`. Whilst RMarkdown was used to generate this HTML document, the code snippets contained in this vignette are intended to serve as static illustrations and are not intended to be run without further modification.
 
-This workflow was written with the use of LDAK `v5.1` (download [here](http://dougspeed.com/downloads/)) and PLINK `v1.90b6.21 64-bit (19 Oct 2020)` (download [here](https://www.cog-genomics.org/plink/2.0/)). 
-
-TODO:
-- discuss retaining SNPs for which we do not have LDAK weights, problem for MAF matching, do we assume in/dependence?
+This workflow was written with the use of LDAK `v5.1` (download [here](http://dougspeed.com/downloads/)) and PLINK `v1.90b6.21 64-bit (19 Oct 2020)` (download [here](https://www.cog-genomics.org/plink/2.0/)). We also use code from the R packages [bigsnpr](https://privefl.github.io/bigsnpr/) and [data.table](https://rdatatable.gitlab.io/data.table/).
 
 ---
 
 ## Obtaining and processing the 1000G data
 
-We first download the 1000G Phase 3 data in the `vcf` format. Note that the data obtained with the links below use the `hg19` genome build for genomic coordinates. 
+*NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~270MB download at [https://doi.org/10.5281/zenodo.4705050](https://doi.org/10.5281/zenodo.4705050). If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.*
+
+We first download the 1000G Phase 3 data in the `vcf` format. These data use the `hg19` genome assembly for SNP coordinates. 
 
 ```{bash download_1000G}
 for i in {1..22}; do
@@ -42,14 +41,15 @@ wget -O "chrX.vcf.gz" "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502
 wget -O "chrY.vcf.gz" "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chrY.phase3_integrated_v2a.20130502.genotypes.vcf.gz"
 ```
 
-We will simplify the next steps by omitting the sex chromosome data.
-
 Subsequent processing depends on the data being in the PLINK-compatible `bed`, `bim`, and `fam` file formats. We use PLINK to convert the `vcf` files to these formats.
 
 ```{bash vcf_to_bed}
 for i in {1..22}; do
     plink --vcf "chr"$i".vcf.gz" --make-bed --out "chr"$i
 done
+
+plink --vcf chrX.vcf.gz --make-bed --out chrX
+plink --vcf chrY.vcf.gz --make-bed --out chrY
 ```
 
 The 1000G haplotype data were obtained by sequencing individuals from a variety of populations. In practice, we take a subset of the 1000G samples to ensure that the ancestry of the individuals from which we obtain haplotype data matches the ancestry of the individuals in the GWAS of interest (from which our principal p-values come). Sample ancestry information for the 1000G project can be found at the [data portal](https://www.internationalgenome.org/data-portal/sample) of the International Genome Sample Resource.
@@ -60,30 +60,41 @@ We specify the desired sample IDs in a `fam` file. The `fam` files generated fro
 for i in {1..22}; do
   plink --bfile "chr"$i --keep euro.fam --make-bed --silent --out "euro_only/chr"$i
 done 
+
+plink --bfile chrX --keep euro.fam --make-bed --silent --out euro_only/chrX
+plink --bfile chrY --keep euro.fam --make-bed --silent --out euro_only/chrY
 ```
 
 We then use a function from the R package `bigsnpr` to carry out some basic QC on the 1000G data and write out the duly filtered data to another directory, `euro_only/qc`. 
 
 ```{r plink_qc}
 for(i in 1:22) {
-       bed <- bigsnpr::snp_plinkQC(plink.path='/bin/plink', prefix.in=paste0('euro_only/chr', i),
-                          prefix.out=paste0('euro_only/qc/chr', i),
-                          geno=0, maf=0.01, hwe=1e-10)
+       bigsnpr::snp_plinkQC(plink.path = '/bin/plink', prefix.in = paste0('euro_only/chr', i),
+                          prefix.out = paste0('euro_only/qc/chr', i),
+                          geno = 0, maf = 0.01, hwe = 1e-10)
 }
+bigsnpr::snp_plinkQC(plink.path = '/bin/plink', prefix.in = 'euro_only/chrX',
+                        prefix.out = 'euro_only/qc/chrX',
+                        geno = 0, maf = 0.01, hwe = 1e-10)
+bigsnpr::snp_plinkQC(plink.path = '/bin/plink', prefix.in = 'euro_only/chrY',
+                        prefix.out = 'euro_only/qc/chrY',
+                        geno = 0, maf = 0.01, hwe = 1e-10)
 ```
 
 --- 
 
 ## Joining the 1000G and GWAS SNPs
 
+*NB: The following processing was carried out with a GWAS containing only autosomal SNPs, so we omit reference to the sex chromosomes henceforth.*
+
 For the purpose of fitting the KDE in `flexible_cfdr` we care only about the dependence structure of the SNPs at which our `p` and `q` values were obtained, so we filter the 1000G SNPs to retain those for which we have GWAS p-values. Ideally, the 1000G SNPs would form a superset of those in the GWAS, but this is typically not the case; with ~5.5 million SNPs in our GWAS we would expect to lose several tens of thousands of SNPs. The absence of this relatively paltry number of SNPs should have a neglible influence upon the KDE. 
 
-To filter the SNPs, we use `plink --extract`, which allows one to extract SNPs based on:
+To filter the SNPs we use `plink --extract`, which allows one to extract SNPs based on:
 
 1. SNP ID (i.e. rsID); or
 2. SNP genomic coordinates
 
-rsIDs are not always consistent between data sets and we have found that extracting SNPs using genomic coordinates typically yields a larger intersection of 1000G and GWAS SNPs. Thus we use `plink --extract` with the `--range` argument ([documentation here](http://zzz.bwh.harvard.edu/plink/dataman.shtml#extract)), which requires that we pass a white space-separated text file specifying a list of genomic 'ranges' (hereafter the 'range file') in the format `chr bp bp ID`. In our use case, each SNP corresponds to a range, albeit one of length one: the first and second `bp` columns which give the start and end coordinates of the range are duplicated. We use rsIDs as range identifiers, but these are essentially superfluous when using the `--range` argument and will not be used by `plink` to filter the SNPs. 
+rsIDs are not always consistent between data sets and we have found that extracting SNPs using genomic coordinates typically yields a larger intersection of 1000G and GWAS SNPs. Thus we use `plink --extract` with the `--range` argument ([documentation here](http://zzz.bwh.harvard.edu/plink/dataman.shtml#extract)), which requires that we pass a white space-separated text file specifying a list of genomic 'ranges' (hereafter the 'range file') in rows in the format `chr bp bp ID`. In our use case, each SNP corresponds to a range, albeit one of length one: the first and second `bp` columns which give the start and end coordinates of the range are duplicated. We use rsIDs as range identifiers, but these are essentially superfluous when using the `--range` argument and will not be used by `plink` to filter the SNPs. 
 
 The coordinates of the GWAS SNPs are usually readily available and a simple approach to generating the requisite range files for `plink --extract` would copy the genomic coordinates of each SNP to the appropriate chromosome-specific range file (albeit in the `plink`-compliant `chr bp bp rsID` format). However, this approach overlooks the possibility that there exist multiple SNPs with different reference/alternative allele pairings at the same locus, that is, duplicates.
 
@@ -97,7 +108,7 @@ library(data.table)
 # We assume this contains columns SNPID, CHR19 and BP19 (so-called because of hg19), REF, and ALT
 gwas_dat <- fread('gwas_sum_stats.tsv.gz', sep = '\t', header = T)
 
-# Iterating over chromosome bim files
+# Iterating over chromosomal bim files
 for(i in 1:22) {
   # bim files have no header
   bim_dat <- fread(sprintf('euro_only/qc/chr%d.bim', i), sep = '\t', header = F, col.names = c('Chr', 'ID', 'Cm', 'BP19', 'A1', 'A2') )
@@ -134,7 +145,7 @@ done
 
 ## Running the LDAK weighting calculation procedure
 
-The weighting calculation procedure entails a preprocessing step, `ldak --cut-weights`, and a calculation step, `ldak --calc-weights-all`. We refer the reader to the [LDAK documentation](http://dougspeed.com/calculate-weightings/) for further guidance; here we hope only to sketch out our own workflow. Note that an idiosyncracy of our approach is that we process the data in a set of chromosome-specific files. This is an artifact of the format of the 1000G data.
+The weighting calculation procedure entails a preprocessing step, `ldak --cut-weights`, and a calculation step, `ldak --calc-weights-all`. We refer the reader to the [LDAK documentation](http://dougspeed.com/calculate-weightings/) for further guidance. An idiosyncracy of our approach is that we process the data in a set of chromosome-specific files. This is an artifact of the format of the 1000G data.
 
 We create the directory `ldak` and within it subdirectories labelled `chrx`, where x ranges from 1 to 22, to hold the results of the procedure. 
 
@@ -163,8 +174,46 @@ sed -i '1 i\Predictor Weight Neighbours Tagging Info Check Chr' "ldak/combined_w
 
 In practice, it is necessary to merge the weightings contained in `combined_weights.all` back into the file containing the `p` and `q` values so that all three vectors can be made available to `flexible_cfdr`. This poses a problem, however, as the rsIDs in the `Predictor` column of `combined_weights.all` are derived from the 1000G `bim` files, not the GWAS file rsIDs specified in the range files (which are ignored by `plink` as noted above). Merging 1000G and GWAS SNPs using genomic coordinates is to be preferred over the use of rsIDs as the latter are not always consistent between data sets. 
 
-`combined_weights.all` as written out by LDAK does not contain SNP basepair coordinates. This means we must use the `bim` files contained in the `filtered/chrx` directories to recover the basepair coordinates and reference/alternative allele pairings. This can be accomplished by matching the SNPs in `combined_weights.all` to those in each `bim` file in turn. As the rsIDs in `combined_weights.all` are derived from these `bim` files, it is appropriate in this case to merge these data with the use of rsIDs.
+`combined_weights.all` as written out by LDAK does not contain SNP basepair coordinates. This means we must use the `bim` files contained in the `filtered/chrx` directories to recover the basepair coordinates and reference/alternative allele pairings. This can be accomplished by matching the SNPs in `combined_weights.all` to those in the `bim` files. As the rsIDs in `combined_weights.all` are derived from these `bim` files, it is appropriate in this case to merge these data with the use of rsIDs. We provide the following snippets as an example of how this can be accomplished.
+
+To simplify matters, we first concatenate all chromosomal `bim` files.
+
+```{bash}
+for i in {1..22}; do
+  cat "filtered/chr"$i".bim" >> "filtered/chr_all.bim"
+done
+```
+
+We then add the genomic metadata we need to the `combined_weights.all` LDAK output file.
+
+```{r merge_bim_combined_weights}
+library(data.table)
+
+bim_dat <- fread('filtered/chr_all.bim', sep = '\t', header = F, col.names = c('Chr', 'ID', 'Cm', 'BP19', 'A1', 'A2'))
+
+weights_dat <- fread('ldak/combined_weights.all', sep = ' ', header = T)
+
+# Drop rows with a missing ID or weight value
+weights_dat <- na.omit(weights_dat, cols = c('Predictor', 'Weight'))
+
+join_dat <- merge(weights_dat, bim_dat[. , (ID, Chr, BP19, A1, A2)], all.x = T, by.x = c('Predictor', 'Chr'), by.y = c('ID', 'Chr'), sort = F)
+
+fwrite(join_dat, file = 'ldak/combined_weights_meta.all', sep = ' ', col.names = T, row.names = F, quote = F)
+```
+
+The format of the file in which your `p` and `q` are stored will of course vary, but the snippet below illustrates how `combined_weights_meta.all` can be merged with it.
 
 ```{r}
-# TODO add BP19 to combined_weights.all and then merge with gwas_dat 
+weights_dat <- fread('ldak/combined_weights_meta.all', sep = ' ', header = T, select = c('Predictor', 'Weight', 'Chr', 'BP19', 'A1', 'A2'))
+
+# We assume this contains columns SNPID, CHR19 and BP19 (so-called because of hg19), REF, and ALT
+gwas_dat <- fread('gwas_sum_stats.tsv.gz', sep = '\t', header = T)
+
+gwas_dat <- merge(gwas_dat, weights_dat, by.x = c('CHR19', 'BP19'), by.y = c('Chr', 'BP19'), sort = F)
+
+# Drop rows where the ref/alt allele pairing differs from that already present
+gwas_dat <- gwas_dat[((REF == A1 & ALT == A2) | (REF == A2 & ALT == A1))]
+
+# Drop now-redundant allele columns
+gwas_dat[, c('A1', 'A2') := NULL ]
 ```
