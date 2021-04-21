@@ -74,11 +74,10 @@ hist(q)
 
 ---
 
-We can use the `corr_plot` and the `stratified_qqplot` functions to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
+We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
 
 ```{r, fig.width = 6, fig.height = 5}
 corr_plot(p, q)
-stratified_qqplot(data_frame = data.frame(p, q), "p", "q", thresholds = c(round(quantile(q, probs = c(0.25, 0.5, 0.75, 1)), 3)))
 ```
 
 ---

@@ -12,6 +12,8 @@ navbar:
         href: articles/fcfdr-vignette.html
       - text: T1D application
         href: articles/t1d_app.html
+      - text: Generating independent SNP set
+        href: articles/ldak-vignette.html
       - text: Extra information
         href: articles/extra-information.html
   right:
