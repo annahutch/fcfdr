@@ -1,6 +1,6 @@
 Package: fcfdr
 Title: Flexible cFDR
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     c(person(given = "Anna",
            family = "Hutchinson",
@@ -8,14 +8,14 @@ Authors@R:
            email = "anna.hutchinson@mrc-bsu.cam.ac.uk",
            comment = c(ORCID = "0000-0002-9224-4410")),
     person("Chris", "Wallace", role = c("aut")),
+    person("Thomas","Willis", role = c("ctb", "aut"))
     person("James", "Liley", role = c("ctb")))
-Description: An R Package to implement flexible cFDR. That is, leveraging auxiliary data from any arbitrary distribution with GWAS p-values to generate reweighted $p$-values.
+Description: An R Package to implement Flexible cFDR. Can be used to leverage auxiliary data from arbitrary distributions with GWAS p-values to generate re-weighted $p$-values.
 Imports:
   locfdr,
   MASS,
   ggplot2,
   cowplot,
-  spatstat.geom,
   fields,
   dplyr,
   polyCub,
