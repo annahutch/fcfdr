@@ -28,7 +28,7 @@ This workflow was written with the use of LDAK `v5.1` (download [here](http://do
 
 ## Obtaining and processing the 1000G data
 
-*NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~270MB download at [https://doi.org/10.5281/zenodo.4705050](https://doi.org/10.5281/zenodo.4705050). If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.*
+*NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~280MB download at [https://doi.org/10.5281/zenodo.4709547](https://doi.org/10.5281/zenodo.4709547). If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.*
 
 We first download the 1000G Phase 3 data in the `vcf` format. These data use the `hg19` genome assembly for SNP coordinates. 
 
