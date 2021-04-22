@@ -46,7 +46,7 @@ The distinguishing feature of `fcfdr` compared to earlier cFDR methods is that i
 
 ### Finding independent subsets of SNPs {#ind}
 
-The `flexible_cfdr()` function requires the indices of an independent subset of the GWAS SNPs to ensure non-biased bandwidth estimation for the KDE. In practice, we use SNPs allocated a non-zero LDAK weight as our subset of independent SNPs. Instructions to generate LDAK weights can be found [here](http://dougspeed.com/calculate-weightings/) (note that genotype data is required but this can be estimated from a reference panel). PLINK can also be used (see [here](https://www.cog-genomics.org/plink/1.9/ld)).
+The `flexible_cfdr()` function requires the indices of an independent subset of the GWAS SNPs to ensure non-biased bandwidth estimation for the KDE. In practice, we use SNPs allocated a non-zero LDAK weight as our subset of independent SNPs. Instructions to generate LDAK weights can be found [in this vignette](https://annahutch.github.io/fcfdr/articles/ldak-vignette.html). Alternatively, PLINK can also be used (see [here](https://www.cog-genomics.org/plink/1.9/ld)).
 
 The binary cFDR method does not fit a KDE and instead uses empirical CDFs. For this reason, a leave-one-chromosome-out procedure is implemented intrinsically in the `binary_cfdr()` function. Therefore, the `binary_cfdr()` function requires per-SNP chromosomes as input.
 
