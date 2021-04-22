@@ -2,7 +2,7 @@
 title: "T1D Application"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{cFDR T1D application}
+  %\VignetteIndexEntry{T1D application}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
