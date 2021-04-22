@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -65,6 +65,9 @@
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D application</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
     </li>
     <li>
       <a href="../articles/extra-information.html">Extra information</a>
@@ -89,7 +92,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="t1d_app_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>T1D Application</h1>
@@ -106,135 +109,368 @@
 <hr>
 <p>The data required for this example is available to download within the <code>fcfdr</code> R package and includes:</p>
 <ol style="list-style-type: decimal">
-<li><p>GWAS <span class="math inline">\(p\)</span>-values for T1D (Onengut-Gumuscu et al. (2015), <a href="https://www.nature.com/articles/ng.3245" class="uri">https://www.nature.com/articles/ng.3245</a>) downloaded from the GWAS Catalog (<a href="https://www.ebi.ac.uk/gwas/publications/25751624" class="uri">https://www.ebi.ac.uk/gwas/publications/25751624</a>)</p></li>
-<li><p>GWAS <span class="math inline">\(p\)</span>-values for Rheumatoid Arthritis (RA) (Eyre et al. (2012), <a href="https://www.nature.com/articles/ng.2462" class="uri">https://www.nature.com/articles/ng.2462</a>) downloaded from the GWAS Catalog (<a href="https://www.ebi.ac.uk/gwas/publications/23143596" class="uri">https://www.ebi.ac.uk/gwas/publications/23143596</a>)</p></li>
+<li><p>GWAS <span class="math inline">\(p\)</span>-values for T1D (Onengut-Gumuscu et al. (2015), <a href="https://www.nature.com/articles/ng.3245" class="uri">https://www.nature.com/articles/ng.3245</a>) downloaded from the GWAS Catalog (<a href="https://www.ebi.ac.uk/gwas/publications/25751624" class="uri">https://www.ebi.ac.uk/gwas/publications/25751624</a>)</p></li>
+<li><p>GWAS <span class="math inline">\(p\)</span>-values for Rheumatoid Arthritis (RA) (Eyre et al. (2012), <a href="https://www.nature.com/articles/ng.2462" class="uri">https://www.nature.com/articles/ng.2462</a>) downloaded from the GWAS Catalog (<a href="https://www.ebi.ac.uk/gwas/publications/23143596" class="uri">https://www.ebi.ac.uk/gwas/publications/23143596</a>)</p></li>
 <li><p>Binary measure of SNP overlap with transcription factor binding site (TFBS), derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (<a href="https://www.nature.com/articles/nature11247" class="uri">https://www.nature.com/articles/nature11247</a>; <a href="https://doi.org/10.1016/j.ajhg.2014.10.004" class="uri">https://doi.org/10.1016/j.ajhg.2014.10.004</a>). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the LDSC data repository (<a href="https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz" class="uri">https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz</a>) and the binary <code>DGF_ENCODE</code> annotation was extracted for all T1D SNPs in our analysis.</p></li>
 <li><p>Fold-enrichment ratio of H3K27ac ChIP-seq counts relative to expected background counts in naive CD4+ T helper cells (<a href="https://www.nature.com/articles/nbt1010-1045" class="uri">https://www.nature.com/articles/nbt1010-1045</a>). Downloaded from <a href="https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig" class="uri">https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig</a>.</p></li>
 </ol>
 <hr>
 <p>First, we download the data:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">fcfdr</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">df</span>, package <span class="op">=</span> <span class="st">"fcfdr"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
-<span class="co">#&gt;    chrom     pos       rsid other_allele effect_allele          p DGF_ENCODE</span>
-<span class="co">#&gt; 1      1 1118275 rs61733845            C             T 0.83426886          0</span>
-<span class="co">#&gt; 2      1 1120431  rs1320571            G             A 0.46962338          1</span>
-<span class="co">#&gt; 3      1 1135242  rs9729550            A             C 0.10564986          0</span>
-<span class="co">#&gt; 10     1 1218086  rs6603788            C             T 0.24897995          1</span>
-<span class="co">#&gt; 17     1 1335790  rs1240708            A             G 0.08398829          0</span>
-<span class="co">#&gt; 18     1 1493727   rs880051            C             T 0.70946836          0</span>
-<span class="co">#&gt;    Th_H3K27ac   RA_p ldak_weight</span>
-<span class="co">#&gt; 1     0.68882 0.3552    0.742346</span>
-<span class="co">#&gt; 2     1.37775 0.9195    0.710176</span>
-<span class="co">#&gt; 3     1.37775 0.1089    0.541020</span>
-<span class="co">#&gt; 10    0.00000 0.3700    0.363778</span>
-<span class="co">#&gt; 17    3.05435 0.6963    0.703253</span>
-<span class="co">#&gt; 18    1.43173 0.5926    0.686436</span></pre></div>
+<span class="co">#&gt;                  rsid chrom       pos other_allele effect_allele         p</span>
+<span class="co">#&gt; 1     1kg_10_59614461    10  59944455            C             A 0.8245356</span>
+<span class="co">#&gt; 2     1kg_14_80445068    14  81375315            G             A 0.3503642</span>
+<span class="co">#&gt; 3     1kg_14_87503642    14  88433889            A             G 0.1048239</span>
+<span class="co">#&gt; 4     1kg_2_207220639     2 207512394            G             C 0.9821215</span>
+<span class="co">#&gt; 5     1kg_5_173458951     5 173526345            C             G 0.4549943</span>
+<span class="co">#&gt; 6 ccc-2-102079765-A-G     2 102713333            ?             ? 0.4395651</span>
+<span class="co">#&gt;   DGF_ENCODE Th_H3K27ac   RA_p ldak_weight       maf</span>
+<span class="co">#&gt; 1          0    0.59652 0.1553    0.900318 0.1413714</span>
+<span class="co">#&gt; 2          0    0.66973 0.6732    0.000000 0.1735724</span>
+<span class="co">#&gt; 3          0    0.42419 0.5976    0.000000 0.3747790</span>
+<span class="co">#&gt; 4          0    0.00000 0.8109    0.000000 0.4781095</span>
+<span class="co">#&gt; 5          0    0.00000 0.7110    0.829307 0.3555777</span>
+<span class="co">#&gt; 6          0    0.89836 0.3508    0.816463 0.4957808</span></code></pre></div>
 <p>In this application we leverage GWAS <span class="math inline">\(p\)</span>-values for RA (<code>q1</code>), binary SNP overlap with TFBS (<code>q2</code>) and H3K27ac counts in naive CD4+ T helper cells (<code>q3</code>) with GWAS <span class="math inline">\(p\)</span>-values for T1D (<code>orig_p</code>) to generate <span class="math inline">\(v\)</span>-values.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">orig_p</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">p</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">orig_p</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">p</span>
 <span class="va">chr</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">chrom</span>
 <span class="va">q1</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">RA_p</span>
 <span class="va">q2</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">DGF_ENCODE</span>
-<span class="va">q3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">Th_H3K27ac</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></pre></div>
+<span class="va">q3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">Th_H3K27ac</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <hr>
 <p>The data frame also contains a column of LDAK weights for each SNP (<a href="http://dougspeed.com/calculate-weightings/" class="uri">http://dougspeed.com/calculate-weightings/</a>). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">ind_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ldak_weight</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ind_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ldak_weight</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <hr>
 <p>We are now ready to use the <code>fcfdr</code> R package to generate <span class="math inline">\(v\)</span>-values. Firstly, we generate <span class="math inline">\(v\)</span>-values leveraging GWAS <span class="math inline">\(p\)</span>-values for RA.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="va">iter1_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">orig_p</span>, 
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iter1_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">orig_p</span>, 
                            q <span class="op">=</span> <span class="va">q1</span>, 
                            indep_index <span class="op">=</span> <span class="va">ind_snps</span><span class="op">)</span>
-<span class="va">v1</span> <span class="op">&lt;-</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></pre></div>
+<span class="co">#&gt; Registered S3 methods overwritten by 'spatstat':</span>
+<span class="co">#&gt;   method                   from         </span>
+<span class="co">#&gt;   Complex.im               spatstat.geom</span>
+<span class="co">#&gt;   Complex.imlist           spatstat.geom</span>
+<span class="co">#&gt;   Math.im                  spatstat.geom</span>
+<span class="co">#&gt;   Math.imlist              spatstat.geom</span>
+<span class="co">#&gt;   mean.im                  spatstat.geom</span>
+<span class="co">#&gt;   median.im                spatstat.geom</span>
+<span class="co">#&gt;   Ops.im                   spatstat.geom</span>
+<span class="co">#&gt;   Ops.imlist               spatstat.geom</span>
+<span class="co">#&gt;   Summary.im               spatstat.geom</span>
+<span class="co">#&gt;   Summary.imlist           spatstat.geom</span>
+<span class="co">#&gt;   anyDuplicated.ppp        spatstat.geom</span>
+<span class="co">#&gt;   anyDuplicated.ppx        spatstat.geom</span>
+<span class="co">#&gt;   [.anylist                spatstat.geom</span>
+<span class="co">#&gt;   anyNA.im                 spatstat.geom</span>
+<span class="co">#&gt;   as.array.im              spatstat.geom</span>
+<span class="co">#&gt;   as.character.unitname    spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.hyperframe spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.im         spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.owin       spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.ppp        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.ppx        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.psp        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.tess       spatstat.geom</span>
+<span class="co">#&gt;   as.double.im             spatstat.geom</span>
+<span class="co">#&gt;   as.function.im           spatstat.geom</span>
+<span class="co">#&gt;   as.function.owin         spatstat.geom</span>
+<span class="co">#&gt;   as.function.tess         spatstat.geom</span>
+<span class="co">#&gt;   as.list.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.im             spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.owin           spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.ppx            spatstat.geom</span>
+<span class="co">#&gt;   by.im                    spatstat.geom</span>
+<span class="co">#&gt;   by.ppp                   spatstat.geom</span>
+<span class="co">#&gt;   cbind.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   contour.funxy            spatstat.geom</span>
+<span class="co">#&gt;   contour.im               spatstat.geom</span>
+<span class="co">#&gt;   contour.imlist           spatstat.geom</span>
+<span class="co">#&gt;   contour.listof           spatstat.geom</span>
+<span class="co">#&gt;   cut.im                   spatstat.geom</span>
+<span class="co">#&gt;   cut.ppp                  spatstat.geom</span>
+<span class="co">#&gt;   [.diagramobj             spatstat.geom</span>
+<span class="co">#&gt;   dim.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   dim.im                   spatstat.geom</span>
+<span class="co">#&gt;   dimnames.hyperframe      spatstat.geom</span>
+<span class="co">#&gt;   dim.owin                 spatstat.geom</span>
+<span class="co">#&gt;   duplicated.ppp           spatstat.geom</span>
+<span class="co">#&gt;   duplicated.ppx           spatstat.geom</span>
+<span class="co">#&gt;   edit.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   edit.im                  spatstat.geom</span>
+<span class="co">#&gt;   edit.ppp                              </span>
+<span class="co">#&gt;   edit.psp                 spatstat.geom</span>
+<span class="co">#&gt;   format.numberwithunit    spatstat.geom</span>
+<span class="co">#&gt;   head.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   head.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   head.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   head.psp                 spatstat.geom</span>
+<span class="co">#&gt;   head.tess                spatstat.geom</span>
+<span class="co">#&gt;   hist.funxy               spatstat.geom</span>
+<span class="co">#&gt;   hist.im                  spatstat.geom</span>
+<span class="co">#&gt;   [.hyperframe             spatstat.geom</span>
+<span class="co">#&gt;   $.hyperframe             spatstat.geom</span>
+<span class="co">#&gt;   identify.ppp             spatstat.geom</span>
+<span class="co">#&gt;   identify.psp             spatstat.geom</span>
+<span class="co">#&gt;   [.im                                  </span>
+<span class="co">#&gt;   image.im                              </span>
+<span class="co">#&gt;   image.imlist             spatstat.geom</span>
+<span class="co">#&gt;   image.listof             spatstat.geom</span>
+<span class="co">#&gt;   [.layered                spatstat.geom</span>
+<span class="co">#&gt;   levels.im                spatstat.geom</span>
+<span class="co">#&gt;   names.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   [.owin                   spatstat.geom</span>
+<span class="co">#&gt;   persp.funxy              spatstat.geom</span>
+<span class="co">#&gt;   persp.im                              </span>
+<span class="co">#&gt;   plot.anylist                          </span>
+<span class="co">#&gt;   plot.barplotdata         spatstat.geom</span>
+<span class="co">#&gt;   plot.colourmap                        </span>
+<span class="co">#&gt;   plot.funxy               spatstat.geom</span>
+<span class="co">#&gt;   plot.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   plot.im                               </span>
+<span class="co">#&gt;   plot.imlist                           </span>
+<span class="co">#&gt;   plot.indicfun            spatstat.geom</span>
+<span class="co">#&gt;   plot.infline             spatstat.geom</span>
+<span class="co">#&gt;   plot.layered             spatstat.geom</span>
+<span class="co">#&gt;   plot.listof                           </span>
+<span class="co">#&gt;   plot.onearrow            spatstat.geom</span>
+<span class="co">#&gt;   plot.owin                spatstat.geom</span>
+<span class="co">#&gt;   plot.pp3                 spatstat.geom</span>
+<span class="co">#&gt;   plot.ppp                              </span>
+<span class="co">#&gt;   plot.pppmatching         spatstat.geom</span>
+<span class="co">#&gt;   plot.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   plot.psp                 spatstat.geom</span>
+<span class="co">#&gt;   plot.quad                spatstat.geom</span>
+<span class="co">#&gt;   plot.quadratcount        spatstat.geom</span>
+<span class="co">#&gt;   plot.solist                           </span>
+<span class="co">#&gt;   plot.splitppp            spatstat.geom</span>
+<span class="co">#&gt;   plot.symbolmap           spatstat.geom</span>
+<span class="co">#&gt;   plot.tess                             </span>
+<span class="co">#&gt;   plot.textstring          spatstat.geom</span>
+<span class="co">#&gt;   plot.texturemap                       </span>
+<span class="co">#&gt;   plot.yardstick                        </span>
+<span class="co">#&gt;   [.pp3                    spatstat.geom</span>
+<span class="co">#&gt;   [.ppp                    spatstat.geom</span>
+<span class="co">#&gt;   [.ppx                    spatstat.geom</span>
+<span class="co">#&gt;   print.anylist            spatstat.geom</span>
+<span class="co">#&gt;   print.box3               spatstat.geom</span>
+<span class="co">#&gt;   print.boxx               spatstat.geom</span>
+<span class="co">#&gt;   print.colourmap          spatstat.geom</span>
+<span class="co">#&gt;   print.distfun            spatstat.geom</span>
+<span class="co">#&gt;   print.ewcdf              spatstat.geom</span>
+<span class="co">#&gt;   print.funxy              spatstat.geom</span>
+<span class="co">#&gt;   print.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   print.im                 spatstat.geom</span>
+<span class="co">#&gt;   print.indicfun           spatstat.geom</span>
+<span class="co">#&gt;   print.infline            spatstat.geom</span>
+<span class="co">#&gt;   print.layered            spatstat.geom</span>
+<span class="co">#&gt;   print.lut                spatstat.geom</span>
+<span class="co">#&gt;   print.nnfun              spatstat.geom</span>
+<span class="co">#&gt;   print.numberwithunit     spatstat.geom</span>
+<span class="co">#&gt;   print.onearrow           spatstat.geom</span>
+<span class="co">#&gt;   print.owin               spatstat.geom</span>
+<span class="co">#&gt;   print.pp3                spatstat.geom</span>
+<span class="co">#&gt;   print.ppp                spatstat.geom</span>
+<span class="co">#&gt;   print.pppmatching        spatstat.geom</span>
+<span class="co">#&gt;   print.ppx                spatstat.geom</span>
+<span class="co">#&gt;   print.psp                spatstat.geom</span>
+<span class="co">#&gt;   print.quad               spatstat.geom</span>
+<span class="co">#&gt;   print.simplepanel        spatstat.geom</span>
+<span class="co">#&gt;   print.solist             spatstat.geom</span>
+<span class="co">#&gt;   print.splitppp           spatstat.geom</span>
+<span class="co">#&gt;   print.splitppx           spatstat.geom</span>
+<span class="co">#&gt;   print.summary.distfun    spatstat.geom</span>
+<span class="co">#&gt;   print.summary.funxy      spatstat.geom</span>
+<span class="co">#&gt;   print.summary.hyperframe spatstat.geom</span>
+<span class="co">#&gt;   print.summary.im         spatstat.geom</span>
+<span class="co">#&gt;   print.summary.listof     spatstat.geom</span>
+<span class="co">#&gt;   print.summary.logiquad   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.lut        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.owin       spatstat.geom</span>
+<span class="co">#&gt;   print.summary.pp3        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.ppp        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.psp        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.quad                    </span>
+<span class="co">#&gt;   print.summary.solist     spatstat.geom</span>
+<span class="co">#&gt;   print.summary.splitppp   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.splitppx   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.unitname   spatstat.geom</span>
+<span class="co">#&gt;   print.symbolmap          spatstat.geom</span>
+<span class="co">#&gt;   print.tess               spatstat.geom</span>
+<span class="co">#&gt;   print.textstring         spatstat.geom</span>
+<span class="co">#&gt;   print.texturemap         spatstat.geom</span>
+<span class="co">#&gt;   print.timed              spatstat.geom</span>
+<span class="co">#&gt;   print.unitname           spatstat.geom</span>
+<span class="co">#&gt;   print.yardstick          spatstat.geom</span>
+<span class="co">#&gt;   [.psp                    spatstat.geom</span>
+<span class="co">#&gt;   [.quad                   spatstat.geom</span>
+<span class="co">#&gt;   quantile.ewcdf           spatstat.geom</span>
+<span class="co">#&gt;   quantile.im              spatstat.geom</span>
+<span class="co">#&gt;   rbind.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   relevel.im               spatstat.geom</span>
+<span class="co">#&gt;   relevel.ppp              spatstat.geom</span>
+<span class="co">#&gt;   relevel.ppx              spatstat.geom</span>
+<span class="co">#&gt;   round.pp3                spatstat.geom</span>
+<span class="co">#&gt;   round.ppp                spatstat.geom</span>
+<span class="co">#&gt;   round.ppx                spatstat.geom</span>
+<span class="co">#&gt;   row.names.hyperframe     spatstat.geom</span>
+<span class="co">#&gt;   [.solist                 spatstat.geom</span>
+<span class="co">#&gt;   sort.im                  spatstat.geom</span>
+<span class="co">#&gt;   split.hyperframe                      </span>
+<span class="co">#&gt;   split.im                 spatstat.geom</span>
+<span class="co">#&gt;   [.splitppp               spatstat.geom</span>
+<span class="co">#&gt;   split.ppp                spatstat.geom</span>
+<span class="co">#&gt;   split.ppx                spatstat.geom</span>
+<span class="co">#&gt;   [.splitppx               spatstat.geom</span>
+<span class="co">#&gt;   str.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   subset.hyperframe        spatstat.geom</span>
+<span class="co">#&gt;   subset.pp3               spatstat.geom</span>
+<span class="co">#&gt;   subset.ppp               spatstat.geom</span>
+<span class="co">#&gt;   subset.ppx               spatstat.geom</span>
+<span class="co">#&gt;   subset.psp               spatstat.geom</span>
+<span class="co">#&gt;   summary.anylist          spatstat.geom</span>
+<span class="co">#&gt;   summary.distfun          spatstat.geom</span>
+<span class="co">#&gt;   summary.funxy            spatstat.geom</span>
+<span class="co">#&gt;   summary.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   summary.im               spatstat.geom</span>
+<span class="co">#&gt;   summary.listof           spatstat.geom</span>
+<span class="co">#&gt;   summary.logiquad         spatstat.geom</span>
+<span class="co">#&gt;   summary.lut              spatstat.geom</span>
+<span class="co">#&gt;   summary.owin             spatstat.geom</span>
+<span class="co">#&gt;   summary.pp3              spatstat.geom</span>
+<span class="co">#&gt;   summary.ppp              spatstat.geom</span>
+<span class="co">#&gt;   summary.pppmatching      spatstat.geom</span>
+<span class="co">#&gt;   summary.ppx              spatstat.geom</span>
+<span class="co">#&gt;   summary.psp              spatstat.geom</span>
+<span class="co">#&gt;   summary.quad                          </span>
+<span class="co">#&gt;   summary.solist           spatstat.geom</span>
+<span class="co">#&gt;   summary.splitppp         spatstat.geom</span>
+<span class="co">#&gt;   summary.splitppx         spatstat.geom</span>
+<span class="co">#&gt;   summary.unitname         spatstat.geom</span>
+<span class="co">#&gt;   tail.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   tail.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   tail.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   tail.psp                 spatstat.geom</span>
+<span class="co">#&gt;   tail.tess                spatstat.geom</span>
+<span class="co">#&gt;   [.tess                   spatstat.geom</span>
+<span class="co">#&gt;   text.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   text.psp                 spatstat.geom</span>
+<span class="co">#&gt;   unique.ppp               spatstat.geom</span>
+<span class="co">#&gt;   unique.ppx               spatstat.geom</span>
+<span class="co">#&gt;   unstack.layered          spatstat.geom</span>
+<span class="co">#&gt;   unstack.ppp              spatstat.geom</span>
+<span class="co">#&gt;   unstack.psp              spatstat.geom</span>
+<span class="co">#&gt;   unstack.solist           spatstat.geom</span>
+<span class="co">#&gt;   unstack.tess             spatstat.geom</span>
+<span class="co">#&gt;   update.im                spatstat.geom</span>
+<span class="co">#&gt;   update.symbolmap         spatstat.geom</span>
+<span class="co">#&gt;   with.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   xtfrm.im                 spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.anylist              spatstat.geom</span>
+<span class="co">#&gt;   dimnames&lt;-.hyperframe    spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   $&lt;-.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.im                   spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.layered              spatstat.geom</span>
+<span class="co">#&gt;   [[&lt;-.layered             spatstat.geom</span>
+<span class="co">#&gt;   levels&lt;-.im              spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.listof               spatstat.geom</span>
+<span class="co">#&gt;   names&lt;-.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.ppp                  spatstat.geom</span>
+<span class="co">#&gt;   row.names&lt;-.hyperframe   spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.solist               spatstat.geom</span>
+<span class="co">#&gt;   split&lt;-.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.splitppp             spatstat.geom</span>
+<span class="co">#&gt;   split&lt;-.ppp              spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.splitppx             spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.tess                 spatstat.geom</span>
+<span class="va">v1</span> <span class="op">&lt;-</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
 <p>The resultant <span class="math inline">\(v\)</span>-values for this first iteration (<code>v1</code>) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-chromosome out procedure and therefore requires the chromosomes for each SNP rather than an independent subset.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">iter2_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/binary_cfdr.html">binary_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">v1</span>,
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iter2_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/binary_cfdr.html">binary_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">v1</span>,
                          q <span class="op">=</span> <span class="va">q2</span>,
                          chr <span class="op">=</span> <span class="va">chr</span><span class="op">)</span>
 
-<span class="va">v2</span> <span class="op">&lt;-</span> <span class="va">iter2_res</span><span class="op">$</span><span class="va">v</span></pre></div>
+<span class="va">v2</span> <span class="op">&lt;-</span> <span class="va">iter2_res</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
 <p>The resultant <span class="math inline">\(v\)</span>-values for this second iteration (<code>v2</code>) are then used in the next iteration to leverage H3K27ac counts.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">iter3_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">v2</span>, 
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iter3_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">v2</span>, 
                            q <span class="op">=</span> <span class="va">q3</span>, 
                            indep_index <span class="op">=</span> <span class="va">ind_snps</span><span class="op">)</span>
+<span class="co">#&gt; Warning: glm.fit: fitted rates numerically 0 occurred</span>
+<span class="co">#&gt; Warning in locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] +</span>
+<span class="co">#&gt; diff(kpq$x)/2, : f(z) misfit = 3.9. Rerun with increased df</span>
 
-<span class="va">v3</span> <span class="op">&lt;-</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></pre></div>
+<span class="va">v3</span> <span class="op">&lt;-</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
 <p>We then create a final data frame for the <code>fcfdr</code> results. Note that the sign is flipped for <span class="math inline">\(q2\)</span> and <span class="math inline">\(q3\)</span>. This is because these are negatively correlated with <code>p</code> and the flexible cFDR software automatically flips the sign of <code>q</code> to ensure that low <code>p</code> are enriched for low <code>q</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">orig_p</span>, q1 <span class="op">=</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">q</span>, q2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">iter2_res</span><span class="op">$</span><span class="va">q</span><span class="op">)</span>, q3 <span class="op">=</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">q</span>, <span class="va">v1</span>, <span class="va">v2</span>, <span class="va">v3</span><span class="op">)</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">orig_p</span>, q1 <span class="op">=</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">q</span>, q2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">iter2_res</span><span class="op">$</span><span class="va">q</span><span class="op">)</span>, q3 <span class="op">=</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">q</span>, <span class="va">v1</span>, <span class="va">v2</span>, <span class="va">v3</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
-<span class="co">#&gt;       orig_p     q1 q2         q3         v1         v2         v3</span>
-<span class="co">#&gt; 1 0.83426886 0.3552  0 -0.5240301 0.82561654 0.86500986 0.86567797</span>
-<span class="co">#&gt; 2 0.46962338 0.9195  1 -0.8661547 0.56530376 0.46612642 0.40692517</span>
-<span class="co">#&gt; 3 0.10564986 0.1089  0 -0.8661547 0.06897879 0.07449097 0.06139096</span>
-<span class="co">#&gt; 4 0.24897995 0.3700  1  0.0000000 0.25853611 0.21000582 0.25324871</span>
-<span class="co">#&gt; 5 0.08398829 0.6963  0 -1.3997904 0.11755798 0.12634234 0.07110725</span>
-<span class="co">#&gt; 6 0.70946836 0.5926  0 -0.8886029 0.75552389 0.80179171 0.72355745</span></pre></div>
+<span class="co">#&gt;      orig_p     q1 q2        q3        v1           v2           v3</span>
+<span class="co">#&gt; 1 0.8245356 0.1553  0 0.4678263 0.7587319 5.633699e-06 5.590807e-06</span>
+<span class="co">#&gt; 2 0.3503642 0.6732  0 0.5126619 0.4137071 3.785206e-01 3.789268e-01</span>
+<span class="co">#&gt; 3 0.1048239 0.5976  0 0.3536032 0.1368236 9.090646e-01 9.033876e-01</span>
+<span class="co">#&gt; 4 0.9821215 0.8109  0 0.0000000 0.9930016 7.273575e-01 7.188404e-01</span>
+<span class="co">#&gt; 5 0.4549943 0.7110  0 0.0000000 0.5224101 3.464855e-01 3.368882e-01</span>
+<span class="co">#&gt; 6 0.4395651 0.3508  0 0.6409904 0.4457289 3.098237e-02 3.163994e-02</span></code></pre></div>
 <hr>
 <p>We inspect the resultant <span class="math inline">\(v\)</span>-values after each iteration by plotting these against the values used as <code>p</code> in that iteration.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot">cowplot</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ********************************************************</span>
-<span class="co">#&gt; Note: As of version 1.0.0, cowplot does not change the</span>
-<span class="co">#&gt;   default ggplot2 theme anymore. To recover the previous</span>
-<span class="co">#&gt;   behavior, execute:</span>
-<span class="co">#&gt;   theme_set(theme_cowplot())</span>
-<span class="co">#&gt; ********************************************************</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span>
 
 <span class="va">mid1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">q1</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">orig_p</span>, y <span class="op">=</span> <span class="va">v1</span>, col <span class="op">=</span> <span class="va">q1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V1"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 1"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_color_gradient2</a></span><span class="op">(</span>midpoint <span class="op">=</span> <span class="va">mid1</span>, low <span class="op">=</span> <span class="st">"blue"</span>, mid <span class="op">=</span> <span class="st">"white"</span>, high <span class="op">=</span> <span class="st">"red"</span>, space <span class="op">=</span> <span class="st">"Lab"</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">orig_p</span>, y <span class="op">=</span> <span class="va">v1</span>, col <span class="op">=</span> <span class="va">q1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V1"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 1"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_color_gradient2</a></span><span class="op">(</span>midpoint <span class="op">=</span> <span class="va">mid1</span>, low <span class="op">=</span> <span class="st">"blue"</span>, mid <span class="op">=</span> <span class="st">"white"</span>, high <span class="op">=</span> <span class="st">"red"</span>, space <span class="op">=</span> <span class="st">"Lab"</span><span class="op">)</span></code></pre></div>
 <p><img src="t1d_app_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">v1</span>, y <span class="op">=</span> <span class="va">v2</span>, col <span class="op">=</span> <span class="va">q2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"V1"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V2"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 2"</span><span class="op">)</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">v1</span>, y <span class="op">=</span> <span class="va">v2</span>, col <span class="op">=</span> <span class="va">q2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"V1"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V2"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 2"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="t1d_app_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="va">mid3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">q3</span><span class="op">)</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mid3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">q3</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">v2</span>, y <span class="op">=</span> <span class="va">v3</span>, col <span class="op">=</span> <span class="va">q3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"V2"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 3"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_color_gradient2</a></span><span class="op">(</span>midpoint <span class="op">=</span> <span class="va">mid3</span>, low <span class="op">=</span> <span class="st">"blue"</span>, mid <span class="op">=</span> <span class="st">"white"</span>, high <span class="op">=</span> <span class="st">"red"</span>, space <span class="op">=</span> <span class="st">"Lab"</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">v2</span>, y <span class="op">=</span> <span class="va">v3</span>, col <span class="op">=</span> <span class="va">q3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"V2"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Iteration 3"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_color_gradient2</a></span><span class="op">(</span>midpoint <span class="op">=</span> <span class="va">mid3</span>, low <span class="op">=</span> <span class="st">"blue"</span>, mid <span class="op">=</span> <span class="st">"white"</span>, high <span class="op">=</span> <span class="st">"red"</span>, space <span class="op">=</span> <span class="st">"Lab"</span><span class="op">)</span></code></pre></div>
 <p><img src="t1d_app_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <hr>
 <p>We can also plot the original <span class="math inline">\(p\)</span>-values for T1D against the final adjusted <span class="math inline">\(v\)</span>-values.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="va">mid1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">q1</span><span class="op">)</span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mid1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">q1</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">orig_p</span>, y <span class="op">=</span> <span class="va">v3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"V3 against original p-values"</span><span class="op">)</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">orig_p</span>, y <span class="op">=</span> <span class="va">v3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"V3 against original p-values"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="t1d_app_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">orig_p</span><span class="op">)</span>, y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P (-log10)"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3 (-log10)"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"V3 against original p-values (-log10)"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">orig_p</span><span class="op">)</span>, y <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">v3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>cex <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/background_grid.html">background_grid</a></span><span class="op">(</span>major <span class="op">=</span> <span class="st">"xy"</span>, minor <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>,  linetype<span class="op">=</span><span class="st">"dashed"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"P (-log10)"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"V3 (-log10)"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"V3 against original p-values (-log10)"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <hr>
 <p>Finally, we find that flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS <span class="math inline">\(p\)</span>-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="va">fdr_thr</span> <span class="op">&lt;-</span> <span class="fl">4</span><span class="op">*</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">6</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fdr_thr</span> <span class="op">&lt;-</span> <span class="fl">4</span><span class="op">*</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">6</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">v3</span> <span class="op">&lt;</span> <span class="va">fdr_thr</span> <span class="op">&amp;</span> <span class="va">orig_p</span> <span class="op">&gt;</span> <span class="va">fdr_thr</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 207</span>
+<span class="co">#&gt; [1] 2285</span>
 
 <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">RA_p</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">v3</span> <span class="op">&lt;</span> <span class="va">fdr_thr</span> <span class="op">&amp;</span> <span class="va">orig_p</span> <span class="op">&gt;</span> <span class="va">fdr_thr</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.004226</span>
+<span class="co">#&gt; [1] 0.4293</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">RA_p</span><span class="op">)</span>
 <span class="co">#&gt; [1] 0.4228</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">DGF_ENCODE</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">v3</span> <span class="op">&lt;</span> <span class="va">fdr_thr</span> <span class="op">&amp;</span> <span class="va">orig_p</span> <span class="op">&gt;</span> <span class="va">fdr_thr</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.3140097</span>
+<span class="co">#&gt; [1] 0.2420131</span>
 <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">DGF_ENCODE</span><span class="op">)</span>
 <span class="co">#&gt; [1] 0.2347241</span>
 
 <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">Th_H3K27ac</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">v3</span> <span class="op">&lt;</span> <span class="va">fdr_thr</span> <span class="op">&amp;</span> <span class="va">orig_p</span> <span class="op">&gt;</span> <span class="va">fdr_thr</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt; [1] 1.33958</span>
+<span class="co">#&gt; [1] 0.63101</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">Th_H3K27ac</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.63626</span></pre></div>
+<span class="co">#&gt; [1] 0.63626</span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

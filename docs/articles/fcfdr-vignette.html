@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -65,6 +65,9 @@
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D application</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
     </li>
     <li>
       <a href="../articles/extra-information.html">Extra information</a>
@@ -89,7 +92,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="fcfdr-vignette_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introductory vignette</h1>
@@ -102,7 +105,7 @@
 
     
     
-<p>The <code>fcfdr</code> R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; <a href="https://github.com/jamesliley/cfdr" class="uri">https://github.com/jamesliley/cfdr</a>) that only support auxiliary <span class="math inline">\(p\)</span>-values from related traits. A direct utility of <code>fcfdr</code> is to leverage relevant functional genomic data with GWAS <span class="math inline">\(p\)</span>-values to increase power for GWAS discovery. The method generates “v-values” which can be interpreted as GWAS <span class="math inline">\(p\)</span>-values that have been re-weighted according to the auxiliary data values, and can be readily FDR controlled.</p>
+<p>The <code>fcfdr</code> R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; <a href="https://github.com/jamesliley/cfdr" class="uri">https://github.com/jamesliley/cfdr</a>) that only support auxiliary <span class="math inline">\(p\)</span>-values from related traits. A direct utility of <code>fcfdr</code> is to leverage relevant functional genomic data with GWAS <span class="math inline">\(p\)</span>-values to increase power for GWAS discovery. The method generates “v-values” which can be interpreted as GWAS <span class="math inline">\(p\)</span>-values that have been re-weighted according to the auxiliary data values. Since the v-values are analogous to p-values, they can be used directly in any error-rate controlling procedure.</p>
 <p>The <code>fcfdr</code> R package contains two key functions:</p>
 <ol style="list-style-type: decimal">
 <li><p><a href="https://annahutch.github.io/fcfdr/reference/flexible_cfdr.html"><code>flexible_cfdr()</code></a>: Implements cFDR leveraging <span class="math inline">\(\textbf{continuous}\)</span> auxiliary covariates.</p></li>
@@ -114,48 +117,285 @@
 <li><p><code>p</code>: GWAS <span class="math inline">\(p\)</span>-values for the trait of interest (vector of per-SNP <span class="math inline">\(p\)</span>-values)</p></li>
 <li><p><code>q</code>: Auxiliary data values (vector of per-SNP auxiliary data values)</p></li>
 </ul>
-<p>along with either the indices of a subset of independent SNPs (<code>indep_index</code>) in <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> or the chromsome for which each SNP resides (<code>chr</code>) in <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code>.</p>
+<p>along with either the indices of a subset of independent SNPs (<code>indep_index</code>) in <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> or the chromosome for which each SNP resides (<code>chr</code>) in <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code>.</p>
 <p>For further details, including instructions to generate <code>indep_index</code>, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the <a href="https://annahutch.github.io/fcfdr/articles/extra-information.html">Extra Information vignette</a></p>
 <hr>
 <div id="simple-walk-through-example" class="section level4">
 <h4 class="hasAnchor">
 <a href="#simple-walk-through-example" class="anchor"></a>Simple walk-through example</h4>
 <p>Firstly, load the flexible cFDR package:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">fcfdr</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">fcfdr</span><span class="op">)</span></code></pre></div>
 <hr>
 <p>Next, simulate <span class="math inline">\(p\)</span>-values for 50,000 genetic variants, including 500 associated variants.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">n</span> <span class="op">=</span> <span class="fl">50000</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">n</span> <span class="op">=</span> <span class="fl">50000</span>
 <span class="va">n1p</span> <span class="op">=</span> <span class="fl">500</span> <span class="co"># associated variants</span>
 <span class="va">zp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n1p</span>, sd<span class="op">=</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">n1p</span>, sd<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># z-scores</span>
 <span class="va">p</span> <span class="op">=</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">zp</span><span class="op">)</span><span class="op">)</span> <span class="co"># convert to p-values</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
 <p><img src="fcfdr-vignette_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <hr>
 <p>We simulate relevant auxiliary data from a mixture normal distribution (<span class="math inline">\(q\)</span>). The associated SNPs (with indices 1-500) are sampled from <span class="math inline">\(N(-0.5, 0.5^2)\)</span> and the non-associated SNPs (with indices 500-50000) are sampled from <span class="math inline">\(N(2,1)\)</span>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">mixture_comp1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">x</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mixture_comp1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">x</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
 <span class="va">mixture_comp2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">x</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">n</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>
 <span class="va">z</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>
 
 <span class="va">q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu">mixture_comp1</span><span class="op">(</span><span class="va">n1p</span><span class="op">)</span>, <span class="fu">mixture_comp2</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="va">n1p</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">q</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">q</span><span class="op">)</span></code></pre></div>
 <p><img src="fcfdr-vignette_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <hr>
 <p>We can use the <code>corr_plot</code> function to visualise the relationship between <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>. We observe that low <span class="math inline">\(p\)</span>-values (i.e. high <span class="math inline">\(-log10(p)\)</span>) are enriched for low <span class="math inline">\(q\)</span> values.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="../reference/corr_plot.html">corr_plot</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/corr_plot.html">corr_plot</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span><span class="op">)</span></code></pre></div>
 <p><img src="fcfdr-vignette_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
 <hr>
 <p>We are now ready to use the <code>flexible_cfdr</code> function to derive the <span class="math inline">\(v\)</span>-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the <a href="http://dougspeed.com/calculate-weightings/">vignette for deriving LDAK weights here</a>.</p>
 <p>This line of code will take approximately 4 minutes to run.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span>, indep_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span>, indep_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Registered S3 methods overwritten by 'spatstat':</span>
+<span class="co">#&gt;   method                   from         </span>
+<span class="co">#&gt;   Complex.im               spatstat.geom</span>
+<span class="co">#&gt;   Complex.imlist           spatstat.geom</span>
+<span class="co">#&gt;   Math.im                  spatstat.geom</span>
+<span class="co">#&gt;   Math.imlist              spatstat.geom</span>
+<span class="co">#&gt;   mean.im                  spatstat.geom</span>
+<span class="co">#&gt;   median.im                spatstat.geom</span>
+<span class="co">#&gt;   Ops.im                   spatstat.geom</span>
+<span class="co">#&gt;   Ops.imlist               spatstat.geom</span>
+<span class="co">#&gt;   Summary.im               spatstat.geom</span>
+<span class="co">#&gt;   Summary.imlist           spatstat.geom</span>
+<span class="co">#&gt;   anyDuplicated.ppp        spatstat.geom</span>
+<span class="co">#&gt;   anyDuplicated.ppx        spatstat.geom</span>
+<span class="co">#&gt;   [.anylist                spatstat.geom</span>
+<span class="co">#&gt;   anyNA.im                 spatstat.geom</span>
+<span class="co">#&gt;   as.array.im              spatstat.geom</span>
+<span class="co">#&gt;   as.character.unitname    spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.hyperframe spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.im         spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.owin       spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.ppp        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.ppx        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.psp        spatstat.geom</span>
+<span class="co">#&gt;   as.data.frame.tess       spatstat.geom</span>
+<span class="co">#&gt;   as.double.im             spatstat.geom</span>
+<span class="co">#&gt;   as.function.im           spatstat.geom</span>
+<span class="co">#&gt;   as.function.owin         spatstat.geom</span>
+<span class="co">#&gt;   as.function.tess         spatstat.geom</span>
+<span class="co">#&gt;   as.list.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.im             spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.owin           spatstat.geom</span>
+<span class="co">#&gt;   as.matrix.ppx            spatstat.geom</span>
+<span class="co">#&gt;   by.im                    spatstat.geom</span>
+<span class="co">#&gt;   by.ppp                   spatstat.geom</span>
+<span class="co">#&gt;   cbind.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   contour.funxy            spatstat.geom</span>
+<span class="co">#&gt;   contour.im               spatstat.geom</span>
+<span class="co">#&gt;   contour.imlist           spatstat.geom</span>
+<span class="co">#&gt;   contour.listof           spatstat.geom</span>
+<span class="co">#&gt;   cut.im                   spatstat.geom</span>
+<span class="co">#&gt;   cut.ppp                  spatstat.geom</span>
+<span class="co">#&gt;   [.diagramobj             spatstat.geom</span>
+<span class="co">#&gt;   dim.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   dim.im                   spatstat.geom</span>
+<span class="co">#&gt;   dimnames.hyperframe      spatstat.geom</span>
+<span class="co">#&gt;   dim.owin                 spatstat.geom</span>
+<span class="co">#&gt;   duplicated.ppp           spatstat.geom</span>
+<span class="co">#&gt;   duplicated.ppx           spatstat.geom</span>
+<span class="co">#&gt;   edit.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   edit.im                  spatstat.geom</span>
+<span class="co">#&gt;   edit.ppp                              </span>
+<span class="co">#&gt;   edit.psp                 spatstat.geom</span>
+<span class="co">#&gt;   format.numberwithunit    spatstat.geom</span>
+<span class="co">#&gt;   head.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   head.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   head.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   head.psp                 spatstat.geom</span>
+<span class="co">#&gt;   head.tess                spatstat.geom</span>
+<span class="co">#&gt;   hist.funxy               spatstat.geom</span>
+<span class="co">#&gt;   hist.im                  spatstat.geom</span>
+<span class="co">#&gt;   [.hyperframe             spatstat.geom</span>
+<span class="co">#&gt;   $.hyperframe             spatstat.geom</span>
+<span class="co">#&gt;   identify.ppp             spatstat.geom</span>
+<span class="co">#&gt;   identify.psp             spatstat.geom</span>
+<span class="co">#&gt;   [.im                                  </span>
+<span class="co">#&gt;   image.im                              </span>
+<span class="co">#&gt;   image.imlist             spatstat.geom</span>
+<span class="co">#&gt;   image.listof             spatstat.geom</span>
+<span class="co">#&gt;   [.layered                spatstat.geom</span>
+<span class="co">#&gt;   levels.im                spatstat.geom</span>
+<span class="co">#&gt;   names.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   [.owin                   spatstat.geom</span>
+<span class="co">#&gt;   persp.funxy              spatstat.geom</span>
+<span class="co">#&gt;   persp.im                              </span>
+<span class="co">#&gt;   plot.anylist                          </span>
+<span class="co">#&gt;   plot.barplotdata         spatstat.geom</span>
+<span class="co">#&gt;   plot.colourmap                        </span>
+<span class="co">#&gt;   plot.funxy               spatstat.geom</span>
+<span class="co">#&gt;   plot.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   plot.im                               </span>
+<span class="co">#&gt;   plot.imlist                           </span>
+<span class="co">#&gt;   plot.indicfun            spatstat.geom</span>
+<span class="co">#&gt;   plot.infline             spatstat.geom</span>
+<span class="co">#&gt;   plot.layered             spatstat.geom</span>
+<span class="co">#&gt;   plot.listof                           </span>
+<span class="co">#&gt;   plot.onearrow            spatstat.geom</span>
+<span class="co">#&gt;   plot.owin                spatstat.geom</span>
+<span class="co">#&gt;   plot.pp3                 spatstat.geom</span>
+<span class="co">#&gt;   plot.ppp                              </span>
+<span class="co">#&gt;   plot.pppmatching         spatstat.geom</span>
+<span class="co">#&gt;   plot.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   plot.psp                 spatstat.geom</span>
+<span class="co">#&gt;   plot.quad                spatstat.geom</span>
+<span class="co">#&gt;   plot.quadratcount        spatstat.geom</span>
+<span class="co">#&gt;   plot.solist                           </span>
+<span class="co">#&gt;   plot.splitppp            spatstat.geom</span>
+<span class="co">#&gt;   plot.symbolmap           spatstat.geom</span>
+<span class="co">#&gt;   plot.tess                             </span>
+<span class="co">#&gt;   plot.textstring          spatstat.geom</span>
+<span class="co">#&gt;   plot.texturemap                       </span>
+<span class="co">#&gt;   plot.yardstick                        </span>
+<span class="co">#&gt;   [.pp3                    spatstat.geom</span>
+<span class="co">#&gt;   [.ppp                    spatstat.geom</span>
+<span class="co">#&gt;   [.ppx                    spatstat.geom</span>
+<span class="co">#&gt;   print.anylist            spatstat.geom</span>
+<span class="co">#&gt;   print.box3               spatstat.geom</span>
+<span class="co">#&gt;   print.boxx               spatstat.geom</span>
+<span class="co">#&gt;   print.colourmap          spatstat.geom</span>
+<span class="co">#&gt;   print.distfun            spatstat.geom</span>
+<span class="co">#&gt;   print.ewcdf              spatstat.geom</span>
+<span class="co">#&gt;   print.funxy              spatstat.geom</span>
+<span class="co">#&gt;   print.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   print.im                 spatstat.geom</span>
+<span class="co">#&gt;   print.indicfun           spatstat.geom</span>
+<span class="co">#&gt;   print.infline            spatstat.geom</span>
+<span class="co">#&gt;   print.layered            spatstat.geom</span>
+<span class="co">#&gt;   print.lut                spatstat.geom</span>
+<span class="co">#&gt;   print.nnfun              spatstat.geom</span>
+<span class="co">#&gt;   print.numberwithunit     spatstat.geom</span>
+<span class="co">#&gt;   print.onearrow           spatstat.geom</span>
+<span class="co">#&gt;   print.owin               spatstat.geom</span>
+<span class="co">#&gt;   print.pp3                spatstat.geom</span>
+<span class="co">#&gt;   print.ppp                spatstat.geom</span>
+<span class="co">#&gt;   print.pppmatching        spatstat.geom</span>
+<span class="co">#&gt;   print.ppx                spatstat.geom</span>
+<span class="co">#&gt;   print.psp                spatstat.geom</span>
+<span class="co">#&gt;   print.quad               spatstat.geom</span>
+<span class="co">#&gt;   print.simplepanel        spatstat.geom</span>
+<span class="co">#&gt;   print.solist             spatstat.geom</span>
+<span class="co">#&gt;   print.splitppp           spatstat.geom</span>
+<span class="co">#&gt;   print.splitppx           spatstat.geom</span>
+<span class="co">#&gt;   print.summary.distfun    spatstat.geom</span>
+<span class="co">#&gt;   print.summary.funxy      spatstat.geom</span>
+<span class="co">#&gt;   print.summary.hyperframe spatstat.geom</span>
+<span class="co">#&gt;   print.summary.im         spatstat.geom</span>
+<span class="co">#&gt;   print.summary.listof     spatstat.geom</span>
+<span class="co">#&gt;   print.summary.logiquad   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.lut        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.owin       spatstat.geom</span>
+<span class="co">#&gt;   print.summary.pp3        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.ppp        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.psp        spatstat.geom</span>
+<span class="co">#&gt;   print.summary.quad                    </span>
+<span class="co">#&gt;   print.summary.solist     spatstat.geom</span>
+<span class="co">#&gt;   print.summary.splitppp   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.splitppx   spatstat.geom</span>
+<span class="co">#&gt;   print.summary.unitname   spatstat.geom</span>
+<span class="co">#&gt;   print.symbolmap          spatstat.geom</span>
+<span class="co">#&gt;   print.tess               spatstat.geom</span>
+<span class="co">#&gt;   print.textstring         spatstat.geom</span>
+<span class="co">#&gt;   print.texturemap         spatstat.geom</span>
+<span class="co">#&gt;   print.timed              spatstat.geom</span>
+<span class="co">#&gt;   print.unitname           spatstat.geom</span>
+<span class="co">#&gt;   print.yardstick          spatstat.geom</span>
+<span class="co">#&gt;   [.psp                    spatstat.geom</span>
+<span class="co">#&gt;   [.quad                   spatstat.geom</span>
+<span class="co">#&gt;   quantile.ewcdf           spatstat.geom</span>
+<span class="co">#&gt;   quantile.im              spatstat.geom</span>
+<span class="co">#&gt;   rbind.hyperframe         spatstat.geom</span>
+<span class="co">#&gt;   relevel.im               spatstat.geom</span>
+<span class="co">#&gt;   relevel.ppp              spatstat.geom</span>
+<span class="co">#&gt;   relevel.ppx              spatstat.geom</span>
+<span class="co">#&gt;   round.pp3                spatstat.geom</span>
+<span class="co">#&gt;   round.ppp                spatstat.geom</span>
+<span class="co">#&gt;   round.ppx                spatstat.geom</span>
+<span class="co">#&gt;   row.names.hyperframe     spatstat.geom</span>
+<span class="co">#&gt;   [.solist                 spatstat.geom</span>
+<span class="co">#&gt;   sort.im                  spatstat.geom</span>
+<span class="co">#&gt;   split.hyperframe                      </span>
+<span class="co">#&gt;   split.im                 spatstat.geom</span>
+<span class="co">#&gt;   [.splitppp               spatstat.geom</span>
+<span class="co">#&gt;   split.ppp                spatstat.geom</span>
+<span class="co">#&gt;   split.ppx                spatstat.geom</span>
+<span class="co">#&gt;   [.splitppx               spatstat.geom</span>
+<span class="co">#&gt;   str.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   subset.hyperframe        spatstat.geom</span>
+<span class="co">#&gt;   subset.pp3               spatstat.geom</span>
+<span class="co">#&gt;   subset.ppp               spatstat.geom</span>
+<span class="co">#&gt;   subset.ppx               spatstat.geom</span>
+<span class="co">#&gt;   subset.psp               spatstat.geom</span>
+<span class="co">#&gt;   summary.anylist          spatstat.geom</span>
+<span class="co">#&gt;   summary.distfun          spatstat.geom</span>
+<span class="co">#&gt;   summary.funxy            spatstat.geom</span>
+<span class="co">#&gt;   summary.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   summary.im               spatstat.geom</span>
+<span class="co">#&gt;   summary.listof           spatstat.geom</span>
+<span class="co">#&gt;   summary.logiquad         spatstat.geom</span>
+<span class="co">#&gt;   summary.lut              spatstat.geom</span>
+<span class="co">#&gt;   summary.owin             spatstat.geom</span>
+<span class="co">#&gt;   summary.pp3              spatstat.geom</span>
+<span class="co">#&gt;   summary.ppp              spatstat.geom</span>
+<span class="co">#&gt;   summary.pppmatching      spatstat.geom</span>
+<span class="co">#&gt;   summary.ppx              spatstat.geom</span>
+<span class="co">#&gt;   summary.psp              spatstat.geom</span>
+<span class="co">#&gt;   summary.quad                          </span>
+<span class="co">#&gt;   summary.solist           spatstat.geom</span>
+<span class="co">#&gt;   summary.splitppp         spatstat.geom</span>
+<span class="co">#&gt;   summary.splitppx         spatstat.geom</span>
+<span class="co">#&gt;   summary.unitname         spatstat.geom</span>
+<span class="co">#&gt;   tail.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   tail.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   tail.ppx                 spatstat.geom</span>
+<span class="co">#&gt;   tail.psp                 spatstat.geom</span>
+<span class="co">#&gt;   tail.tess                spatstat.geom</span>
+<span class="co">#&gt;   [.tess                   spatstat.geom</span>
+<span class="co">#&gt;   text.ppp                 spatstat.geom</span>
+<span class="co">#&gt;   text.psp                 spatstat.geom</span>
+<span class="co">#&gt;   unique.ppp               spatstat.geom</span>
+<span class="co">#&gt;   unique.ppx               spatstat.geom</span>
+<span class="co">#&gt;   unstack.layered          spatstat.geom</span>
+<span class="co">#&gt;   unstack.ppp              spatstat.geom</span>
+<span class="co">#&gt;   unstack.psp              spatstat.geom</span>
+<span class="co">#&gt;   unstack.solist           spatstat.geom</span>
+<span class="co">#&gt;   unstack.tess             spatstat.geom</span>
+<span class="co">#&gt;   update.im                spatstat.geom</span>
+<span class="co">#&gt;   update.symbolmap         spatstat.geom</span>
+<span class="co">#&gt;   with.hyperframe          spatstat.geom</span>
+<span class="co">#&gt;   xtfrm.im                 spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.anylist              spatstat.geom</span>
+<span class="co">#&gt;   dimnames&lt;-.hyperframe    spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   $&lt;-.hyperframe           spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.im                   spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.layered              spatstat.geom</span>
+<span class="co">#&gt;   [[&lt;-.layered             spatstat.geom</span>
+<span class="co">#&gt;   levels&lt;-.im              spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.listof               spatstat.geom</span>
+<span class="co">#&gt;   names&lt;-.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.ppp                  spatstat.geom</span>
+<span class="co">#&gt;   row.names&lt;-.hyperframe   spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.solist               spatstat.geom</span>
+<span class="co">#&gt;   split&lt;-.hyperframe       spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.splitppp             spatstat.geom</span>
+<span class="co">#&gt;   split&lt;-.ppp              spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.splitppx             spatstat.geom</span>
+<span class="co">#&gt;   [&lt;-.tess                 spatstat.geom</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ :'data.frame':    50000 obs. of  3 variables:</span>
 <span class="co">#&gt;   ..$ p: num [1:50000] 1.73e-03 3.59e-01 2.94e-05 1.51e-15 9.94e-02 ...</span>
@@ -168,40 +408,40 @@
 
 <span class="va">p</span> <span class="op">=</span> <span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">p</span>
 <span class="va">q</span> <span class="op">=</span> <span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">q</span>
-<span class="va">v</span> <span class="op">=</span> <span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></pre></div>
+<span class="va">v</span> <span class="op">=</span> <span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <p>The output from the function is a list of length two. The first element is a data.frame containing the <span class="math inline">\(p\)</span>-values (input parameter <code>p</code>), the auxiliary data values (input parameter <code>q</code>) and the generated <span class="math inline">\(v\)</span>-values. The second element contains auxiliary data, such as how many data-points were left-censored in the method and/or spline corrected.</p>
 <p><strong>Note that the cFDR framework requires that low <span class="math inline">\(p\)</span>-values are enriched for low <span class="math inline">\(q\)</span> values, so that if the correlation between <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> is negative then the function intrinsically flips the sign of <span class="math inline">\(q\)</span>, meaning that the <span class="math inline">\(q\)</span> values reported in the data.frame output may be <span class="math inline">\(q:=-q\)</span>.</strong></p>
 <hr>
 <p>We can then visualise the results using the <code>pv_plot</code> and <code>log10pv_plot</code> functions. We observe that <span class="math inline">\(v\)</span>-values for SNPs with high <span class="math inline">\(q\)</span> values are increased, whilst those for SNPs with low <span class="math inline">\(q\)</span> values are decreased.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu"><a href="../reference/pv_plot.html">pv_plot</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">p</span>, q <span class="op">=</span> <span class="va">q</span>, v <span class="op">=</span> <span class="va">v</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pv_plot.html">pv_plot</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">p</span>, q <span class="op">=</span> <span class="va">q</span>, v <span class="op">=</span> <span class="va">v</span><span class="op">)</span></code></pre></div>
 <p><img src="fcfdr-vignette_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="fu"><a href="../reference/log10pv_plot.html">log10pv_plot</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">p</span>, q <span class="op">=</span> <span class="va">q</span>, v <span class="op">=</span> <span class="va">v</span>, 
-             axis_lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="co"># zoom in to interesting region</span></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/log10pv_plot.html">log10pv_plot</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">p</span>, q <span class="op">=</span> <span class="va">q</span>, v <span class="op">=</span> <span class="va">v</span>, 
+             axis_lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="co"># zoom in to interesting region</span></code></pre></div>
 <p><img src="fcfdr-vignette_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
 <hr>
 <p>Finally, we run the Benjamini-Hochberg procedure on the <span class="math inline">\(v\)</span>-values and control the FDR at 0.05. This means that we are willing to accept up to 5% of the associations to be false positives.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="va">hit</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html">p.adjust</a></span><span class="op">(</span><span class="va">v</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hit</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html">p.adjust</a></span><span class="op">(</span><span class="va">v</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span></code></pre></div>
 <p>For comparison, we do the same to the raw p-values:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="va">hit_p</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html">p.adjust</a></span><span class="op">(</span><span class="va">p</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hit_p</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html">p.adjust</a></span><span class="op">(</span><span class="va">p</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span></code></pre></div>
 <p>‘True’ associations are those with indices 1-500, so the proportions of false discoveries are</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="co"># cFDR</span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># cFDR</span>
 <span class="fl">1</span> <span class="op">-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html">intersect</a></span><span class="op">(</span><span class="va">hit</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">hit</span><span class="op">)</span><span class="op">)</span> 
 <span class="co">#&gt; [1] 0.04363636</span>
 
 <span class="co"># p-value</span>
 <span class="fl">1</span> <span class="op">-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html">intersect</a></span><span class="op">(</span><span class="va">hit_p</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">hit_p</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.02262443</span></pre></div>
+<span class="co">#&gt; [1] 0.02262443</span></code></pre></div>
 <hr>
 <p>Altogether, the cFDR method has found 47 new associations that are true whilst controlling the FDR.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="co"># number of extra true associations identified by flexible cFDR</span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># number of extra true associations identified by flexible cFDR</span>
 <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">hit</span><span class="op">[</span><span class="op">!</span><span class="va">hit</span> <span class="op">%in%</span> <span class="va">hit_p</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">500</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 47</span></pre></div>
+<span class="co">#&gt; [1] 47</span></code></pre></div>
 </div>
   </div>
 

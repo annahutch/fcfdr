@@ -87,7 +87,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,6 +106,9 @@
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D application</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
     </li>
     <li>
       <a href="../articles/extra-information.html">Extra information</a>
@@ -186,20 +189,25 @@
         <td>
           <p><code><a href="corr_plot.html">corr_plot()</a></code> </p>
         </td>
-        <td><p>Plot relationship between p and q
-Plot -log10(p) values for quantiles of q</p></td>
+        <td><p>Writes out a violin plot of -log10(p) values for quantiles of q</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="stratified_qqplot.html">stratified_qqplot()</a></code> </p>
+        </td>
+        <td><p>Writes out a stratified Q-Q plot.</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="pv_plot.html">pv_plot()</a></code> </p>
         </td>
-        <td><p>ggplot to visualise fcfdr results</p></td>
+        <td><p>Writes out a plot of p against v coloured by q</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="log10pv_plot.html">log10pv_plot()</a></code> </p>
         </td>
-        <td><p>ggplot to visualise fcfdr results (-log10)</p></td>
+        <td><p>Writes out a plot of -log10(p) against -log10(v) coloured by q</p></td>
       </tr>
     </tbody>
     </table>

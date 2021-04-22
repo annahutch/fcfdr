@@ -47,7 +47,9 @@
 
 
 <meta property="og:title" content="Function to perform cFDR for continuous auxiliary covariates — flexible_cfdr" />
-<meta property="og:description" content="Function to perform cFDR for continuous auxiliary covariates" />
+<meta property="og:description" content="
+
+" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -88,7 +90,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -107,6 +109,9 @@
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D application</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
     </li>
     <li>
       <a href="../articles/extra-information.html">Extra information</a>
@@ -140,7 +145,9 @@
     </div>
 
     <div class="ref-description">
-    <p>Function to perform cFDR for continuous auxiliary covariates</p>
+    
+
+
     </div>
 
     <pre class="usage"><span class='fu'>flexible_cfdr</span><span class='op'>(</span>
@@ -152,7 +159,11 @@
   res_q <span class='op'>=</span> <span class='fl'>500</span>,
   gridp <span class='op'>=</span> <span class='fl'>50</span>,
   splinecorr <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  dist_thr <span class='op'>=</span> <span class='fl'>0.5</span>
+  dist_thr <span class='op'>=</span> <span class='fl'>0.5</span>,
+  plot_KDE <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  maf <span class='op'>=</span> <span class='cn'>NULL</span>,
+  check_indep_cor <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  enforce_p_q_cor <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -194,11 +205,30 @@
       <th>dist_thr</th>
       <td><p>distance threshold for spline correction</p></td>
     </tr>
+    <tr>
+      <th>plot_KDE</th>
+      <td><p>logical value for whether to plot the fitted KDE</p></td>
+    </tr>
+    <tr>
+      <th>maf</th>
+      <td><p>minor allele frequencies for SNPs to which <code>p</code> and <code>q</code> relate</p></td>
+    </tr>
+    <tr>
+      <th>check_indep_cor</th>
+      <td><p>check that sign of the correlation between <code>p</code> and <code>q</code> is the same in the independent subset as in the whole</p></td>
+    </tr>
+    <tr>
+      <th>enforce_p_q_cor</th>
+      <td><p>if <code>p</code> and <code>q</code> are negatively correlated, flip the sign on <code>q</code> values</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If <code>maf</code> is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

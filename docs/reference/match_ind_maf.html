@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • fcfdr</title>
+<title>Function to downsample independent SNPs to match MAF distribution of whole set. — match_ind_maf • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Function to downsample independent SNPs to match MAF distribution of whole set. — match_ind_maf" />
+<meta property="og:description" content="Matches MAF distribution of independent set of SNPs to MAF distribution of whole set of SNPs to avoid MAF-based confounding." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -66,7 +67,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -136,24 +137,42 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Function to downsample independent SNPs to match MAF distribution of whole set.</h1>
+    
+    <div class="hidden name"><code>match_ind_maf.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="extra-information.html">Extra Information</a></dt>
-        <dd></dt>
-        <dt><a href="fcfdr-vignette.html">Introductory vignette</a></dt>
-        <dd></dt>
-        <dt><a href="ldak-vignette.html">LDAK vignette</a></dt>
-        <dd></dt>
-        <dt><a href="t1d_app.html">T1D Application</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Matches MAF distribution of independent set of SNPs to MAF distribution of whole set of SNPs to avoid MAF-based confounding.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>match_ind_maf</span><span class='op'>(</span><span class='va'>maf</span>, <span class='va'>indep_index</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>maf</th>
+      <td><p>minor allele frequencies of (all) SNPs</p></td>
+    </tr>
+    <tr>
+      <th>indep_index</th>
+      <td><p>indices of independent SNPs</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>indices of independent SNP in chosen in sample</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Must supply maf values from the whole data set, not just the independent SNPs.</p>
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
