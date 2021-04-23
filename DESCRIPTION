@@ -1,6 +1,6 @@
 Package: fcfdr
 Title: Flexible cFDR
-Version: 0.0.1
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Anna",
            family = "Hutchinson",
