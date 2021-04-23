@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fcfdr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -62,9 +62,6 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
-    </li>
-    <li>
-      <a href="../articles/t1d_app.html">T1D application</a>
     </li>
     <li>
       <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
@@ -137,7 +134,7 @@
 <div id="ind" class="section level3">
 <h3 class="hasAnchor">
 <a href="#ind" class="anchor"></a>Finding independent subsets of SNPs</h3>
-<p>The <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> function requires the indices of an independent subset of the GWAS SNPs to ensure non-biased bandwidth estimation for the KDE. In practice, we use SNPs allocated a non-zero LDAK weight as our subset of independent SNPs. Instructions to generate LDAK weights can be found <a href="http://dougspeed.com/calculate-weightings/">here</a> (note that genotype data is required but this can be estimated from a reference panel). PLINK can also be used (see <a href="https://www.cog-genomics.org/plink/1.9/ld">here</a>).</p>
+<p>The <code><a href="../reference/flexible_cfdr.html">flexible_cfdr()</a></code> function requires the indices of an independent subset of the GWAS SNPs to ensure non-biased bandwidth estimation for the KDE. In practice, we use SNPs allocated a non-zero LDAK weight as our subset of independent SNPs. Instructions to generate LDAK weights can be found <a href="https://annahutch.github.io/fcfdr/articles/ldak-vignette.html">in this vignette</a>. Alternatively, PLINK can also be used (see <a href="https://www.cog-genomics.org/plink/1.9/ld">here</a>).</p>
 <p>The binary cFDR method does not fit a KDE and instead uses empirical CDFs. For this reason, a leave-one-chromosome-out procedure is implemented intrinsically in the <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code> function. Therefore, the <code><a href="../reference/binary_cfdr.html">binary_cfdr()</a></code> function requires per-SNP chromosomes as input.</p>
 <hr>
 </div>
@@ -158,7 +155,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Anna Hutchinson, Chris Wallace.</p>
+  <p>Developed by Anna Hutchinson, Chris Wallace, Thomas Willis.</p>
 </div>
 
 <div class="pkgdown">

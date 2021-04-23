@@ -2,7 +2,7 @@
 title: "T1D Application"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{T1D application}
+  %\VignetteIndexEntry{T1D Application}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   dev = 'png'
 )
+
+Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
 In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations. This application takes about 30 minutes to run.
@@ -36,18 +38,18 @@ First, we download the data:
 ```{r}
 set.seed(1)
 library(fcfdr)
-data(df, package = "fcfdr")
-head(df)
+data(T1D_df, package = "fcfdr")
+head(T1D_df)
 ```
 
 In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overlap with TFBS (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate $v$-values. 
 
 ```{r}
-orig_p <- df$p
-chr <- df$chrom
-q1 <- df$RA_p
-q2 <- df$DGF_ENCODE
-q3 <- log(df$Th_H3K27ac+1)
+orig_p <- T1D_df$p
+chr <- T1D_df$chrom
+q1 <- T1D_df$RA_p
+q2 <- T1D_df$DGF_ENCODE
+q3 <- log(T1D_df$Th_H3K27ac+1)
 ```
 
 ---
@@ -55,7 +57,7 @@ q3 <- log(df$Th_H3K27ac+1)
 The data frame also contains a column of LDAK weights for each SNP (http://dougspeed.com/calculate-weightings/). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.
 
 ```{r}
-ind_snps <- which(df$ldak_weight != 0)
+ind_snps <- which(T1D_df$ldak_weight != 0)
 ```
 
 ---
@@ -149,12 +151,12 @@ fdr_thr <- 4*10^-6
 
 length(which(v3 < fdr_thr & orig_p > fdr_thr))
 
-median(df$RA_p[which(v3 < fdr_thr & orig_p > fdr_thr)])
-median(df$RA_p)
+median(T1D_df$RA_p[which(v3 < fdr_thr & orig_p > fdr_thr)])
+median(T1D_df$RA_p)
 
-mean(df$DGF_ENCODE[which(v3 < fdr_thr & orig_p > fdr_thr)])
-mean(df$DGF_ENCODE)
+mean(T1D_df$DGF_ENCODE[which(v3 < fdr_thr & orig_p > fdr_thr)])
+mean(T1D_df$DGF_ENCODE)
 
-median(df$Th_H3K27ac[which(v3 < fdr_thr & orig_p > fdr_thr)])
-median(df$Th_H3K27ac)
+median(T1D_df$Th_H3K27ac[which(v3 < fdr_thr & orig_p > fdr_thr)])
+median(T1D_df$Th_H3K27ac)
 ```

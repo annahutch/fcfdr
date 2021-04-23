@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fcfdr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -62,9 +62,6 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
-    </li>
-    <li>
-      <a href="../articles/t1d_app.html">T1D application</a>
     </li>
     <li>
       <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
@@ -113,7 +110,7 @@
 <div id="obtaining-and-processing-the-1000g-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#obtaining-and-processing-the-1000g-data" class="anchor"></a>Obtaining and processing the 1000G data</h2>
-<p><em>NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~270MB download at <a href="https://doi.org/10.5281/zenodo.4705050">https://doi.org/10.5281/zenodo.4705050</a>. If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.</em></p>
+<p><em>NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~280MB download at <a href="https://doi.org/10.5281/zenodo.4709547">https://doi.org/10.5281/zenodo.4709547</a>. If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.</em></p>
 <p>We first download the 1000G Phase 3 data in the <code>vcf</code> format. These data use the <code>hg19</code> genome assembly for SNP coordinates.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>    <span class="fu">wget</span> -O <span class="st">"chr"</span><span class="va">$i</span><span class="st">".vcf.gz"</span> <span class="st">"ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr"</span><span class="va">$i</span><span class="st">".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"</span></span>
@@ -272,7 +269,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Anna Hutchinson, Chris Wallace.</p>
+  <p>Developed by Anna Hutchinson, Chris Wallace, Thomas Willis.</p>
 </div>
 
 <div class="pkgdown">

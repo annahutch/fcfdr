@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fcfdr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -62,9 +62,6 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
-    </li>
-    <li>
-      <a href="../articles/t1d_app.html">T1D application</a>
     </li>
     <li>
       <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
@@ -156,244 +153,7 @@
 <p>We are now ready to use the <code>flexible_cfdr</code> function to derive the <span class="math inline">\(v\)</span>-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the <a href="http://dougspeed.com/calculate-weightings/">vignette for deriving LDAK weights here</a>.</p>
 <p>This line of code will take approximately 4 minutes to run.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span>, indep_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Registered S3 methods overwritten by 'spatstat':</span>
-<span class="co">#&gt;   method                   from         </span>
-<span class="co">#&gt;   Complex.im               spatstat.geom</span>
-<span class="co">#&gt;   Complex.imlist           spatstat.geom</span>
-<span class="co">#&gt;   Math.im                  spatstat.geom</span>
-<span class="co">#&gt;   Math.imlist              spatstat.geom</span>
-<span class="co">#&gt;   mean.im                  spatstat.geom</span>
-<span class="co">#&gt;   median.im                spatstat.geom</span>
-<span class="co">#&gt;   Ops.im                   spatstat.geom</span>
-<span class="co">#&gt;   Ops.imlist               spatstat.geom</span>
-<span class="co">#&gt;   Summary.im               spatstat.geom</span>
-<span class="co">#&gt;   Summary.imlist           spatstat.geom</span>
-<span class="co">#&gt;   anyDuplicated.ppp        spatstat.geom</span>
-<span class="co">#&gt;   anyDuplicated.ppx        spatstat.geom</span>
-<span class="co">#&gt;   [.anylist                spatstat.geom</span>
-<span class="co">#&gt;   anyNA.im                 spatstat.geom</span>
-<span class="co">#&gt;   as.array.im              spatstat.geom</span>
-<span class="co">#&gt;   as.character.unitname    spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.hyperframe spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.im         spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.owin       spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.ppp        spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.ppx        spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.psp        spatstat.geom</span>
-<span class="co">#&gt;   as.data.frame.tess       spatstat.geom</span>
-<span class="co">#&gt;   as.double.im             spatstat.geom</span>
-<span class="co">#&gt;   as.function.im           spatstat.geom</span>
-<span class="co">#&gt;   as.function.owin         spatstat.geom</span>
-<span class="co">#&gt;   as.function.tess         spatstat.geom</span>
-<span class="co">#&gt;   as.list.hyperframe       spatstat.geom</span>
-<span class="co">#&gt;   as.matrix.im             spatstat.geom</span>
-<span class="co">#&gt;   as.matrix.owin           spatstat.geom</span>
-<span class="co">#&gt;   as.matrix.ppx            spatstat.geom</span>
-<span class="co">#&gt;   by.im                    spatstat.geom</span>
-<span class="co">#&gt;   by.ppp                   spatstat.geom</span>
-<span class="co">#&gt;   cbind.hyperframe         spatstat.geom</span>
-<span class="co">#&gt;   contour.funxy            spatstat.geom</span>
-<span class="co">#&gt;   contour.im               spatstat.geom</span>
-<span class="co">#&gt;   contour.imlist           spatstat.geom</span>
-<span class="co">#&gt;   contour.listof           spatstat.geom</span>
-<span class="co">#&gt;   cut.im                   spatstat.geom</span>
-<span class="co">#&gt;   cut.ppp                  spatstat.geom</span>
-<span class="co">#&gt;   [.diagramobj             spatstat.geom</span>
-<span class="co">#&gt;   dim.hyperframe           spatstat.geom</span>
-<span class="co">#&gt;   dim.im                   spatstat.geom</span>
-<span class="co">#&gt;   dimnames.hyperframe      spatstat.geom</span>
-<span class="co">#&gt;   dim.owin                 spatstat.geom</span>
-<span class="co">#&gt;   duplicated.ppp           spatstat.geom</span>
-<span class="co">#&gt;   duplicated.ppx           spatstat.geom</span>
-<span class="co">#&gt;   edit.hyperframe          spatstat.geom</span>
-<span class="co">#&gt;   edit.im                  spatstat.geom</span>
-<span class="co">#&gt;   edit.ppp                              </span>
-<span class="co">#&gt;   edit.psp                 spatstat.geom</span>
-<span class="co">#&gt;   format.numberwithunit    spatstat.geom</span>
-<span class="co">#&gt;   head.hyperframe          spatstat.geom</span>
-<span class="co">#&gt;   head.ppp                 spatstat.geom</span>
-<span class="co">#&gt;   head.ppx                 spatstat.geom</span>
-<span class="co">#&gt;   head.psp                 spatstat.geom</span>
-<span class="co">#&gt;   head.tess                spatstat.geom</span>
-<span class="co">#&gt;   hist.funxy               spatstat.geom</span>
-<span class="co">#&gt;   hist.im                  spatstat.geom</span>
-<span class="co">#&gt;   [.hyperframe             spatstat.geom</span>
-<span class="co">#&gt;   $.hyperframe             spatstat.geom</span>
-<span class="co">#&gt;   identify.ppp             spatstat.geom</span>
-<span class="co">#&gt;   identify.psp             spatstat.geom</span>
-<span class="co">#&gt;   [.im                                  </span>
-<span class="co">#&gt;   image.im                              </span>
-<span class="co">#&gt;   image.imlist             spatstat.geom</span>
-<span class="co">#&gt;   image.listof             spatstat.geom</span>
-<span class="co">#&gt;   [.layered                spatstat.geom</span>
-<span class="co">#&gt;   levels.im                spatstat.geom</span>
-<span class="co">#&gt;   names.hyperframe         spatstat.geom</span>
-<span class="co">#&gt;   [.owin                   spatstat.geom</span>
-<span class="co">#&gt;   persp.funxy              spatstat.geom</span>
-<span class="co">#&gt;   persp.im                              </span>
-<span class="co">#&gt;   plot.anylist                          </span>
-<span class="co">#&gt;   plot.barplotdata         spatstat.geom</span>
-<span class="co">#&gt;   plot.colourmap                        </span>
-<span class="co">#&gt;   plot.funxy               spatstat.geom</span>
-<span class="co">#&gt;   plot.hyperframe          spatstat.geom</span>
-<span class="co">#&gt;   plot.im                               </span>
-<span class="co">#&gt;   plot.imlist                           </span>
-<span class="co">#&gt;   plot.indicfun            spatstat.geom</span>
-<span class="co">#&gt;   plot.infline             spatstat.geom</span>
-<span class="co">#&gt;   plot.layered             spatstat.geom</span>
-<span class="co">#&gt;   plot.listof                           </span>
-<span class="co">#&gt;   plot.onearrow            spatstat.geom</span>
-<span class="co">#&gt;   plot.owin                spatstat.geom</span>
-<span class="co">#&gt;   plot.pp3                 spatstat.geom</span>
-<span class="co">#&gt;   plot.ppp                              </span>
-<span class="co">#&gt;   plot.pppmatching         spatstat.geom</span>
-<span class="co">#&gt;   plot.ppx                 spatstat.geom</span>
-<span class="co">#&gt;   plot.psp                 spatstat.geom</span>
-<span class="co">#&gt;   plot.quad                spatstat.geom</span>
-<span class="co">#&gt;   plot.quadratcount        spatstat.geom</span>
-<span class="co">#&gt;   plot.solist                           </span>
-<span class="co">#&gt;   plot.splitppp            spatstat.geom</span>
-<span class="co">#&gt;   plot.symbolmap           spatstat.geom</span>
-<span class="co">#&gt;   plot.tess                             </span>
-<span class="co">#&gt;   plot.textstring          spatstat.geom</span>
-<span class="co">#&gt;   plot.texturemap                       </span>
-<span class="co">#&gt;   plot.yardstick                        </span>
-<span class="co">#&gt;   [.pp3                    spatstat.geom</span>
-<span class="co">#&gt;   [.ppp                    spatstat.geom</span>
-<span class="co">#&gt;   [.ppx                    spatstat.geom</span>
-<span class="co">#&gt;   print.anylist            spatstat.geom</span>
-<span class="co">#&gt;   print.box3               spatstat.geom</span>
-<span class="co">#&gt;   print.boxx               spatstat.geom</span>
-<span class="co">#&gt;   print.colourmap          spatstat.geom</span>
-<span class="co">#&gt;   print.distfun            spatstat.geom</span>
-<span class="co">#&gt;   print.ewcdf              spatstat.geom</span>
-<span class="co">#&gt;   print.funxy              spatstat.geom</span>
-<span class="co">#&gt;   print.hyperframe         spatstat.geom</span>
-<span class="co">#&gt;   print.im                 spatstat.geom</span>
-<span class="co">#&gt;   print.indicfun           spatstat.geom</span>
-<span class="co">#&gt;   print.infline            spatstat.geom</span>
-<span class="co">#&gt;   print.layered            spatstat.geom</span>
-<span class="co">#&gt;   print.lut                spatstat.geom</span>
-<span class="co">#&gt;   print.nnfun              spatstat.geom</span>
-<span class="co">#&gt;   print.numberwithunit     spatstat.geom</span>
-<span class="co">#&gt;   print.onearrow           spatstat.geom</span>
-<span class="co">#&gt;   print.owin               spatstat.geom</span>
-<span class="co">#&gt;   print.pp3                spatstat.geom</span>
-<span class="co">#&gt;   print.ppp                spatstat.geom</span>
-<span class="co">#&gt;   print.pppmatching        spatstat.geom</span>
-<span class="co">#&gt;   print.ppx                spatstat.geom</span>
-<span class="co">#&gt;   print.psp                spatstat.geom</span>
-<span class="co">#&gt;   print.quad               spatstat.geom</span>
-<span class="co">#&gt;   print.simplepanel        spatstat.geom</span>
-<span class="co">#&gt;   print.solist             spatstat.geom</span>
-<span class="co">#&gt;   print.splitppp           spatstat.geom</span>
-<span class="co">#&gt;   print.splitppx           spatstat.geom</span>
-<span class="co">#&gt;   print.summary.distfun    spatstat.geom</span>
-<span class="co">#&gt;   print.summary.funxy      spatstat.geom</span>
-<span class="co">#&gt;   print.summary.hyperframe spatstat.geom</span>
-<span class="co">#&gt;   print.summary.im         spatstat.geom</span>
-<span class="co">#&gt;   print.summary.listof     spatstat.geom</span>
-<span class="co">#&gt;   print.summary.logiquad   spatstat.geom</span>
-<span class="co">#&gt;   print.summary.lut        spatstat.geom</span>
-<span class="co">#&gt;   print.summary.owin       spatstat.geom</span>
-<span class="co">#&gt;   print.summary.pp3        spatstat.geom</span>
-<span class="co">#&gt;   print.summary.ppp        spatstat.geom</span>
-<span class="co">#&gt;   print.summary.psp        spatstat.geom</span>
-<span class="co">#&gt;   print.summary.quad                    </span>
-<span class="co">#&gt;   print.summary.solist     spatstat.geom</span>
-<span class="co">#&gt;   print.summary.splitppp   spatstat.geom</span>
-<span class="co">#&gt;   print.summary.splitppx   spatstat.geom</span>
-<span class="co">#&gt;   print.summary.unitname   spatstat.geom</span>
-<span class="co">#&gt;   print.symbolmap          spatstat.geom</span>
-<span class="co">#&gt;   print.tess               spatstat.geom</span>
-<span class="co">#&gt;   print.textstring         spatstat.geom</span>
-<span class="co">#&gt;   print.texturemap         spatstat.geom</span>
-<span class="co">#&gt;   print.timed              spatstat.geom</span>
-<span class="co">#&gt;   print.unitname           spatstat.geom</span>
-<span class="co">#&gt;   print.yardstick          spatstat.geom</span>
-<span class="co">#&gt;   [.psp                    spatstat.geom</span>
-<span class="co">#&gt;   [.quad                   spatstat.geom</span>
-<span class="co">#&gt;   quantile.ewcdf           spatstat.geom</span>
-<span class="co">#&gt;   quantile.im              spatstat.geom</span>
-<span class="co">#&gt;   rbind.hyperframe         spatstat.geom</span>
-<span class="co">#&gt;   relevel.im               spatstat.geom</span>
-<span class="co">#&gt;   relevel.ppp              spatstat.geom</span>
-<span class="co">#&gt;   relevel.ppx              spatstat.geom</span>
-<span class="co">#&gt;   round.pp3                spatstat.geom</span>
-<span class="co">#&gt;   round.ppp                spatstat.geom</span>
-<span class="co">#&gt;   round.ppx                spatstat.geom</span>
-<span class="co">#&gt;   row.names.hyperframe     spatstat.geom</span>
-<span class="co">#&gt;   [.solist                 spatstat.geom</span>
-<span class="co">#&gt;   sort.im                  spatstat.geom</span>
-<span class="co">#&gt;   split.hyperframe                      </span>
-<span class="co">#&gt;   split.im                 spatstat.geom</span>
-<span class="co">#&gt;   [.splitppp               spatstat.geom</span>
-<span class="co">#&gt;   split.ppp                spatstat.geom</span>
-<span class="co">#&gt;   split.ppx                spatstat.geom</span>
-<span class="co">#&gt;   [.splitppx               spatstat.geom</span>
-<span class="co">#&gt;   str.hyperframe           spatstat.geom</span>
-<span class="co">#&gt;   subset.hyperframe        spatstat.geom</span>
-<span class="co">#&gt;   subset.pp3               spatstat.geom</span>
-<span class="co">#&gt;   subset.ppp               spatstat.geom</span>
-<span class="co">#&gt;   subset.ppx               spatstat.geom</span>
-<span class="co">#&gt;   subset.psp               spatstat.geom</span>
-<span class="co">#&gt;   summary.anylist          spatstat.geom</span>
-<span class="co">#&gt;   summary.distfun          spatstat.geom</span>
-<span class="co">#&gt;   summary.funxy            spatstat.geom</span>
-<span class="co">#&gt;   summary.hyperframe       spatstat.geom</span>
-<span class="co">#&gt;   summary.im               spatstat.geom</span>
-<span class="co">#&gt;   summary.listof           spatstat.geom</span>
-<span class="co">#&gt;   summary.logiquad         spatstat.geom</span>
-<span class="co">#&gt;   summary.lut              spatstat.geom</span>
-<span class="co">#&gt;   summary.owin             spatstat.geom</span>
-<span class="co">#&gt;   summary.pp3              spatstat.geom</span>
-<span class="co">#&gt;   summary.ppp              spatstat.geom</span>
-<span class="co">#&gt;   summary.pppmatching      spatstat.geom</span>
-<span class="co">#&gt;   summary.ppx              spatstat.geom</span>
-<span class="co">#&gt;   summary.psp              spatstat.geom</span>
-<span class="co">#&gt;   summary.quad                          </span>
-<span class="co">#&gt;   summary.solist           spatstat.geom</span>
-<span class="co">#&gt;   summary.splitppp         spatstat.geom</span>
-<span class="co">#&gt;   summary.splitppx         spatstat.geom</span>
-<span class="co">#&gt;   summary.unitname         spatstat.geom</span>
-<span class="co">#&gt;   tail.hyperframe          spatstat.geom</span>
-<span class="co">#&gt;   tail.ppp                 spatstat.geom</span>
-<span class="co">#&gt;   tail.ppx                 spatstat.geom</span>
-<span class="co">#&gt;   tail.psp                 spatstat.geom</span>
-<span class="co">#&gt;   tail.tess                spatstat.geom</span>
-<span class="co">#&gt;   [.tess                   spatstat.geom</span>
-<span class="co">#&gt;   text.ppp                 spatstat.geom</span>
-<span class="co">#&gt;   text.psp                 spatstat.geom</span>
-<span class="co">#&gt;   unique.ppp               spatstat.geom</span>
-<span class="co">#&gt;   unique.ppx               spatstat.geom</span>
-<span class="co">#&gt;   unstack.layered          spatstat.geom</span>
-<span class="co">#&gt;   unstack.ppp              spatstat.geom</span>
-<span class="co">#&gt;   unstack.psp              spatstat.geom</span>
-<span class="co">#&gt;   unstack.solist           spatstat.geom</span>
-<span class="co">#&gt;   unstack.tess             spatstat.geom</span>
-<span class="co">#&gt;   update.im                spatstat.geom</span>
-<span class="co">#&gt;   update.symbolmap         spatstat.geom</span>
-<span class="co">#&gt;   with.hyperframe          spatstat.geom</span>
-<span class="co">#&gt;   xtfrm.im                 spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.anylist              spatstat.geom</span>
-<span class="co">#&gt;   dimnames&lt;-.hyperframe    spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.hyperframe           spatstat.geom</span>
-<span class="co">#&gt;   $&lt;-.hyperframe           spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.im                   spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.layered              spatstat.geom</span>
-<span class="co">#&gt;   [[&lt;-.layered             spatstat.geom</span>
-<span class="co">#&gt;   levels&lt;-.im              spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.listof               spatstat.geom</span>
-<span class="co">#&gt;   names&lt;-.hyperframe       spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.ppp                  spatstat.geom</span>
-<span class="co">#&gt;   row.names&lt;-.hyperframe   spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.solist               spatstat.geom</span>
-<span class="co">#&gt;   split&lt;-.hyperframe       spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.splitppp             spatstat.geom</span>
-<span class="co">#&gt;   split&lt;-.ppp              spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.splitppx             spatstat.geom</span>
-<span class="co">#&gt;   [&lt;-.tess                 spatstat.geom</span></code></pre></div>
+<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flexible_cfdr.html">flexible_cfdr</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">q</span>, indep_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
@@ -454,7 +214,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Anna Hutchinson, Chris Wallace.</p>
+  <p>Developed by Anna Hutchinson, Chris Wallace, Thomas Willis.</p>
 </div>
 
 <div class="pkgdown">

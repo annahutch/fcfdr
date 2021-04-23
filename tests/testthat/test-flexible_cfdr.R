@@ -79,21 +79,21 @@ test_that("flexible_cfdr throws an error with flipped sign of principal-auxiliar
 })
 
 test_that("flexible_cfdr runs on subset of package sample data when matching MAF and using RA p-value as the auxiliary covariate", {
-  load(file=system.file('data', 'df.rda', package='fcfdr', mustWork = T))
+  load(file=system.file('data', 'T1D_df.RData', package='fcfdr', mustWork = T))
 
   set.seed(42)
 
-  res <- flexible_cfdr(df$p, q = -qnorm(df$RA_p/2), indep_index = which(df$ldak_weight != 0), maf = df$maf, check_indep_cor = FALSE, enforce_p_q_cor = FALSE)
+  res <- flexible_cfdr(T1D_df$p, q = -qnorm(T1D_df$RA_p/2), indep_index = which(T1D_df$ldak_weight != 0), maf = T1D_df$maf, check_indep_cor = FALSE, enforce_p_q_cor = FALSE)
   
   expect_equal(digest::digest(res), "f07705b80f5fc87fbed00872158046ad")
 })
 
 test_that("match_ind_maf runs on package sample data", {
-  load(file=system.file('data', 'df.rda', package='fcfdr', mustWork = T))
+  load(file=system.file('data', 'T1D_df.RData', package='fcfdr', mustWork = T))
 
   set.seed(1)
 
-  indep_index_sample <- match_ind_maf(maf = df$maf, indep_index = which(df$ldak_weight != 0))
+  indep_index_sample <- match_ind_maf(maf = T1D_df$maf, indep_index = which(T1D_df$ldak_weight != 0))
 
   expect_equal(digest::digest(indep_index_sample), "b5108cc5933a7c35f30aa718d30d93d2")
 })

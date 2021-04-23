@@ -19,5 +19,5 @@ log10pv_plot(p, q, v, axis_lim = c(0, 20))
 ggplot object
 }
 \description{
-
+Can be used to visualise the results from Flexible cFDR
 }

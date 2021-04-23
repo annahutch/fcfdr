@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   dev = 'png'
 )
+Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
 The `fcfdr` R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values. Since the v-values are analogous to p-values, they can be used directly in any error-rate controlling procedure.

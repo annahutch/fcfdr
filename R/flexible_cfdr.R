@@ -1,6 +1,6 @@
 #' @title Function to perform cFDR for continuous auxiliary covariates
 #'
-#' @description 
+#' @description Performs Flexible cFDR for continuous auxiliary covariates
 #'
 #' @details If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution. 
 #'

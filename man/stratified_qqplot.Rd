@@ -24,7 +24,7 @@ stratified_qqplot(
 ggplot object
 }
 \description{
-
+Can be used to investigate the relationship between p and q
 }
 \details{
 Note that this function does not do the heavy lifting of styling the plot's aesthetics.
