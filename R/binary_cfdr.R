@@ -59,6 +59,6 @@ binary_cfdr <- function(p, q, chr){
     v_res[[j]] <- p0*(1-q0) + p1*q0
   }
 
-  data.frame(p = unsplit(p_res, f = chr), q = unsplit(q_res, f = chr), v = unlist(v_res))
+  data.frame(p = unsplit(p_res, f = chr), q = unsplit(q_res, f = chr), v = unsplit(v_res, f = chr))
 
 }
