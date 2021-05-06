@@ -1,4 +1,5 @@
 #' Function to perform cFDR for binary auxiliary covariates
+#' PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT
 #'
 #' @param p p values for principal trait (vector of length n)
 #' @param q binary auxillary data values (vector of length n)
@@ -10,6 +11,8 @@
 #' @export
 #'
 binary_cfdr <- function(p, q, chr){
+  
+  print("Note that this function is currently under development!")
 
   unique_chr <- unique(chr)
 
