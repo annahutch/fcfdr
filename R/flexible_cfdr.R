@@ -5,11 +5,11 @@
 #' @details If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution. 
 #'
 #' @param p p values for principal trait (vector of length n)
-#' @param q continuous auxillary data values (vector of length n)
+#' @param q continuous auxiliary data values (vector of length n)
 #' @param indep_index indices of independent SNPs
-#' @param nxbin number of bins in zp direction for hex-binning
-#' @param res_p number of test points in x-direction (p)
-#' @param res_q number of test points in y-direction (q)
+#' @param res_p number of grid points in x-direction (p) for KDE estimation
+#' @param res_q number of grid points in y-direction (q) for KDE estimation
+#' @param nxbin number of bins in x-direction (p) for hex-binning
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
@@ -27,9 +27,9 @@
 #' @importFrom grDevices contourLines
 #' @import stats
 #'
-#' @return list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+#' @return list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 500, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, plot_KDE = FALSE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, plot_KDE = FALSE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -213,6 +213,9 @@ flexible_cfdr <- function(p, q, indep_index, nxbin = 1000, res_p = 300, res_q = 
   }
 
   v[which(v>1)] <- 1 # fix bug where some v vals = 1 + 2.220446e-16
+  
+  # print warning if v-values have changed too much as something has likely gone wrong
+  if( median(v) < 0.8*median(p) | median(v) > 1.2*median(p) ) warning('v-values very different to input p-values - check results')
 
   df <- data.frame(p, q, v)
 
