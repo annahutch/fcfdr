@@ -13,6 +13,7 @@
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
+#' @param locfdr_df df parameter in locfdr function
 #' @param plot_KDE logical value for whether to plot the fitted KDE
 #' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
@@ -29,7 +30,7 @@
 #'
 #' @return list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, plot_KDE = FALSE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot_KDE = FALSE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -79,7 +80,16 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   names(mlests) = NULL
 
   # local FDR = P(H0|ZP=zp)
-  lfdr <- locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 0, df = 10)
+  lfdr <- tryCatch(
+    {
+      locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 0, df = locfdr_df)
+    },
+    warning=function(cond) {
+      message("Warning from locfdr:")
+      message(cond)
+      message("Try running flexible_cfdr again and adjusting locfdr_df parameter")
+    }
+  )
 
   # extract lfdr values for kpq$x values
   lfdr_vals <- lfdr$mat[res_p:length(lfdr$mat[,1]),][,2]
