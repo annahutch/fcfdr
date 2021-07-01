@@ -8,13 +8,14 @@ flexible_cfdr(
   p,
   q,
   indep_index,
-  nxbin = 1000,
   res_p = 300,
   res_q = 500,
+  nxbin = 1000,
   gridp = 50,
   splinecorr = TRUE,
   dist_thr = 0.5,
-  plot_KDE = FALSE,
+  locfdr_df = 10,
+  plot = TRUE,
   maf = NULL,
   check_indep_cor = TRUE,
   enforce_p_q_cor = TRUE
@@ -23,15 +24,15 @@ flexible_cfdr(
 \arguments{
 \item{p}{p values for principal trait (vector of length n)}
 
-\item{q}{continuous auxillary data values (vector of length n)}
+\item{q}{continuous auxiliary data values (vector of length n)}
 
 \item{indep_index}{indices of independent SNPs}
 
-\item{nxbin}{number of bins in zp direction for hex-binning}
+\item{res_p}{number of grid points in x-direction (p) for KDE estimation}
 
-\item{res_p}{number of test points in x-direction (p)}
+\item{res_q}{number of grid points in y-direction (q) for KDE estimation}
 
-\item{res_q}{number of test points in y-direction (q)}
+\item{nxbin}{number of bins in x-direction (p) for hex-binning}
 
 \item{gridp}{number of data points required in a KDE grid point for left-censoring}
 
@@ -39,16 +40,18 @@ flexible_cfdr(
 
 \item{dist_thr}{distance threshold for spline correction}
 
-\item{plot_KDE}{logical value for whether to plot the fitted KDE}
+\item{locfdr_df}{df parameter in locfdr function}
 
-\item{maf}{minor allele frequencies for SNPs to which \code{p} and \code{q} relate}
+\item{plot}{logical value for whether to produce plots to assess KDE fit}
+
+\item{maf}{minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)}
 
 \item{check_indep_cor}{check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole}
 
 \item{enforce_p_q_cor}{if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values}
 }
 \value{
-list of length two: (1) dataframe of p-values, q-values and v-values (2) dataframe of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 }
 \description{
 Performs Flexible cFDR for continuous auxiliary covariates

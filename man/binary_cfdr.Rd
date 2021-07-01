@@ -2,7 +2,8 @@
 % Please edit documentation in R/binary_cfdr.R
 \name{binary_cfdr}
 \alias{binary_cfdr}
-\title{Function to perform cFDR for binary auxiliary covariates}
+\title{Function to perform cFDR for binary auxiliary covariates
+PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT}
 \usage{
 binary_cfdr(p, q, chr)
 }
@@ -18,4 +19,5 @@ dataframe of p, q and v values
 }
 \description{
 Function to perform cFDR for binary auxiliary covariates
+PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT
 }

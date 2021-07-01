@@ -14,8 +14,8 @@
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
 #' @param locfdr_df df parameter in locfdr function
-#' @param plot_KDE logical value for whether to plot the fitted KDE
-#' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate
+#' @param plot logical value for whether to produce plots to assess KDE fit
+#' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
 #' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
 #'
@@ -30,7 +30,7 @@
 #'
 #' @return list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot_KDE = FALSE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -88,6 +88,11 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
       message("Warning from locfdr:")
       message(cond)
       message("Try running flexible_cfdr again and adjusting locfdr_df parameter")
+      message("...")
+      message("To determine optimal value for locfdr_df parameter (df in locfdr::locfdr) see locfdr documentation here: ")
+      message("https://cran.r-project.org/web/packages/locfdr/vignettes/locfdr-example.pdf")
+      message("The fcfdr::zz_in_locfdr function can be used to output the zz vector")
+      message("that flexible_cfdr inputs into locfdr internally")
     }
   )
 
@@ -115,9 +120,11 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   # avoid 0-0 errors
   kgrid$z[which(kgrid$z==0)] <- min(kgrid$z[which(kgrid$z>0)])
   
-  if(plot_KDE == TRUE){
+  if(plot == TRUE){
     hist(q_ind, freq = FALSE, xlab = "q", main = "Histogram of q with\nestimated density in red")
     lines(kpq$y, kpq_norm[1,], col =  "red")
+    
+    image(kpq, xlab = "Principal trait Z-scores", ylab = "q", main = "Estimated density from 2D KDE")
   }
 
   # cgrid is grid of cFDR values
@@ -225,7 +232,11 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   v[which(v>1)] <- 1 # fix bug where some v vals = 1 + 2.220446e-16
   
   # print warning if v-values have changed too much as something has likely gone wrong
-  if( median(v) < 0.8*median(p) | median(v) > 1.2*median(p) ) warning('v-values very different to input p-values - check results')
+  if( median(v) < 0.8*median(p) | median(v) > 1.2*median(p) ){
+    
+    warning('v-values very different to input p-values - check results (if q has a long tail then try left censoring)')
+    
+    }
 
   df <- data.frame(p, q, v)
 
@@ -274,3 +285,55 @@ match_ind_maf <- function(maf, indep_index) {
 
   indep_sample_index
 }
+
+#' zz_in_locfdr
+#'
+#' @param p p values for principal trait (vector of length n)
+#' @param q continuous auxiliary data values (vector of length n)
+#' @param indep_index indices of independent SNPs
+#' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)
+#' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
+#' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
+#'
+#' @return
+#' @export
+#'
+zz_in_locfdr <- function(p, q, indep_index, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+  
+  # match MAF distribution of independent SNPs to that of whole
+  if(!is.null(maf)) {
+    
+    if(length(maf) != length(p)) {
+      stop("Mismatch in lengths of p and maf vectors") 
+    }
+    
+    indep_index <- match_ind_maf(maf, indep_index)
+  }
+  
+  # Suitable for auxiliary covariates other than p-values
+  if(check_indep_cor) {
+    if(sign(cor(p[indep_index], q[indep_index], method="spearman"))!= sign(cor(p, q, method="spearman"))) {
+      stop('Correlation between p and q in whole dataset has a different sign to that in independent subset of SNPs')
+    }
+  }
+  
+  # ensure low q enriched for low p
+  if(enforce_p_q_cor) {
+    if(cor(p[indep_index], q[indep_index], method="spearman") < 0) {
+      q <- -q
+    }
+  }
+  
+  zp = -qnorm(p/2) # convert p-vals to z-scores
+  
+  # define support for KDE (range of data +/- 10%)
+  q_10 <- (max(q) - min(q)) * 0.1
+  zp_10 <- (max(zp) - min(zp)) * 0.1
+  lims <- c(0, max(zp) + zp_10, min(q) - q_10, max(q) + q_10) # c(xl, xu, yl, yu)
+  
+  # folded normal KDE only computed for independent SNPs (so BW computation isnt biased)
+  p_ind <- p[indep_index]
+  zp_ind <- zp[indep_index]
+  
+  return(c(zp_ind, -zp_ind))}
+

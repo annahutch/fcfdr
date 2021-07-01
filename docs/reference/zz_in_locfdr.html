@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to perform cFDR for continuous auxiliary covariates — flexible_cfdr • fcfdr</title>
+<title>zz_in_locfdr — zz_in_locfdr • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Function to perform cFDR for continuous auxiliary covariates — flexible_cfdr" />
-<meta property="og:description" content="Performs Flexible cFDR for continuous auxiliary covariates" />
+<meta property="og:title" content="zz_in_locfdr — zz_in_locfdr" />
+<meta property="og:description" content="zz_in_locfdr" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,27 +137,19 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to perform cFDR for continuous auxiliary covariates</h1>
+    <h1>zz_in_locfdr</h1>
     
-    <div class="hidden name"><code>flexible_cfdr.Rd</code></div>
+    <div class="hidden name"><code>zz_in_locfdr.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Performs Flexible cFDR for continuous auxiliary covariates</p>
+    <p>zz_in_locfdr</p>
     </div>
 
-    <pre class="usage"><span class='fu'>flexible_cfdr</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>zz_in_locfdr</span><span class='op'>(</span>
   <span class='va'>p</span>,
   <span class='va'>q</span>,
   <span class='va'>indep_index</span>,
-  res_p <span class='op'>=</span> <span class='fl'>300</span>,
-  res_q <span class='op'>=</span> <span class='fl'>500</span>,
-  nxbin <span class='op'>=</span> <span class='fl'>1000</span>,
-  gridp <span class='op'>=</span> <span class='fl'>50</span>,
-  splinecorr <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  dist_thr <span class='op'>=</span> <span class='fl'>0.5</span>,
-  locfdr_df <span class='op'>=</span> <span class='fl'>10</span>,
-  plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
   maf <span class='op'>=</span> <span class='cn'>NULL</span>,
   check_indep_cor <span class='op'>=</span> <span class='cn'>TRUE</span>,
   enforce_p_q_cor <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -179,38 +171,6 @@
       <td><p>indices of independent SNPs</p></td>
     </tr>
     <tr>
-      <th>res_p</th>
-      <td><p>number of grid points in x-direction (p) for KDE estimation</p></td>
-    </tr>
-    <tr>
-      <th>res_q</th>
-      <td><p>number of grid points in y-direction (q) for KDE estimation</p></td>
-    </tr>
-    <tr>
-      <th>nxbin</th>
-      <td><p>number of bins in x-direction (p) for hex-binning</p></td>
-    </tr>
-    <tr>
-      <th>gridp</th>
-      <td><p>number of data points required in a KDE grid point for left-censoring</p></td>
-    </tr>
-    <tr>
-      <th>splinecorr</th>
-      <td><p>logical value for whether spline correction should be implemented</p></td>
-    </tr>
-    <tr>
-      <th>dist_thr</th>
-      <td><p>distance threshold for spline correction</p></td>
-    </tr>
-    <tr>
-      <th>locfdr_df</th>
-      <td><p>df parameter in locfdr function</p></td>
-    </tr>
-    <tr>
-      <th>plot</th>
-      <td><p>logical value for whether to produce plots to assess KDE fit</p></td>
-    </tr>
-    <tr>
       <th>maf</th>
       <td><p>minor allele frequencies for SNPs to which <code>p</code> and <code>q</code> relate (optional and used to perform MAF matching)</p></td>
     </tr>
@@ -226,10 +186,9 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    
 
-    <p>If <code>maf</code> is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution.</p>
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
