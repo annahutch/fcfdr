@@ -1,40 +1,37 @@
-#' Function to perform cFDR for binary auxiliary covariates
-#' PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT
+#' Function to perform cFDR with binary auxiliary covariates
 #'
-#' @param p p values for principal trait (vector of length n)
-#' @param q binary auxillary data values (vector of length n)
-#' @param chr chromosome each SNP resides (vector of length n)
+#' @param p p-values for principal trait (vector of length n)
+#' @param q binary auxiliary data values (vector of length n)
+#' @param group group membership of each SNP for leave-one-out procedure (vector of length n) (e.g. chromosome number or LD block)
 #'
 #' @importFrom Hmisc approxExtrap
 #' 
-#' @return dataframe of p, q and v values
+#' @return data.frame of p, q and v values
 #' @export
 #'
-binary_cfdr <- function(p, q, chr){
-  
-  print("Note that this function is currently under development!")
+binary_cfdr <- function(p, q, group){
 
-  unique_chr <- unique(chr)
+  unique_group <- unique(group)
 
-  # split p and q into chromosomes
-  p_res <- split(p, f = chr)
-  q_res <- split(q, f = chr)
+  # split p and q into groups
+  p_res <- split(p, f = group)
+  q_res <- split(q, f = group)
   minp=min(p)
   maxp=max(p)
 
   # prepare container for v
-  v_res <- vector(mode = "list", length = length(unique_chr))
+  v_res <- vector(mode = "list", length = length(unique_group))
 
   ## prepare x for approxfun
   logx=seq(log10(minp),log10(maxp),length.out=1000)
   x=c(exp(logx),1)
 
-  for(j in 1:length(unique_chr)){
+  for(j in 1:length(unique_group)){
 
-    chrom <- unique_chr[j]
+    this_group <- unique_group[j]
 
-    p_loo <- p[-which(chr == chrom)] # df leave-one-chromosome-out
-    q_loo <- q[-which(chr == chrom)] # df leave-one-chromosome-out
+    p_loo <- p[-which(group == this_group)] # df leave-one-out
+    q_loo <- q[-which(group == this_group)] # df leave-one-out
     ps <- p_res[[j]]
     qs <- q_res[[j]]
 
@@ -62,6 +59,31 @@ binary_cfdr <- function(p, q, chr){
     v_res[[j]] <- p0*(1-q0) + p1*q0
   }
 
-  data.frame(p = unsplit(p_res, f = chr), q = unsplit(q_res, f = chr), v = unsplit(v_res, f = chr))
+  p = unsplit(p_res, f = group)
+  q = unsplit(q_res, f = group)
+  v = unsplit(v_res, f = group)
+  
+  # correct plateau for low p in applications where p,q are very weakly correlated
+  
+  if(abs(cor(p,q))<0.01){
+    
+    # identify problematic points
+    ind <- which( p < 0.01 & (v < 0.8*p | v > 1.2*p ))
+    data_bad <- data.frame(p = p[ind], v = v[ind], q = q[ind])
+    data_good <- data.frame(p = p[-ind], v = v[-ind], q = q[-ind])
+    
+    # find straight lines from data 
+    lmout_q_0 <- lm(v~p-1, data = data_good[which(data_good$q==0),])
+    lmout_q_1 <- lm(v~p-1, data = data_good[which(data_good$q==1),])
+    
+    # replace problematic points
+    v[ind] <- ifelse(data_bad$q==0, predict(lmout_q_0, data.frame(p = data_bad$p)), predict(lmout_q_1, data.frame(p = data_bad$p)))
+    
+    if(ind > length(p)*0.5) warning("p,q have low correlation and >50% of v-values may be problematic - check results")
+    
+    
+  }
+  
+  data.frame(p, q, v)
 
 }
