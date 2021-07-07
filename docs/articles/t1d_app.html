@@ -156,12 +156,11 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">v1</span> <span class="op">&lt;-</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
-<p>The resultant <span class="math inline">\(v\)</span>-values for this first iteration (<code>v1</code>) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-chromosome out procedure and therefore requires the chromosomes for each SNP rather than an independent subset.</p>
+<p>The resultant <span class="math inline">\(v\)</span>-values for this first iteration (<code>v1</code>) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iter2_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/binary_cfdr.html">binary_cfdr</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">v1</span>,
                          q <span class="op">=</span> <span class="va">q2</span>,
-                         chr <span class="op">=</span> <span class="va">chr</span><span class="op">)</span>
-<span class="co">#&gt; [1] "Note that this function is currently under development!"</span>
+                         group <span class="op">=</span> <span class="va">chr</span><span class="op">)</span>
 
 <span class="va">v2</span> <span class="op">&lt;-</span> <span class="va">iter2_res</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>

@@ -73,12 +73,12 @@ v1 <- iter1_res[[1]]$v
 
 ---
 
-The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-chromosome out procedure and therefore requires the chromosomes for each SNP rather than an independent subset.
+The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
 
 ```{r}
 iter2_res <- binary_cfdr(p = v1,
                          q = q2,
-                         chr = chr)
+                         group = chr)
 
 v2 <- iter2_res$v
 ```
