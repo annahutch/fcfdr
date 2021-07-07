@@ -1,6 +1,8 @@
-#' @title Writes out a violin plot of -log10(p) values for quantiles of q
+#' @title Violin plot of p-values for quantiles of q
 #'
-#' @description Can be used to investigate the relationship between p and q
+#' @details Can be used to investigate the relationship between p and q
+#' @details If this shows a non-monotonic relationship then the cFDR framework should not be used
+#' @details (because e.g. cFDR cannot simultaneously shrink v-values for high p and low p)
 #'
 #' @param p p values for principal trait (vector of length n)
 #' @param q auxiliary data values (vector of length n)
@@ -38,9 +40,9 @@ corr_plot <- function(p, q, ylim = c(0, 1.5)){
     theme_cowplot(12) + background_grid(major = "xy", minor = "xy") + xlab("q") + ylab("p (-log10)") + theme(legend.text=element_text(size=8)) + geom_boxplot(aes(fill=quantiles), width = 0.1) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + coord_cartesian(ylim = ylim)
 }
 
-#' @title Writes out a plot of p against v coloured by q
+#' @title Plot p against v and colour by q
 #'
-#' @description Can be used to visualise the results from Flexible cFDR
+#' @details Can be used to visualise the results from Flexible cFDR
 #' 
 #' @param p p values for principal trait (vector of length n)
 #' @param q auxiliary data values (vector of length n)
@@ -60,9 +62,9 @@ pv_plot <- function(p, q, v, axis_lim = c(0, 1)){
   ggplot(df, aes(x = p, y = v, col = q)) + geom_point() + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("raw p-values") + ylab("v-values") + ggtitle(paste0("Flexible cFDR results")) + scale_color_gradient2(midpoint = mid, low = "blue", mid = "white", high = "red", space = "Lab") + coord_cartesian(ylim = axis_lim, xlim = axis_lim)
 }
 
-#' @title Writes out a plot of -log10(p) against -log10(v) coloured by q
+#' @title Plot -log10(p) against -log10(v) and colour by q
 #'
-#' @description Can be used to visualise the results from Flexible cFDR
+#' @details Can be used to visualise the results from Flexible cFDR
 #'
 #' @param p p values for principal trait (vector of length n)
 #' @param q auxiliary data values (vector of length n)
@@ -82,9 +84,9 @@ log10pv_plot <- function(p, q, v, axis_lim = c(0, 20)){
   ggplot(df, aes(x = -log10(p), y = -log10(v), col = q)) + geom_point() + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("raw p-values (-log10)") + ylab("v-values (-log10)") + ggtitle(paste0("Flexible cFDR results")) + scale_color_gradient2(midpoint = mid, low = "blue", mid = "white", high = "red", space = "Lab") + coord_cartesian(ylim = axis_lim, xlim = axis_lim)
 }
 
-#' @title Writes out a stratified Q-Q plot.
+#' @title Stratified Q-Q plot.
 #'
-#' @description Can be used to investigate the relationship between p and q
+#' @details Can be used to investigate the relationship between p and q
 #'
 #' @details Note that this function does not do the heavy lifting of styling the plot's aesthetics.
 #' 

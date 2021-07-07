@@ -17,17 +17,17 @@ knitr::opts_chunk$set(
 Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
-In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations. This application takes about 30 minutes to run.
+In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations. This vignettes will take about 30 minutes to run.
 
 ---
 
 The data required for this example is available to download within the `fcfdr` R package and includes:
 
-1. GWAS $p$-values for T1D (Onengut-Gumuscu et al. (2015), https://www.nature.com/articles/ng.3245) downloaded from the GWAS Catalog (https://www.ebi.ac.uk/gwas/publications/25751624)
+1. GWAS $p$-values for T1D ([Onengut-Gumuscu et al. 2015](https://www.nature.com/articles/ng.3245)) downloaded from the [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/25751624)
 
-2. GWAS $p$-values for Rheumatoid Arthritis (RA) (Eyre et al. (2012), https://www.nature.com/articles/ng.2462) downloaded from the GWAS Catalog (https://www.ebi.ac.uk/gwas/publications/23143596)
+2. GWAS $p$-values for Rheumatoid Arthritis (RA) ([Eyre et al. 2012](https://www.nature.com/articles/ng.2462)) downloaded from the [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/23143596)
 
-3. Binary measure of SNP overlap with transcription factor binding site (TFBS), derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the LDSC data repository (https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
+3. Binary measure of SNP overlap with transcription factor binding site (TFBS), derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (see https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the [LDSC data repository](https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
 
 4. Fold-enrichment ratio of H3K27ac ChIP-seq counts relative to expected background counts in naive CD4+ T helper cells (https://www.nature.com/articles/nbt1010-1045). Downloaded from https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig.
 
@@ -138,13 +138,13 @@ mid1 <- median(res$q1)
 ggplot(res, aes(x = orig_p, y = v3)) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P") + ylab("V3") + ggtitle(paste0("V3 against original p-values"))
 ```
 
-```{r eval = FALSE}
+```{r}
 ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P (-log10)") + ylab("V3 (-log10)") + ggtitle(paste0("V3 against original p-values (-log10)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
 ```
 
 ---
 
-Finally, we find that flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
+We find that Flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
 
 ```{r}
 fdr_thr <- 4*10^-6

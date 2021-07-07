@@ -5,11 +5,11 @@
 
 <img src="man/figures/logo.png" align="right" />
 
-`fcfdr` is an R package that implements cFDR to generate GWAS
-\(p\)-values that have been adjusted using auxiliary covariates. It
-supports auxiliary covariates from any arbitrary distribution, enabling
-researchers to leverage a wide variety of auxiliary data types with GWAS
-\(p\)-values to boost power for discovery.
+`fcfdr` is an R package that implements the cFDR framework for a variety
+of auxiliary covariates. As input it requires GWAS p-values for a trait
+of interest and auxiliary data values. It then outputs “v-values” which
+can be interpreted as GWAS p-values that have been adjusted using the
+auxiliary data values.
 
 If you have any questions please do not hesitate to contact me:
 `anna.hutchinson@mrc-bsu.cam.ac.uk`
@@ -51,7 +51,7 @@ powerful approach. The conditional false discovery rate (cFDR) extends
 the standard FDR framework by conditioning on auxiliary data to call
 significant associations, but current implementations are restricted to
 auxiliary data satisfying specific parametric distributions, typically
-GWAS \(p\)-values for related traits. We relax these distributional
+GWAS p-values for related traits. We relax these distributional
 assumptions, enabling an extension of the cFDR framework that supports
 auxiliary covariates from arbitrary continuous distributions (“Flexible
 cFDR”). Our method can be applied iteratively, thereby supporting
@@ -61,3 +61,36 @@ several iterations. We further demonstrate its practical potential
 through application to an asthma GWAS, leveraging various functional
 genomic data to find additional genetic associations for asthma, which
 we validate in the larger, independent, UK Biobank data resource.
+
+-----
+
+## Brief history of cFDR
+
+The cFDR framework was first introduced by [Andreassen and colleagues
+in 2013](https://doi.org/10.1371/journal.pgen.1003455). They also
+applied the approach to uncover new genetic associations for [blood
+pressure](https://doi.org/10.1161/HYPERTENSIONAHA.113.02077) and
+[multiple sclerosis](https://doi.org/10.1038/mp.2013.195).
+
+In 2015, [Liley and
+Wallace](https://doi.org/10.1371/journal.pgen.1004926) showed that the
+conventional cFDR approach does not control the frequentist FDR and
+described an extension of the approach to ensure that FDR is controlled,
+however their approach is rather conservative. In 2021, [Liley and
+Wallace](https://doi.org/10.1002/bimj.201900254) described an elegant
+cFDR framework that takes as input GWAS p-values for related traits and
+returns “v-values” which can be interpreted as GWAS p-values that have
+been adjusted using the auxiliary related trait data, and thus can be
+used directly in any error-rate controlling procedure
+(e.g. Benjamini-Hochberg).
+
+Up until this point, the cFDR framework was designed for a very specific
+setting, that is to increase GWAS discovery (in the “principal trait”)
+by leveraging GWAS test statistics from a genetically related
+(“conditional”) trait. In 2021 we described an extention of the cFDR
+framework, [“Flexible cFDR”](https://doi.org/10.1101/2020.12.04.411710),
+that allows for auxiliary covariates sampled from arbitrary
+distributions to be leveraged with GWAS test statistics - thus enabling
+broader applicability. In practice, Flexible cFDR can be used to
+leverage functional genomic data with GWAS results to boost power for
+GWAS discovery whilst controlling the FDR.

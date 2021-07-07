@@ -10,7 +10,7 @@ Authors@R:
     person("Chris", "Wallace", role = c("aut")),
     person("Thomas","Willis", role = c("ctb", "aut")),
     person("James", "Liley", role = c("ctb")))
-Description: An R Package to implement Flexible cFDR. Can be used to leverage auxiliary data from arbitrary distributions with GWAS p-values to generate re-weighted $p$-values.
+Description: An R Package to implement Flexible cFDR. Can be used to leverage auxiliary data from arbitrary distributions with GWAS p-values to generate re-weighted p-values.
 Imports:
   locfdr,
   MASS,

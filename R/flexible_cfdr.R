@@ -1,19 +1,19 @@
-#' @title Function to perform cFDR for continuous auxiliary covariates
+#' @title Perform Flexible cFDR
 #'
 #' @description Performs Flexible cFDR for continuous auxiliary covariates
 #'
-#' @details If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution. 
+#' @details If \code{maf} is specified, then the independent SNPs will be down-sampled to match the minor allele frequency distribution. 
 #'
-#' @param p p values for principal trait (vector of length n)
+#' @param p p-values for principal trait (vector of length n)
 #' @param q continuous auxiliary data values (vector of length n)
 #' @param indep_index indices of independent SNPs
-#' @param res_p number of grid points in x-direction (p) for KDE estimation
-#' @param res_q number of grid points in y-direction (q) for KDE estimation
-#' @param nxbin number of bins in x-direction (p) for hex-binning
+#' @param res_p number of grid points in x-direction (\code{p}) for KDE estimation
+#' @param res_q number of grid points in y-direction (\code{q}) for KDE estimation
+#' @param nxbin number of bins in x-direction (\code{p}) for hex-binning
 #' @param gridp number of data points required in a KDE grid point for left-censoring
 #' @param splinecorr logical value for whether spline correction should be implemented
 #' @param dist_thr distance threshold for spline correction
-#' @param locfdr_df df parameter in locfdr function
+#' @param locfdr_df \code{df} parameter in locfdr function
 #' @param plot logical value for whether to produce plots to assess KDE fit
 #' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
@@ -28,7 +28,7 @@
 #' @importFrom grDevices contourLines
 #' @import stats
 #'
-#' @return list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+#' @return List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
 flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
 

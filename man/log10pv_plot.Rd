@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_functions.R
 \name{log10pv_plot}
 \alias{log10pv_plot}
-\title{Writes out a plot of -log10(p) against -log10(v) coloured by q}
+\title{Plot -log10(p) against -log10(v) and colour by q}
 \usage{
 log10pv_plot(p, q, v, axis_lim = c(0, 20))
 }
@@ -19,5 +19,8 @@ log10pv_plot(p, q, v, axis_lim = c(0, 20))
 ggplot object
 }
 \description{
+Plot -log10(p) against -log10(v) and colour by q
+}
+\details{
 Can be used to visualise the results from Flexible cFDR
 }

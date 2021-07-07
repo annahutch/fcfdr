@@ -2,22 +2,20 @@
 % Please edit documentation in R/binary_cfdr.R
 \name{binary_cfdr}
 \alias{binary_cfdr}
-\title{Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT}
+\title{Perform cFDR leveraging binary auxiliary covariates}
 \usage{
-binary_cfdr(p, q, chr)
+binary_cfdr(p, q, group)
 }
 \arguments{
-\item{p}{p values for principal trait (vector of length n)}
+\item{p}{p-values for principal trait (vector of length n)}
 
-\item{q}{binary auxillary data values (vector of length n)}
+\item{q}{binary auxiliary data values (vector of length n)}
 
-\item{chr}{chromosome each SNP resides (vector of length n)}
+\item{group}{group membership of each SNP for leave-one-out procedure (vector of length n) (e.g. chromosome number or LD block)}
 }
 \value{
-dataframe of p, q and v values
+data.frame of p, q and v values
 }
 \description{
-Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT
+Perform cFDR leveraging binary auxiliary covariates
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_functions.R
 \name{pv_plot}
 \alias{pv_plot}
-\title{Writes out a plot of p against v coloured by q}
+\title{Plot p against v and colour by q}
 \usage{
 pv_plot(p, q, v, axis_lim = c(0, 1))
 }
@@ -19,5 +19,8 @@ pv_plot(p, q, v, axis_lim = c(0, 1))
 ggplot object
 }
 \description{
+Plot p against v and colour by q
+}
+\details{
 Can be used to visualise the results from Flexible cFDR
 }

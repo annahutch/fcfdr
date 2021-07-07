@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_functions.R
 \name{corr_plot}
 \alias{corr_plot}
-\title{Writes out a violin plot of -log10(p) values for quantiles of q}
+\title{Violin plot of p-values for quantiles of q}
 \usage{
 corr_plot(p, q, ylim = c(0, 1.5))
 }
@@ -17,5 +17,12 @@ corr_plot(p, q, ylim = c(0, 1.5))
 ggplot object
 }
 \description{
+Violin plot of p-values for quantiles of q
+}
+\details{
 Can be used to investigate the relationship between p and q
+
+If this shows a non-monotonic relationship then the cFDR framework should not be used
+
+(because e.g. cFDR cannot simultaneously shrink v-values for high p and low p)
 }

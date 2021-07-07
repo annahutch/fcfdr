@@ -1,4 +1,4 @@
-#' Function to perform cFDR with binary auxiliary covariates
+#' Perform cFDR leveraging binary auxiliary covariates
 #'
 #' @param p p-values for principal trait (vector of length n)
 #' @param q binary auxiliary data values (vector of length n)

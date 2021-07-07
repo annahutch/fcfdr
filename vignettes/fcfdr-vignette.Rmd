@@ -16,34 +16,35 @@ knitr::opts_chunk$set(
 Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
-The `fcfdr` R package implements cFDR for a variety of auxiliary covariates, unlike earlier empirical cFDR methods (Liley and Wallace 2019; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "v-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values. Since the v-values are analogous to p-values, they can be used directly in any error-rate controlling procedure.
+The `fcfdr` R package implements the cFDR framework and is applicable for a wide variety of auxiliary covariates. This is in contrast to earlier empirical cFDR methods (Liley and Wallace 2021; https://github.com/jamesliley/cfdr) that only support auxiliary $p$-values from related traits. A direct utility of `fcfdr` is to leverage relevant functional genomic data with GWAS $p$-values to increase power for GWAS discovery. The method generates "$v$-values" which can be interpreted as GWAS $p$-values that have been re-weighted according to the auxiliary data values. Since the $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure.
+
+---
 
 The `fcfdr` R package contains two key functions:
 
-1. [`flexible_cfdr()`](https://annahutch.github.io/fcfdr/reference/flexible_cfdr.html): Implements cFDR leveraging $\textbf{continuous}$ auxiliary covariates.
+1. [`flexible_cfdr`](https://annahutch.github.io/fcfdr/reference/flexible_cfdr.html): Implements cFDR leveraging $\textbf{continuous}$ auxiliary covariates.
 
-2. [`binary_cfdr()`](https://annahutch.github.io/fcfdr/reference/binary_cfdr.html): Implements cFDR leveraging $\textbf{binary}$ auxiliary covariates.
+2. [`binary_cfdr`](https://annahutch.github.io/fcfdr/reference/binary_cfdr.html): Implements cFDR leveraging $\textbf{binary}$ auxiliary covariates.
 
 ---
 
-Both functions require 2 parameters to be specified:
+Both functions require two parameters to be specified:
 
 * `p`: GWAS $p$-values for the trait of interest (vector of per-SNP $p$-values)
 
-* `q`: Auxiliary data values (vector of per-SNP auxiliary data values)
+* `q`: Auxiliary data values (vector of per-SNP auxiliary data values).
 
-along with either the indices of a subset of independent SNPs (`indep_index`) in `flexible_cfdr()` or the chromosome for which each SNP resides (`chr`) in `binary_cfdr()`.
+The `flexible_cfdr` function also requires the indices of an independent subset of SNPs (`indep_index` parameter; see [LDAK vignette](https://annahutch.github.io/fcfdr/articles/ldak-vignette.html)) whilst the `binary_cfdr` function requires group indices for each SNP (`group` parameter; typically the chromosome or LD block index for each SNP).
 
-For further details, including instructions to generate `indep_index`, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the [Extra Information vignette](https://annahutch.github.io/fcfdr/articles/extra-information.html)
+For further details, including instructions to generate `indep_index`, examples of auxiliary data to leverage and instructions to apply cFDR iteratively, please see the [Extra Information vignette](https://annahutch.github.io/fcfdr/articles/extra-information.html).
 
 ---
 
-#### Simple walk-through example
+### Simple walk-through example
 
-Firstly, load the flexible cFDR package:
+Firstly, load the Flexible cFDR R package:
 
 ```{r}
-set.seed(1)
 library(fcfdr)
 ```
 
@@ -52,6 +53,7 @@ library(fcfdr)
 Next, simulate $p$-values for 50,000 genetic variants, including 500 associated variants.
 
 ```{r}
+set.seed(1)
 n = 50000
 n1p = 500 # associated variants
 zp = c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1)) # z-scores
@@ -81,15 +83,25 @@ We can use the `corr_plot` function to visualise the relationship between $p$ an
 corr_plot(p, q)
 ```
 
+This is also clear from the stratified QQ plot.
+
+```{r, fig.width = 6, fig.height = 5}
+stratified_qqplot(data_frame = data.frame(p, q), prin_value_label = "p", cond_value_label = "q", thresholds = quantile(q)[-1])
+```
+
 ---
 
 We are now ready to use the `flexible_cfdr` function to derive the $v$-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the [vignette for deriving LDAK weights here](http://dougspeed.com/calculate-weightings/). 
 
-This line of code will take approximately 4 minutes to run.
+By default, `flexible_cfdr` prints some useful plots so that users can evaluate the accuracy of the KDE that is estimated in the method.
+
+(This line of code will take approximately 4 minutes to run.)
 
 ```{r}
 res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1))
 ```
+
+The output from the function is a list of length two. The first element is a data.frame containing the $p$-values (input parameter `p`), the auxiliary data values (input parameter `q`) and the generated $v$-values. The second element contains auxiliary data, such as how many data-points were left-censored in the method and/or spline corrected. In this example, we can see that a value of $q=-0.169$ was used for left censoring (any auxiliary data values smaller than this were set to this value) which results in 1108/50000 (2% of) data points being left censored. We also see that 109 (0.2% of) data points were spline corrected.
 
 ```{r}
 str(res)
@@ -99,13 +111,13 @@ q = res[[1]]$q
 v = res[[1]]$v
 ```
 
-The output from the function is a list of length two. The first element is a data.frame containing the $p$-values (input parameter `p`), the auxiliary data values (input parameter `q`) and the generated $v$-values. The second element contains auxiliary data, such as how many data-points were left-censored in the method and/or spline corrected.
-
 **Note that the cFDR framework requires that low $p$-values are enriched for low $q$ values, so that if the correlation between $p$ and $q$ is negative then the function intrinsically flips the sign of $q$, meaning that the $q$ values reported in the data.frame output may be $q:=-q$.**
 
 ---
 
-We can then visualise the results using the `pv_plot` and `log10pv_plot` functions. We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
+We can then visualise the results using the `pv_plot` and `log10pv_plot` functions. 
+
+We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
 
 ```{r}
 pv_plot(p = p, q = q, v = v)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/flexible_cfdr.R
 \name{flexible_cfdr}
 \alias{flexible_cfdr}
-\title{Function to perform cFDR for continuous auxiliary covariates}
+\title{Perform Flexible cFDR}
 \usage{
 flexible_cfdr(
   p,
@@ -22,17 +22,17 @@ flexible_cfdr(
 )
 }
 \arguments{
-\item{p}{p values for principal trait (vector of length n)}
+\item{p}{p-values for principal trait (vector of length n)}
 
 \item{q}{continuous auxiliary data values (vector of length n)}
 
 \item{indep_index}{indices of independent SNPs}
 
-\item{res_p}{number of grid points in x-direction (p) for KDE estimation}
+\item{res_p}{number of grid points in x-direction (\code{p}) for KDE estimation}
 
-\item{res_q}{number of grid points in y-direction (q) for KDE estimation}
+\item{res_q}{number of grid points in y-direction (\code{q}) for KDE estimation}
 
-\item{nxbin}{number of bins in x-direction (p) for hex-binning}
+\item{nxbin}{number of bins in x-direction (\code{p}) for hex-binning}
 
 \item{gridp}{number of data points required in a KDE grid point for left-censoring}
 
@@ -40,7 +40,7 @@ flexible_cfdr(
 
 \item{dist_thr}{distance threshold for spline correction}
 
-\item{locfdr_df}{df parameter in locfdr function}
+\item{locfdr_df}{\code{df} parameter in locfdr function}
 
 \item{plot}{logical value for whether to produce plots to assess KDE fit}
 
@@ -51,11 +51,11 @@ flexible_cfdr(
 \item{enforce_p_q_cor}{if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values}
 }
 \value{
-list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
+List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 }
 \description{
 Performs Flexible cFDR for continuous auxiliary covariates
 }
 \details{
-If \code{maf} is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution.
+If \code{maf} is specified, then the independent SNPs will be down-sampled to match the minor allele frequency distribution.
 }
