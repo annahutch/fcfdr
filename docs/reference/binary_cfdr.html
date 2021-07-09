@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT — binary_cfdr • fcfdr</title>
+<title>Perform cFDR leveraging binary auxiliary covariates — binary_cfdr • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,10 +46,8 @@ PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT — binary_cfdr �
 
 
 
-<meta property="og:title" content="Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT — binary_cfdr" />
-<meta property="og:description" content="Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT" />
+<meta property="og:title" content="Perform cFDR leveraging binary auxiliary covariates — binary_cfdr" />
+<meta property="og:description" content="Perform cFDR leveraging binary auxiliary covariates" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -140,39 +137,37 @@ PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT</h1>
+    <h1>Perform cFDR leveraging binary auxiliary covariates</h1>
     
     <div class="hidden name"><code>binary_cfdr.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Function to perform cFDR for binary auxiliary covariates
-PLEASE NOTE THAT THIS FUNCTION IS CURRENTLY UNDER DEVELOPMENT</p>
+    <p>Perform cFDR leveraging binary auxiliary covariates</p>
     </div>
 
-    <pre class="usage"><span class='fu'>binary_cfdr</span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span>, <span class='va'>chr</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>binary_cfdr</span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span>, <span class='va'>group</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>p</th>
-      <td><p>p values for principal trait (vector of length n)</p></td>
+      <td><p>p-values for principal trait (vector of length n)</p></td>
     </tr>
     <tr>
       <th>q</th>
-      <td><p>binary auxillary data values (vector of length n)</p></td>
+      <td><p>binary auxiliary data values (vector of length n)</p></td>
     </tr>
     <tr>
-      <th>chr</th>
-      <td><p>chromosome each SNP resides (vector of length n)</p></td>
+      <th>group</th>
+      <td><p>group membership of each SNP for leave-one-out procedure (vector of length n) (e.g. chromosome number or LD block)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>dataframe of p, q and v values</p>
+    <p>data.frame of p, q and v values</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

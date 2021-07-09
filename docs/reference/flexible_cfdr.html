@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to perform cFDR for continuous auxiliary covariates — flexible_cfdr • fcfdr</title>
+<title>Perform Flexible cFDR — flexible_cfdr • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Function to perform cFDR for continuous auxiliary covariates — flexible_cfdr" />
+<meta property="og:title" content="Perform Flexible cFDR — flexible_cfdr" />
 <meta property="og:description" content="Performs Flexible cFDR for continuous auxiliary covariates" />
 <meta property="og:image" content="/logo.png" />
 
@@ -137,7 +137,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to perform cFDR for continuous auxiliary covariates</h1>
+    <h1>Perform Flexible cFDR</h1>
     
     <div class="hidden name"><code>flexible_cfdr.Rd</code></div>
     </div>
@@ -168,7 +168,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>p</th>
-      <td><p>p values for principal trait (vector of length n)</p></td>
+      <td><p>p-values for principal trait (vector of length n)</p></td>
     </tr>
     <tr>
       <th>q</th>
@@ -180,15 +180,15 @@
     </tr>
     <tr>
       <th>res_p</th>
-      <td><p>number of grid points in x-direction (p) for KDE estimation</p></td>
+      <td><p>number of grid points in x-direction (<code>p</code>) for KDE estimation</p></td>
     </tr>
     <tr>
       <th>res_q</th>
-      <td><p>number of grid points in y-direction (q) for KDE estimation</p></td>
+      <td><p>number of grid points in y-direction (<code>q</code>) for KDE estimation</p></td>
     </tr>
     <tr>
       <th>nxbin</th>
-      <td><p>number of bins in x-direction (p) for hex-binning</p></td>
+      <td><p>number of bins in x-direction (<code>p</code>) for hex-binning</p></td>
     </tr>
     <tr>
       <th>gridp</th>
@@ -204,7 +204,7 @@
     </tr>
     <tr>
       <th>locfdr_df</th>
-      <td><p>df parameter in locfdr function</p></td>
+      <td><p><code>df</code> parameter in locfdr function</p></td>
     </tr>
     <tr>
       <th>plot</th>
@@ -226,10 +226,10 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>list of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)</p>
+    <p>List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>If <code>maf</code> is specified, then the independent SNPs will be downsampled to match the minor allele frequency distribution.</p>
+    <p>If <code>maf</code> is specified, then the independent SNPs will be down-sampled to match the minor allele frequency distribution.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

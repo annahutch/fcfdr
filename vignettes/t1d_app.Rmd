@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
-In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$ values for type 1 diabetes (T1D) to find new associations. This vignettes will take about 30 minutes to run.
+In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$-values for type 1 diabetes (T1D) to find new genetic associations. This vignette will take about 30 minutes to complete.
 
 ---
 
@@ -42,7 +42,7 @@ data(T1D_df, package = "fcfdr")
 head(T1D_df)
 ```
 
-In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overlap with TFBS (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate $v$-values. 
+In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overlap with TFBS (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate adjusted $p$-values (called $v$-values). 
 
 ```{r}
 orig_p <- T1D_df$p
@@ -144,19 +144,21 @@ ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alp
 
 ---
 
-We find that Flexible cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
+Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the BH method to derive FDR-adjusted $v$-values and find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
 
 ```{r}
-fdr_thr <- 4*10^-6
+fdr_thr <- 5*10^-6
+p_fdr <- p.adjust(orig_p, method = "BH")
+v3_fdr <- p.adjust(v3, method = "BH")
 
-length(which(v3 < fdr_thr & orig_p > fdr_thr))
+length(which(v3_fdr <= fdr_thr & p_fdr > fdr_thr))
 
-median(T1D_df$RA_p[which(v3 < fdr_thr & orig_p > fdr_thr)])
+median(T1D_df$RA_p[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
 median(T1D_df$RA_p)
 
-mean(T1D_df$DGF_ENCODE[which(v3 < fdr_thr & orig_p > fdr_thr)])
+mean(T1D_df$DGF_ENCODE[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
 mean(T1D_df$DGF_ENCODE)
 
-median(T1D_df$Th_H3K27ac[which(v3 < fdr_thr & orig_p > fdr_thr)])
+median(T1D_df$Th_H3K27ac[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
 median(T1D_df$Th_H3K27ac)
 ```

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Writes out a violin plot of -log10(p) values for quantiles of q — corr_plot • fcfdr</title>
+<title>Violin plot of p-values for quantiles of q — corr_plot • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Writes out a violin plot of -log10(p) values for quantiles of q — corr_plot" />
-<meta property="og:description" content="Can be used to investigate the relationship between p and q" />
+<meta property="og:title" content="Violin plot of p-values for quantiles of q — corr_plot" />
+<meta property="og:description" content="Violin plot of p-values for quantiles of q" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,13 +137,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Writes out a violin plot of -log10(p) values for quantiles of q</h1>
+    <h1>Violin plot of p-values for quantiles of q</h1>
     
     <div class="hidden name"><code>corr_plot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Can be used to investigate the relationship between p and q</p>
+    <p>Violin plot of p-values for quantiles of q</p>
     </div>
 
     <pre class="usage"><span class='fu'>corr_plot</span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span>, ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1.5</span><span class='op'>)</span><span class='op'>)</span></pre>
@@ -168,6 +168,11 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>ggplot object</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Can be used to investigate the relationship between p and q</p>
+<p>If this shows a non-monotonic relationship then the cFDR framework should not be used</p>
+<p>(because e.g. cFDR cannot simultaneously shrink v-values for high p and low p)</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
