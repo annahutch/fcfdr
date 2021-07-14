@@ -30,7 +30,7 @@
 #'
 #' @return List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE, suppress_locfdrwarning = FALSE){
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -79,22 +79,31 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   mlests = locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
   names(mlests) = NULL
 
-  # local FDR = P(H0|ZP=zp)
-  lfdr <- tryCatch(
-    {
-      locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 0, df = locfdr_df)
-    },
-    warning=function(cond) {
-      message("Warning from locfdr:")
-      message(cond)
-      message("Try running flexible_cfdr again and adjusting locfdr_df parameter")
-      message("...")
-      message("To determine optimal value for locfdr_df parameter (df in locfdr::locfdr) see locfdr documentation here: ")
-      message("https://cran.r-project.org/web/packages/locfdr/vignettes/locfdr-example.pdf")
-      message("The fcfdr::zz_in_locfdr function can be used to output the zz vector")
-      message("that flexible_cfdr inputs into locfdr internally")
-    }
-  )
+  if(suppress_locfdrwarning == FALSE){
+    
+    # local FDR = P(H0|ZP=zp)
+    lfdr <- tryCatch(
+      {
+        locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df)
+      },
+      warning=function(cond) {
+        message("Warning from locfdr:")
+        message(cond)
+        message(" ")
+        message("Examine the fit to the data")
+        message("See locfdr documentation here: https://cran.r-project.org/web/packages/locfdr/vignettes/locfdr-example.pdf")
+        message("...")
+        message("Alternatively, the fcfdr::parameters_in_locfdr function can be used to output the parameters used as input in locfdr::locfdr")
+        return(locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df))
+      }
+    )
+    
+  } else{
+    
+    lfdr  <- suppressWarnings(locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df))
+    
+  }
+  
 
   # extract lfdr values for kpq$x values
   lfdr_vals <- lfdr$mat[res_p:length(lfdr$mat[,1]),][,2]
@@ -286,7 +295,7 @@ match_ind_maf <- function(maf, indep_index) {
   indep_sample_index
 }
 
-#' zz_in_locfdr
+#' parameters_in_locfdr
 #'
 #' @param p p values for principal trait (vector of length n)
 #' @param q continuous auxiliary data values (vector of length n)
@@ -295,10 +304,10 @@ match_ind_maf <- function(maf, indep_index) {
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
 #' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
 #'
-#' @return
+#' @return list of values used as input into \code{locfdr::locfdr} function intrinsically in \code{flexible_cfdr}
 #' @export
 #'
-zz_in_locfdr <- function(p, q, indep_index, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
+parameters_in_locfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
   
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -334,6 +343,19 @@ zz_in_locfdr <- function(p, q, indep_index, maf = NULL, check_indep_cor = TRUE, 
   # folded normal KDE only computed for independent SNPs (so BW computation isnt biased)
   p_ind <- p[indep_index]
   zp_ind <- zp[indep_index]
+  q_ind <- q[indep_index]
   
-  return(c(zp_ind, -zp_ind))}
+  # bivariate density of zp and q
+  kpq <- MASS::kde2d(c(zp_ind, -zp_ind), c(q_ind, q_ind), n = c(res_p, res_q), lims = lims)
+  
+  ### estimate P(Q<=q|H0)
+  
+  # find optimal mlests parameter values
+  N = length(c(zp_ind, -zp_ind)); b = 4.3 * exp(-0.26 * log(N, 10)); med = median(c(zp_ind, -zp_ind))
+  sc = diff(quantile(c(zp_ind, -zp_ind))[c(2,4)])/(2*qnorm(.75))
+  mlests = locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
+  names(mlests) = NULL
+  
+  return(list("zz" = c(zp_ind, -zp_ind), "bre" = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), "mlests" = c(mlests[1], b*mlests[2])))
+}
 

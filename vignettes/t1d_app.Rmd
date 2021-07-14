@@ -47,6 +47,7 @@ In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overla
 ```{r}
 orig_p <- T1D_df$p
 chr <- T1D_df$chrom
+MAF <- T1D_df$maf
 q1 <- T1D_df$RA_p
 q2 <- T1D_df$DGF_ENCODE
 q3 <- log(T1D_df$Th_H3K27ac+1)
@@ -62,12 +63,13 @@ ind_snps <- which(T1D_df$ldak_weight != 0)
 
 ---
 
-We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values leveraging GWAS $p$-values for RA. 
+We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values leveraging GWAS $p$-values for RA. We supply MAF values to prevent a bias of the KDE fit towards the behaviour of rarer SNPs (the function intrinsically down-samples the independent subset of SNPs to match the MAF distribution in this subset to that in the whole set of SNPs).
 
 ```{r}
 iter1_res <- flexible_cfdr(p = orig_p, 
                            q = q1, 
-                           indep_index = ind_snps)
+                           indep_index = ind_snps,
+                           maf = MAF)
 v1 <- iter1_res[[1]]$v
 ```
 
@@ -90,7 +92,8 @@ The resultant $v$-values for this second iteration (`v2`) are then used in the n
 ```{r}
 iter3_res <- flexible_cfdr(p = v2, 
                            q = q3, 
-                           indep_index = ind_snps)
+                           indep_index = ind_snps,
+                           maf = MAF)
 
 v3 <- iter3_res[[1]]$v
 ```
