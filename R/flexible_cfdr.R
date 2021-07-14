@@ -30,7 +30,7 @@
 #'
 #' @return List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)
 #' @export
-flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE, suppress_locfdrwarning = FALSE){
+flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1000, gridp = 50, splinecorr = TRUE, dist_thr = 0.5, locfdr_df = 10, plot = TRUE, maf = NULL, check_indep_cor = TRUE, enforce_p_q_cor = TRUE){
 
   # match MAF distribution of independent SNPs to that of whole
   if(!is.null(maf)) {
@@ -79,9 +79,7 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   mlests = locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
   names(mlests) = NULL
 
-  if(suppress_locfdrwarning == FALSE){
-    
-    # local FDR = P(H0|ZP=zp)
+  # local FDR = P(H0|ZP=zp)
     lfdr <- tryCatch(
       {
         locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df)
@@ -97,12 +95,6 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
         return(locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df))
       }
     )
-    
-  } else{
-    
-    lfdr  <- suppressWarnings(locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df))
-    
-  }
   
 
   # extract lfdr values for kpq$x values

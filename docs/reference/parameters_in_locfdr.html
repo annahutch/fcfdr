@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Perform Flexible cFDR — flexible_cfdr • fcfdr</title>
+<title>parameters_in_locfdr — parameters_in_locfdr • fcfdr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Perform Flexible cFDR — flexible_cfdr" />
-<meta property="og:description" content="Performs Flexible cFDR for continuous auxiliary covariates" />
+<meta property="og:title" content="parameters_in_locfdr — parameters_in_locfdr" />
+<meta property="og:description" content="parameters_in_locfdr" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,31 +137,24 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Perform Flexible cFDR</h1>
+    <h1>parameters_in_locfdr</h1>
     
-    <div class="hidden name"><code>flexible_cfdr.Rd</code></div>
+    <div class="hidden name"><code>parameters_in_locfdr.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Performs Flexible cFDR for continuous auxiliary covariates</p>
+    <p>parameters_in_locfdr</p>
     </div>
 
-    <pre class="usage"><span class='fu'>flexible_cfdr</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>parameters_in_locfdr</span><span class='op'>(</span>
   <span class='va'>p</span>,
   <span class='va'>q</span>,
   <span class='va'>indep_index</span>,
   res_p <span class='op'>=</span> <span class='fl'>300</span>,
   res_q <span class='op'>=</span> <span class='fl'>500</span>,
-  nxbin <span class='op'>=</span> <span class='fl'>1000</span>,
-  gridp <span class='op'>=</span> <span class='fl'>50</span>,
-  splinecorr <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  dist_thr <span class='op'>=</span> <span class='fl'>0.5</span>,
-  locfdr_df <span class='op'>=</span> <span class='fl'>10</span>,
-  plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
   maf <span class='op'>=</span> <span class='cn'>NULL</span>,
   check_indep_cor <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  enforce_p_q_cor <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  suppress_locfdrwarning <span class='op'>=</span> <span class='cn'>FALSE</span>
+  enforce_p_q_cor <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -169,7 +162,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>p</th>
-      <td><p>p-values for principal trait (vector of length n)</p></td>
+      <td><p>p values for principal trait (vector of length n)</p></td>
     </tr>
     <tr>
       <th>q</th>
@@ -178,38 +171,6 @@
     <tr>
       <th>indep_index</th>
       <td><p>indices of independent SNPs</p></td>
-    </tr>
-    <tr>
-      <th>res_p</th>
-      <td><p>number of grid points in x-direction (<code>p</code>) for KDE estimation</p></td>
-    </tr>
-    <tr>
-      <th>res_q</th>
-      <td><p>number of grid points in y-direction (<code>q</code>) for KDE estimation</p></td>
-    </tr>
-    <tr>
-      <th>nxbin</th>
-      <td><p>number of bins in x-direction (<code>p</code>) for hex-binning</p></td>
-    </tr>
-    <tr>
-      <th>gridp</th>
-      <td><p>number of data points required in a KDE grid point for left-censoring</p></td>
-    </tr>
-    <tr>
-      <th>splinecorr</th>
-      <td><p>logical value for whether spline correction should be implemented</p></td>
-    </tr>
-    <tr>
-      <th>dist_thr</th>
-      <td><p>distance threshold for spline correction</p></td>
-    </tr>
-    <tr>
-      <th>locfdr_df</th>
-      <td><p><code>df</code> parameter in locfdr function</p></td>
-    </tr>
-    <tr>
-      <th>plot</th>
-      <td><p>logical value for whether to produce plots to assess KDE fit</p></td>
     </tr>
     <tr>
       <th>maf</th>
@@ -227,10 +188,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of length two: (1) data.frame of p-values, q-values and v-values (2) data.frame of auxiliary data (q_low used for left censoring, how many data-points were left censored and/or spline corrected)</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>If <code>maf</code> is specified, then the independent SNPs will be down-sampled to match the minor allele frequency distribution.</p>
+    <p>list of values used as input into <code><a href='https://rdrr.io/pkg/locfdr/man/locfdr.html'>locfdr::locfdr</a></code> function intrinsically in <code>flexible_cfdr</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -18,8 +18,7 @@ flexible_cfdr(
   plot = TRUE,
   maf = NULL,
   check_indep_cor = TRUE,
-  enforce_p_q_cor = TRUE,
-  suppress_locfdrwarning = FALSE
+  enforce_p_q_cor = TRUE
 )
 }
 \arguments{
