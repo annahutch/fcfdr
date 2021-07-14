@@ -50,7 +50,7 @@ chr <- T1D_df$chrom
 MAF <- T1D_df$maf
 q1 <- T1D_df$RA_p
 q2 <- T1D_df$DGF_ENCODE
-q3 <- log(T1D_df$Th_H3K27ac+1)
+q3 <- log(T1D_df$Th_H3K27ac+1) # deal with long tail
 ```
 
 ---
@@ -70,6 +70,11 @@ iter1_res <- flexible_cfdr(p = orig_p,
                            q = q1, 
                            indep_index = ind_snps,
                            maf = MAF)
+```
+
+Ah ha! We've encountered a warning suggesting that the estimated density from `locfdr` may be inaccurate. Let's do as suggested and examine the fit to the data. This means examining the second plot returned by the function. We can see that the fit to the data looks fine so we can ignore the warning in this instance. (Note that an alternative approach would be to use the `fcfdr::parameters_in_locfdr` function to extract the parameter values used intrinsically in `locfdr` and examine the effect of changing these within the `locfdr::locfdr` function).
+
+```{r}
 v1 <- iter1_res[[1]]$v
 ```
 
