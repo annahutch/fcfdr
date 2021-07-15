@@ -74,7 +74,7 @@ iter1_res <- flexible_cfdr(p = orig_p,
 
 Ah ha! We've encountered a warning suggesting that the estimated density from `locfdr` may be inaccurate. Let's do as suggested and examine the fit to the data. This means examining the first plot returned by the function. We can see that the fit to the data from the `locfdr::locfdr` function looks fine so we can ignore the warning in this instance. (Note that an alternative approach would be to use the `fcfdr::parameters_in_locfdr` function to extract the parameter values used intrinsically in `locfdr` and examine the effect of changing these within the `locfdr::locfdr` function).
 
-```{r eval = FALSE}
+```{r}
 v1 <- iter1_res[[1]]$v
 ```
 
@@ -82,7 +82,7 @@ v1 <- iter1_res[[1]]$v
 
 The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
 
-```{r eval = FALSE}
+```{r}
 iter2_res <- binary_cfdr(p = v1,
                          q = q2,
                          group = chr)
@@ -94,7 +94,7 @@ v2 <- iter2_res$v
 
 The resultant $v$-values for this second iteration (`v2`) are then used in the next iteration to leverage H3K27ac counts.
 
-```{r eval = FALSE}
+```{r}
 iter3_res <- flexible_cfdr(p = v2, 
                            q = q3, 
                            indep_index = ind_snps,
@@ -106,7 +106,7 @@ v3 <- iter3_res[[1]]$v
 
 We then create a final data frame for the `fcfdr` results. Note that the sign is flipped for $q2$ and $q3$. This is because these are negatively correlated with `p` and the flexible cFDR software automatically flips the sign of `q` to ensure that low `p` are enriched for low `q`.
 
-```{r eval = FALSE}
+```{r}
 res <- data.frame(orig_p, q1 = iter1_res[[1]]$q, q2 = as.factor(iter2_res$q), q3 = iter3_res[[1]]$q, v1, v2, v3)
 
 head(res)
@@ -116,7 +116,7 @@ head(res)
 
 We inspect the resultant $v$-values after each iteration by plotting these against the values used as `p` in that iteration.
 
-```{r eval = FALSE}
+```{r}
 library(ggplot2)
 library(cowplot)
 
@@ -125,11 +125,11 @@ mid1 <- median(res$q1)
 ggplot(res, aes(x = orig_p, y = v1, col = q1)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("P") + ylab("V1") + ggtitle(paste0("Iteration 1")) + scale_color_gradient2(midpoint = mid1, low = "blue", mid = "white", high = "red", space = "Lab")
 ```
 
-```{r eval = FALSE}
+```{r}
 ggplot(res, aes(x = v1, y = v2, col = q2)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V1") + ylab("V2") + ggtitle(paste0("Iteration 2"))
 ```
 
-```{r eval = FALSE}
+```{r}
 mid3 <- median(res$q3)
 
 ggplot(res, aes(x = v2, y = v3, col = q3)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V2") + ylab("V3") + ggtitle(paste0("Iteration 3")) + scale_color_gradient2(midpoint = mid3, low = "blue", mid = "white", high = "red", space = "Lab")
@@ -139,13 +139,13 @@ ggplot(res, aes(x = v2, y = v3, col = q3)) + geom_point(cex = 0.5) + theme_cowpl
 
 We can also plot the original $p$-values for T1D against the final adjusted $v$-values.
 
-```{r eval = FALSE}
+```{r}
 mid1 <- median(res$q1)
 
 ggplot(res, aes(x = orig_p, y = v3)) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P") + ylab("V3") + ggtitle(paste0("V3 against original p-values"))
 ```
 
-```{r eval = FALSE}
+```{r}
 ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P (-log10)") + ylab("V3 (-log10)") + ggtitle(paste0("V3 against original p-values (-log10)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
 ```
 
@@ -153,7 +153,7 @@ ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alp
 
 Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the BH method to derive FDR-adjusted $v$-values and find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
 
-```{r eval = FALSE}
+```{r}
 fdr_thr <- 5*10^-6
 p_fdr <- p.adjust(orig_p, method = "BH")
 v3_fdr <- p.adjust(v3, method = "BH")

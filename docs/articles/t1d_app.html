@@ -154,10 +154,15 @@
                            q <span class="op">=</span> <span class="va">q1</span>, 
                            indep_index <span class="op">=</span> <span class="va">ind_snps</span>,
                            maf <span class="op">=</span> <span class="va">MAF</span><span class="op">)</span>
-<span class="co">#&gt; Warning from locfdr:</span>
+<span class="co">#&gt; Warning: glm.fit: fitted rates numerically 0 occurred</span>
+<span class="co">#&gt; Warning from locfdr</span>
+<span class="co">#&gt; Examine the fit to the data</span>
+<span class="co">#&gt; See locfdr documentation here: https://cran.r-project.org/web/packages/locfdr/vignettes/locfdr-example.pdf</span>
+<span class="co">#&gt; Alternatively, the fcfdr::parameters_in_locfdr function can be used to output the parameters used as input in locfdr::locfdr</span>
+<span class="co">#&gt; ...</span>
 <span class="co">#&gt; Warning: glm.fit: fitted rates numerically 0 occurred</span></code></pre></div>
-<p><img src="t1d_app_files/figure-html/unnamed-chunk-5-1.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
-<p>Ah ha! We’ve encountered a warning suggesting that the estimated density from <code>locfdr</code> may be inaccurate. Let’s do as suggested and examine the fit to the data. This means examining the second plot returned by the function. We can see that the fit to the data looks fine so we can ignore the warning in this instance. (Note that an alternative approach would be to use the <code><a href="../reference/parameters_in_locfdr.html">fcfdr::parameters_in_locfdr</a></code> function to extract the parameter values used intrinsically in <code>locfdr</code> and examine the effect of changing these within the <code><a href="https://rdrr.io/pkg/locfdr/man/locfdr.html">locfdr::locfdr</a></code> function).</p>
+<p><img src="t1d_app_files/figure-html/unnamed-chunk-5-1.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-5-2.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
+<p>Ah ha! We’ve encountered a warning suggesting that the estimated density from <code>locfdr</code> may be inaccurate. Let’s do as suggested and examine the fit to the data. This means examining the first plot returned by the function. We can see that the fit to the data from the <code><a href="https://rdrr.io/pkg/locfdr/man/locfdr.html">locfdr::locfdr</a></code> function looks fine so we can ignore the warning in this instance. (Note that an alternative approach would be to use the <code><a href="../reference/parameters_in_locfdr.html">fcfdr::parameters_in_locfdr</a></code> function to extract the parameter values used intrinsically in <code>locfdr</code> and examine the effect of changing these within the <code><a href="https://rdrr.io/pkg/locfdr/man/locfdr.html">locfdr::locfdr</a></code> function).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">v1</span> <span class="op">&lt;-</span> <span class="va">iter1_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
@@ -175,10 +180,9 @@
                            q <span class="op">=</span> <span class="va">q3</span>, 
                            indep_index <span class="op">=</span> <span class="va">ind_snps</span>,
                            maf <span class="op">=</span> <span class="va">MAF</span><span class="op">)</span></code></pre></div>
-<p><img src="t1d_app_files/figure-html/unnamed-chunk-8-1.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
+<p><img src="t1d_app_files/figure-html/unnamed-chunk-8-1.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-8-2.png" width="700"><img src="t1d_app_files/figure-html/unnamed-chunk-8-3.png" width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">v3</span> <span class="op">&lt;-</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
+<code class="sourceCode R"><span class="va">v3</span> <span class="op">&lt;-</span> <span class="va">iter3_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">v</span></code></pre></div>
 <hr>
 <p>We then create a final data frame for the <code>fcfdr</code> results. Note that the sign is flipped for <span class="math inline">\(q2\)</span> and <span class="math inline">\(q3\)</span>. This is because these are negatively correlated with <code>p</code> and the flexible cFDR software automatically flips the sign of <code>q</code> to ensure that low <code>p</code> are enriched for low <code>q</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
