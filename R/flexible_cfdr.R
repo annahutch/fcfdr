@@ -97,6 +97,9 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
  # )
   
   lfdr <- withCallingHandlers(
+    
+    locfdr(c(zp_ind, -zp_ind), bre = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), mlests = c(mlests[1], b*mlests[2]), plot = 1, df = locfdr_df),
+    
     warning = function(cnd) {
       message("Warning from locfdr:")
       message(cnd)
