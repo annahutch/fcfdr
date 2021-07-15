@@ -87,10 +87,12 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
     warning=function(cond) {
       message("Warning from locfdr:")
       message(cond)
+      message("...")
       message("Examine the fit to the data")
       message("See locfdr documentation here: https://cran.r-project.org/web/packages/locfdr/vignettes/locfdr-example.pdf")
       message("...")
       message("Alternatively, the fcfdr::parameters_in_locfdr function can be used to output the parameters used as input in locfdr::locfdr")
+      invokeRestart("muffleWarning")
     }
   )
   
