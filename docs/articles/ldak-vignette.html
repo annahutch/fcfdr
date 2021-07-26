@@ -110,9 +110,9 @@
 <p>The purpose of this vignette is to sketch out our own approach to generating LDAK weightings for use in <code>fcfdr</code>. Whilst RMarkdown was used to generate this HTML document, the code snippets contained in this vignette are intended to serve as static illustrations and are not intended to be run without further modification.</p>
 <p>This workflow was written with the use of LDAK <code>v5.1</code> (download <a href="http://dougspeed.com/downloads/">here</a>) and PLINK <code>v1.90b6.21 64-bit (19 Oct 2020)</code> (download <a href="https://www.cog-genomics.org/plink/2.0/">here</a>). We also use code from the R packages <a href="https://privefl.github.io/bigsnpr/">bigsnpr</a> and <a href="https://rdatatable.gitlab.io/data.table/">data.table</a>.</p>
 <hr>
-<div id="obtaining-and-processing-the-1000g-data" class="section level2">
+<div id="optional-obtaining-and-processing-the-1000g-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#obtaining-and-processing-the-1000g-data" class="anchor"></a>Obtaining and processing the 1000G data</h2>
+<a href="#optional-obtaining-and-processing-the-1000g-data" class="anchor"></a>Optional: Obtaining and processing the 1000G data</h2>
 <p><em>NB: In this section we discuss how to obtain and process haplotype data from the 1000G project. We have made available the end result, the quality-controlled, European-only data, as a ~280MB download at <a href="https://doi.org/10.5281/zenodo.4709547">https://doi.org/10.5281/zenodo.4709547</a>. If your principal p-values were taken from a GWAS conducted in a European population, you can skip the steps here and use the files in the download instead. You will still have to run LDAK. Note that the data use coordinates from the hg19 genome assembly.</em></p>
 <p>We first download the 1000G Phase 3 data in the <code>vcf</code> format. These data use the <code>hg19</code> genome assembly for SNP coordinates.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
@@ -138,19 +138,19 @@
 <span id="cb3-6"><a href="#cb3-6"></a><span class="ex">plink</span> --bfile chrY --keep euro.fam --make-bed --silent --out euro_only/chrY</span></code></pre></div>
 <p>The <code>fam</code> files omit sex information. This is problematic only when we wish to carry out QC on the Y chromosome SNPs: PLINK drops heterozygous Y genotypes if we do not affirm the sex of the samples in <code>chrY.fam</code>. We do this by changing the values in the sex code column from 0 (‘unknown’) to 1 (‘male’).</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">sed</span> -i <span class="st">'s/0 0 0 -9/0 0 1 -9/'</span> euro_only/chrY.fam</span></code></pre></div>
-<p>We then use a function from the R package <code>bigsnpr</code> to carry out some basic QC on the 1000G data and write out the duly filtered data to another directory, <code>euro_only/qc</code>.</p>
+<p>We then use a function from the R package <code>bigsnpr</code> to carry out some basic QC on the 1000G data and write out the duly filtered data to another directory, <code>euro_only_qc</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span> <span class="op">{</span>
        <span class="fu">bigsnpr</span><span class="fu">::</span><span class="fu">snp_plinkQC</span><span class="op">(</span>plink.path <span class="op">=</span> <span class="st">'/bin/plink'</span>, prefix.in <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'euro_only/chr'</span>, <span class="va">i</span><span class="op">)</span>,
-                          prefix.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'euro_only/qc/chr'</span>, <span class="va">i</span><span class="op">)</span>,
+                          prefix.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'euro_only_qc/chr'</span>, <span class="va">i</span><span class="op">)</span>,
                           geno <span class="op">=</span> <span class="fl">0</span>, maf <span class="op">=</span> <span class="fl">0.01</span>, hwe <span class="op">=</span> <span class="fl">1e-10</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu">bigsnpr</span><span class="fu">::</span><span class="fu">snp_plinkQC</span><span class="op">(</span>plink.path <span class="op">=</span> <span class="st">'/bin/plink'</span>, prefix.in <span class="op">=</span> <span class="st">'euro_only/chrX'</span>,
-                        prefix.out <span class="op">=</span> <span class="st">'euro_only/qc/chrX'</span>,
+                        prefix.out <span class="op">=</span> <span class="st">'euro_only_qc/chrX'</span>,
                         geno <span class="op">=</span> <span class="fl">0</span>, maf <span class="op">=</span> <span class="fl">0.01</span>, hwe <span class="op">=</span> <span class="fl">1e-10</span><span class="op">)</span>
 
 <span class="fu">bigsnpr</span><span class="fu">::</span><span class="fu">snp_plinkQC</span><span class="op">(</span>plink.path <span class="op">=</span> <span class="st">'/bin/plink'</span>, prefix.in <span class="op">=</span> <span class="st">'euro_only/chrY'</span>,
-                        prefix.out <span class="op">=</span> <span class="st">'euro_only/qc/chrY'</span>,
+                        prefix.out <span class="op">=</span> <span class="st">'euro_only_qc/chrY'</span>,
                         geno <span class="op">=</span> <span class="fl">0</span>, maf <span class="op">=</span> <span class="fl">0.01</span>, hwe <span class="op">=</span> <span class="fl">1e-10</span><span class="op">)</span></code></pre></div>
 <hr>
 </div>
@@ -158,6 +158,9 @@
 <h2 class="hasAnchor">
 <a href="#joining-the-1000g-and-gwas-snps" class="anchor"></a>Joining the 1000G and GWAS SNPs</h2>
 <p><em>NB: The following processing was carried out with a GWAS containing only autosomal SNPs, so we omit reference to the sex chromosomes henceforth.</em></p>
+<p>If you skipped the previous section on processing the 1000G data then you can download our pre-processed files:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">wget</span> https://zenodo.org/record/4709547/files/euro_only_qc.tar.gz</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">tar</span> -xvf euro_only_qc.tar</span></code></pre></div>
 <p>For the purpose of fitting the KDE in <code>flexible_cfdr</code> we care only about the dependence structure of the SNPs at which our <code>p</code> and <code>q</code> values were obtained, so we filter the 1000G SNPs to retain those for which we have GWAS p-values. Ideally, the 1000G SNPs would form a superset of those in the GWAS, but this is typically not the case; with ~5.5 million SNPs in our GWAS we would expect to lose several tens of thousands of SNPs. The absence of this relatively paltry number of SNPs should have a neglible influence upon the KDE.</p>
 <p>To filter the SNPs we use <code>plink --extract</code>, which allows one to extract SNPs based on:</p>
 <ol style="list-style-type: decimal">
@@ -168,16 +171,20 @@
 <p>The coordinates of the GWAS SNPs are usually readily available and a simple approach to generating the requisite range files for <code>plink --extract</code> would copy the genomic coordinates of each SNP to the appropriate chromosome-specific range file (albeit in the <code>plink</code>-compliant <code>chr bp bp rsID</code> format). However, this approach overlooks the possibility that there exist multiple SNPs with different reference/alternative allele pairings at the same locus, that is, duplicates.</p>
 <p>We can account for this when preparing the range files by first joining the 1000G SNPs in each chromosome’s <code>bim</code> file data to our GWAS SNPs and checking that the allele pairings match. This approach also allows us to remove duplicated rows in the range files; as noted above, it is not essential for a good fit that we retain <em>every</em> SNP.</p>
 <p>The following exemplifies the sort of R code one can use to write out the range files whilst carrying out the aforementioned checks.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"mkdir plinkRanges"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"mkdir filtered"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"mkdir ldak"</span><span class="op">)</span>
 
 <span class="co"># We assume this contains columns SNPID, CHR19 and BP19 (so-called because of hg19), REF, and ALT</span>
+<span class="co"># note that gwas_dat needs to be a data.table</span>
 <span class="va">gwas_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="st">'gwas_sum_stats.tsv.gz'</span>, sep <span class="op">=</span> <span class="st">'\t'</span>, header <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
 
 <span class="co"># Iterating over chromosomal bim files</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># bim files have no header</span>
-  <span class="va">bim_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">'euro_only/qc/chr%d.bim'</span>, <span class="va">i</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">'\t'</span>, header <span class="op">=</span> <span class="cn">F</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Chr'</span>, <span class="st">'ID'</span>, <span class="st">'Cm'</span>, <span class="st">'BP19'</span>, <span class="st">'A1'</span>, <span class="st">'A2'</span><span class="op">)</span> <span class="op">)</span>
+  <span class="va">bim_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">'euro_only_qc/chr%d.bim'</span>, <span class="va">i</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">'\t'</span>, header <span class="op">=</span> <span class="cn">F</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Chr'</span>, <span class="st">'ID'</span>, <span class="st">'Cm'</span>, <span class="st">'BP19'</span>, <span class="st">'A1'</span>, <span class="st">'A2'</span><span class="op">)</span> <span class="op">)</span>
   
   <span class="va">bim_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/merge.html">merge</a></span><span class="op">(</span><span class="va">bim_dat</span>, <span class="va">gwas_dat</span><span class="op">[</span><span class="va">CHR19</span> <span class="op">==</span> <span class="va">i</span><span class="op">]</span>, by.x <span class="op">=</span> <span class="st">'BP19'</span>, by.y <span class="op">=</span> <span class="st">'BP19'</span><span class="op">)</span>
   
@@ -197,28 +204,28 @@
 <span class="op">}</span></code></pre></div>
 <p>Note that we took care to use the <code>hg19</code> assembly coordinates to match the assembly used in the 1000G data we downloaded above.</p>
 <p>Using these range files we can now filter the 1000G data.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>  <span class="ex">plink</span> --silent --bfile <span class="st">"euro_only/qc/chr"</span><span class="va">$i</span> --extract <span class="st">"plink_ranges/chr"</span><span class="va">$i</span><span class="st">".tsv"</span> --range --make-bed --out <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="ex">plink</span> --silent --bfile <span class="st">"euro_only_qc/chr"</span><span class="va">$i</span> --extract <span class="st">"plinkRanges/chr"</span><span class="va">$i</span><span class="st">".tsv"</span> --range --make-bed --out <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="kw">done</span></span></code></pre></div>
 <hr>
 </div>
 <div id="running-the-ldak-weighting-calculation-procedure" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-the-ldak-weighting-calculation-procedure" class="anchor"></a>Running the LDAK weighting calculation procedure</h2>
 <p>The weighting calculation procedure entails a preprocessing step, <code>ldak --cut-weights</code>, and a calculation step, <code>ldak --calc-weights-all</code>. We refer the reader to the <a href="http://dougspeed.com/calculate-weightings/">LDAK documentation</a> for further guidance. An idiosyncracy of our approach is that we process the data in a set of chromosome-specific files. This is an artifact of the format of the 1000G data.</p>
-<p>We create the directory <code>ldak</code> and within it subdirectories labelled <code>chrx</code>, where x ranges from 1 to 22, to hold the results of the procedure.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span> </span>
-<span id="cb8-2"><a href="#cb8-2"></a>  <span class="ex">ldak</span> --cut-weights <span class="st">"ldak/chr"</span><span class="va">$i</span> --bfile <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a>  <span class="ex">ldak</span> --calc-weights-all <span class="st">"ldak/chr"</span><span class="va">$i</span> --bfile <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">done</span></span></code></pre></div>
+<p>We create the directory <code>ldak</code> and within it subdirectories labelled <code>chrx</code>, where x ranges from 1 to 22, to hold the results of the procedure. (note that you may have to replace the executable <code>ldak</code> with <code>ldak5.1.linux</code> depending on how you downloaded the LDAK software).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span> </span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="ex">ldak</span> --cut-weights <span class="st">"ldak/chr"</span><span class="va">$i</span> --bfile <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="ex">ldak</span> --calc-weights-all <span class="st">"ldak/chr"</span><span class="va">$i</span> --bfile <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">done</span></span></code></pre></div>
 <p>LDAK will write out the procedure’s results to files named <code>ldak/chrx/weights.all</code>. We join these chromosome-specific files into one.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a> <span class="co"># We omit the header in each file</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a>  <span class="fu">sed</span> <span class="st">"s/$/ </span><span class="va">$i</span><span class="st">/"</span> <span class="op">&lt;(</span><span class="fu">tail</span> -n +2 <span class="st">"ldak/chr</span><span class="va">$i</span><span class="st">/weights.all"</span><span class="op">)</span> <span class="op">&gt;&gt;</span> <span class="st">"ldak/combined_weights.all"</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">done</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a></span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="co"># We add back in a single header for the combined file</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="fu">sed</span> -i <span class="st">'1 i\Predictor Weight Neighbours Tagging Info Check Chr'</span> <span class="st">"ldak/combined_weights.all"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a> <span class="co"># We omit the header in each file</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>  <span class="fu">sed</span> <span class="st">"s/$/ </span><span class="va">$i</span><span class="st">/"</span> <span class="op">&lt;(</span><span class="fu">tail</span> -n +2 <span class="st">"ldak/chr</span><span class="va">$i</span><span class="st">/weights.all"</span><span class="op">)</span> <span class="op">&gt;&gt;</span> <span class="st">"ldak/combined_weights.all"</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">done</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># We add back in a single header for the combined file</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="fu">sed</span> -i <span class="st">'1 i\Predictor Weight Neighbours Tagging Info Check Chr'</span> <span class="st">"ldak/combined_weights.all"</span></span></code></pre></div>
 <hr>
 </div>
 <div id="using-the-ldak-weightings-in-flexible_fcfdr" class="section level2">
@@ -228,24 +235,25 @@
 <p>In practice, it is necessary to merge the weightings contained in <code>combined_weights.all</code> back into the file containing the <code>p</code> and <code>q</code> values so that all three vectors can be made available to <code>flexible_cfdr</code>. This poses a problem, however, as the rsIDs in the <code>Predictor</code> column of <code>combined_weights.all</code> are derived from the 1000G <code>bim</code> files, not the GWAS file rsIDs specified in the range files (which are ignored by <code>plink</code> as noted above). Merging 1000G and GWAS SNPs using genomic coordinates is to be preferred over the use of rsIDs as the latter are not always consistent between data sets.</p>
 <p><code>combined_weights.all</code> as written out by LDAK does not contain SNP basepair coordinates. This means we must use the <code>bim</code> files contained in the <code>filtered/chrx</code> directories to recover the basepair coordinates and reference/alternative allele pairings. This can be accomplished by matching the SNPs in <code>combined_weights.all</code> to those in the <code>bim</code> files. As the rsIDs in <code>combined_weights.all</code> are derived from these <code>bim</code> files, it is appropriate in this case to merge these data with the use of rsIDs. We provide the following snippets as an example of how this can be accomplished.</p>
 <p>To simplify matters, we first concatenate all chromosomal <code>bim</code> files.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>  <span class="fu">cat</span> <span class="st">"filtered/chr"</span><span class="va">$i</span><span class="st">".bim"</span> <span class="op">&gt;&gt;</span> <span class="st">"filtered/chr_all.bim"</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..22}</span><span class="kw">;</span> <span class="kw">do</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">cat</span> <span class="st">"filtered/chr"</span><span class="va">$i</span><span class="st">".bim"</span> <span class="op">&gt;&gt;</span> <span class="st">"filtered/chr_all.bim"</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">done</span></span></code></pre></div>
 <p>We then add the genomic metadata we need to the <code>combined_weights.all</code> LDAK output file.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">library</span>(data.table)</span>
-<span id="cb11-2"><a href="#cb11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3"></a>bim_dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="st">'filtered/chr_all.bim'</span>, <span class="dt">sep =</span> <span class="st">'</span><span class="ch">\t</span><span class="st">'</span>, <span class="dt">header =</span> F, <span class="dt">col.names =</span> <span class="kw">c</span>(<span class="st">'Chr'</span>, <span class="st">'ID'</span>, <span class="st">'Cm'</span>, <span class="st">'BP19'</span>, <span class="st">'A1'</span>, <span class="st">'A2'</span>))</span>
-<span id="cb11-4"><a href="#cb11-4"></a></span>
-<span id="cb11-5"><a href="#cb11-5"></a>weights_dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="st">'ldak/combined_weights.all'</span>, <span class="dt">sep =</span> <span class="st">' '</span>, <span class="dt">header =</span> T)</span>
-<span id="cb11-6"><a href="#cb11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7"></a><span class="co"># Drop rows with a missing ID or weight value</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a>weights_dat &lt;-<span class="st"> </span><span class="kw">na.omit</span>(weights_dat, <span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">'Predictor'</span>, <span class="st">'Weight'</span>))</span>
-<span id="cb11-9"><a href="#cb11-9"></a></span>
-<span id="cb11-10"><a href="#cb11-10"></a>join_dat &lt;-<span class="st"> </span><span class="kw">merge</span>(weights_dat, bim_dat[. , (ID, Chr, BP19, A1, A2)], <span class="dt">all.x =</span> T, <span class="dt">by.x =</span> <span class="kw">c</span>(<span class="st">'Predictor'</span>, <span class="st">'Chr'</span>), <span class="dt">by.y =</span> <span class="kw">c</span>(<span class="st">'ID'</span>, <span class="st">'Chr'</span>), <span class="dt">sort =</span> F)</span>
-<span id="cb11-11"><a href="#cb11-11"></a></span>
-<span id="cb11-12"><a href="#cb11-12"></a><span class="kw">fwrite</span>(join_dat, <span class="dt">file =</span> <span class="st">'ldak/combined_weights_meta.all'</span>, <span class="dt">sep =</span> <span class="st">' '</span>, <span class="dt">col.names =</span> T, <span class="dt">row.names =</span> F, <span class="dt">quote =</span> F)</span></code></pre></div>
-<p>The format of the file in which your <code>p</code> and <code>q</code> are stored will of course vary, but the snippet below illustrates how <code>combined_weights_meta.all</code> can be merged with it.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
+
+<span class="va">bim_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="st">'filtered/chr_all.bim'</span>, sep <span class="op">=</span> <span class="st">'\t'</span>, header <span class="op">=</span> <span class="cn">F</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Chr'</span>, <span class="st">'ID'</span>, <span class="st">'Cm'</span>, <span class="st">'BP19'</span>, <span class="st">'A1'</span>, <span class="st">'A2'</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">weights_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="st">'ldak/combined_weights.all'</span>, sep <span class="op">=</span> <span class="st">' '</span>, header <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+
+<span class="co"># Drop rows with a missing ID or weight value</span>
+<span class="va">weights_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/na.omit.data.table.html">na.omit</a></span><span class="op">(</span><span class="va">weights_dat</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Predictor'</span>, <span class="st">'Weight'</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">join_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/merge.html">merge</a></span><span class="op">(</span><span class="va">weights_dat</span>, <span class="va">bim_dat</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">ID</span>, <span class="va">Chr</span>, <span class="va">BP19</span>, <span class="va">A1</span>, <span class="va">A2</span><span class="op">)</span><span class="op">]</span>, all.x <span class="op">=</span> <span class="cn">T</span>, by.x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Predictor'</span>, <span class="st">'Chr'</span><span class="op">)</span>, by.y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ID'</span>, <span class="st">'Chr'</span><span class="op">)</span>, sort <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
+
+<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fwrite.html">fwrite</a></span><span class="op">(</span><span class="va">join_dat</span>, file <span class="op">=</span> <span class="st">'ldak/combined_weights_meta.all'</span>, sep <span class="op">=</span> <span class="st">' '</span>, col.names <span class="op">=</span> <span class="cn">T</span>, row.names <span class="op">=</span> <span class="cn">F</span>, quote <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
+<p>The format of the file in which your <code>p</code> and <code>q</code> are stored will of course vary, but the snippet below illustrates how <code>combined_weights_meta.all</code> can be merged with it.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weights_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="st">'ldak/combined_weights_meta.all'</span>, sep <span class="op">=</span> <span class="st">' '</span>, header <span class="op">=</span> <span class="cn">T</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Predictor'</span>, <span class="st">'Weight'</span>, <span class="st">'Chr'</span>, <span class="st">'BP19'</span>, <span class="st">'A1'</span>, <span class="st">'A2'</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># We assume this contains columns SNPID, CHR19 and BP19 (so-called because of hg19), REF, and ALT</span>
