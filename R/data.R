@@ -1,14 +1,15 @@
-#' T1D Application data
+#' Data for T1D application
 #'
-#' A dataframe containing the chromosome (chrom), base pair position (pos),
-#' rsid, major (other_allele) and minor (effect_allele) allele, T1D GWAS p-value (p),
-#' binary chromatin accessibility measure (DGF_ENCODE), H3K27ac fold change value
-#' in naive CD4+ T helper cells (Th_H3K27ac), RA GWAS p-value (RA_p), ldak weight, and minor allele frequency (maf) for 114,641 SNPs in the T1D GWAS (https://www.nature.com/articles/ng.3245)
+#' A data.frame containing the rsID, chromosome (CHR19) and base pair position (BP19) in hg19,
+#' reference allele (REF), alternative allele (ALLT), type 1 diabetes GWAS p-value (T1D_pval),
+#' minor allele frequency (MAF), LDAK weight (LDAK_weight), rheumatoid arthritis GWAS p-value (RA_pval),
+#' binary regulatory factor binding site overlap (DGF), average H3K27ac fold change value
+#' in T1D-relevant cell types (H3K27ac) for 113,543 SNPs in the T1D GWAS (https://www.nature.com/articles/ng.3245)
 #'
-#' Minor allele frequency is taken from data by a study by Cooper et al.
-#' (https://doi.org/10.1101/120022) where available. Missing values were replaced
+#' Minor allele frequencies estimated from the CEU sub-population samples 
+#' in the 1000 Genomes Project Phase 3 data set. Missing values were replaced
 #' by drawing samples from the empirical distribution of MAFs 
 #'
-#' @format A data frame with 114641 rows and 11 variables:
+#' @format A data frame with 113543 rows and 11 variables:
 #' 
-"T1D_df"
+"T1D_application_data"

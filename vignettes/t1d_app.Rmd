@@ -17,70 +17,66 @@ knitr::opts_chunk$set(
 Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
 ```
 
-In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various functional genomic data with GWAS $p$-values for type 1 diabetes (T1D) to find new genetic associations. This vignette will take about 30 minutes to complete.
+In this vignette, we walk through an example to illustrate how the `fcfdr` R package can be used to leverage various relevant genetic and genomic data with GWAS $p$-values for type 1 diabetes (T1D) to find new genetic associations. This vignette will take approximately 30 minutes to complete.
 
 ---
 
 The data required for this example is available to download within the `fcfdr` R package and includes:
 
-1. GWAS $p$-values for T1D ([Onengut-Gumuscu et al. 2015](https://www.nature.com/articles/ng.3245)) downloaded from the [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/25751624)
+1. GWAS $p$-values for T1D ([Onengut-Gumuscu et al. 2015](https://www.nature.com/articles/ng.3245)) downloaded from the NHGRI-EBI GWAS Catalog (study GCST005536 accessed on 08/10/21).
 
-2. GWAS $p$-values for Rheumatoid Arthritis (RA) ([Eyre et al. 2012](https://www.nature.com/articles/ng.2462)) downloaded from the [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/23143596)
+2. GWAS $p$-values for rheumatoid arthritis (RA) ([Eyre et al. 2012](https://www.nature.com/articles/ng.2462)) downloaded from the NHGRI-EBI GWAS Catalog (study GCST90013445 accessed on 08/10/21).
 
-3. Binary measure of SNP overlap with transcription factor binding site (TFBS), derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (see https://www.nature.com/articles/nature11247; https://doi.org/10.1016/j.ajhg.2014.10.004). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the [LDSC data repository](https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all T1D SNPs in our analysis.
+3. Binary measure of SNP overlap with regulatory factor binding sites, derived from merging all DNaseI digital genomic footprinting (DGF) regions from the narrow-peak classifications across 57 cell types (see https://www.nature.com/articles/nature11247). SNP annotations were downloaded for all 1000 Genomes phase 3 SNPs from the [LDSC data repository](https://storage.googleapis.com/broad-alkesgroup-public/LDSCORE/1000G_Phase3_baselineLD_v2.1_ldscores.tgz) and the binary `DGF_ENCODE` annotation was extracted for all SNPs in our analysis.
 
-4. Fold-enrichment ratio of H3K27ac ChIP-seq counts relative to expected background counts in naive CD4+ T helper cells (https://www.nature.com/articles/nbt1010-1045). Downloaded from https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/E043-H3K27ac.fc.signal.bigwig.
+4. Average fold-enrichment ratios of H3K27ac ChIP-seq counts relative to expected background counts in T1D-relevant cell types. Fold-enrichment ratios were downloaded from NIH Roadmap for CD3, CD4+ CD25int CD127+ Tmem, CD4+ CD25+ CD127- Treg, CD4+ CD25- Th, CD4+ CD25- CD45RA+, CD4 memory, CD4 naive, CD8 memory and CD8 naive primary cells (from https://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/foldChange/ see epigenome ID to cell type conversion table [here](https://docs.google.com/spreadsheets/u/1/d/1yikGx4MsO9Ei36b64yOy9Vb6oPC5IBGlFbYEt-N6gOM/edit#gid=15)). The fold-enrichment ratios were averaged over cell types to derive the values in column `H3K27ac`.
 
 ---
 
-First, we download the data:
+Firstly, we download the data:
 
 ```{r}
 set.seed(1)
 library(fcfdr)
-data(T1D_df, package = "fcfdr")
-head(T1D_df)
+data(T1D_application_data, package = "fcfdr")
+head(T1D_application_data)
 ```
 
-In this application we leverage GWAS $p$-values for RA (`q1`), binary SNP overlap with TFBS (`q2`) and H3K27ac counts in naive CD4+ T helper cells (`q3`) with GWAS $p$-values for T1D (`orig_p`) to generate adjusted $p$-values (called $v$-values). 
+In this application we leverage GWAS $p$-values for RA, binary SNP overlap with regulatory factor binding sites and H3K27ac counts in T1D-relevant cell types with GWAS $p$-values for T1D to generate adjusted $p$-values (called $v$-values). 
 
 ```{r}
-orig_p <- T1D_df$p
-chr <- T1D_df$chrom
-MAF <- T1D_df$maf
-q1 <- T1D_df$RA_p
-q2 <- T1D_df$DGF_ENCODE
-q3 <- log(T1D_df$Th_H3K27ac+1) # deal with long tail
+orig_p <- T1D_application_data$T1D_pval
+chr <- T1D_application_data$CHR19
+MAF <- T1D_application_data$MAF
+q1 <- T1D_application_data$RA_pval
+q2 <- T1D_application_data$DGF
+q3 <- log(T1D_application_data$H3K27ac+1) # deal with long tail
 ```
 
 ---
 
-The data frame also contains a column of LDAK weights for each SNP (http://dougspeed.com/calculate-weightings/). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.
+The data frame also contains a column of LDAK weights for each SNP (http://dougspeed.com/calculate-weightings/). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs, and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.
 
 ```{r}
-ind_snps <- which(T1D_df$ldak_weight != 0)
+ind_snps <- which(T1D_application_data$LDAK_weight != 0)
 ```
 
 ---
 
-We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values leveraging GWAS $p$-values for RA. We supply MAF values to prevent a bias of the KDE fit towards the behaviour of rarer SNPs (the function intrinsically down-samples the independent subset of SNPs to match the MAF distribution in this subset to that in the whole set of SNPs).
+We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values by leveraging GWAS $p$-values for RA. We supply MAF values to prevent a bias of the KDE fit towards the behaviour of rarer SNPs (the function intrinsically down-samples the independent subset of SNPs to match the MAF distribution in this subset to that in the whole set of SNPs).
 
 ```{r}
 iter1_res <- flexible_cfdr(p = orig_p, 
                            q = q1, 
                            indep_index = ind_snps,
                            maf = MAF)
-```
 
-Ah ha! We've encountered a warning suggesting that the estimated density from `locfdr` may be inaccurate. Let's do as suggested and examine the fit to the data. This means examining the first plot returned by the function. We can see that the fit to the data from the `locfdr::locfdr` function looks fine so we can ignore the warning in this instance. (Note that an alternative approach would be to use the `fcfdr::parameters_in_locfdr` function to extract the parameter values used intrinsically in `locfdr` and examine the effect of changing these within the `locfdr::locfdr` function).
-
-```{r}
 v1 <- iter1_res[[1]]$v
 ```
 
 ---
 
-The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with TFBS. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
+The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with regulatory factor binding sites. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
 
 ```{r}
 iter2_res <- binary_cfdr(p = v1,
@@ -104,7 +100,7 @@ v3 <- iter3_res[[1]]$v
 
 ---
 
-We then create a final data frame for the `fcfdr` results. Note that the sign is flipped for $q2$ and $q3$. This is because these are negatively correlated with `p` and the flexible cFDR software automatically flips the sign of `q` to ensure that low `p` are enriched for low `q`.
+We then create a final data frame containing the results from our analysis. Note that the sign is flipped for $q2$ and $q3$. This is because these are negatively correlated with `p` and the flexible cFDR software automatically flips the sign of `q` to ensure that low `p` are enriched for low `q`.
 
 ```{r}
 res <- data.frame(orig_p, q1 = iter1_res[[1]]$q, q2 = as.factor(iter2_res$q), q3 = iter3_res[[1]]$q, v1, v2, v3)
@@ -151,21 +147,19 @@ ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alp
 
 ---
 
-Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the BH method to derive FDR-adjusted $v$-values and find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where transcription factors may bind and have relatively high H3K27ac counts in a T1D relevant cell type.
+Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the Benjamini-Hochberg (BH) procedure to derive FDR-adjusted $v$-values. We find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where regulatory factors bind and have relatively high H3K27ac counts in T1D relevant cell types.
 
 ```{r}
 fdr_thr <- 5*10^-6
 p_fdr <- p.adjust(orig_p, method = "BH")
 v3_fdr <- p.adjust(v3, method = "BH")
 
-length(which(v3_fdr <= fdr_thr & p_fdr > fdr_thr))
+median(T1D_application_data$RA_p[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
+median(T1D_application_data$RA_p)
 
-median(T1D_df$RA_p[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
-median(T1D_df$RA_p)
+mean(T1D_application_data$DGF[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
+mean(T1D_application_data$DGF)
 
-mean(T1D_df$DGF_ENCODE[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
-mean(T1D_df$DGF_ENCODE)
-
-median(T1D_df$Th_H3K27ac[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
-median(T1D_df$Th_H3K27ac)
+median(T1D_application_data$H3K27ac[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
+median(T1D_application_data$H3K27ac)
 ```
