@@ -150,9 +150,11 @@ ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alp
 Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the Benjamini-Hochberg (BH) procedure to derive FDR-adjusted $v$-values. We find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where regulatory factors bind and have relatively high H3K27ac counts in T1D relevant cell types.
 
 ```{r}
-fdr_thr <- 5*10^-6
 p_fdr <- p.adjust(orig_p, method = "BH")
 v3_fdr <- p.adjust(v3, method = "BH")
+
+# choose fdr threshold corresponding to genome-wide significance threshold
+fdr_thr <- max(p_fdr[which(orig_p <= 5*10^{-8})])
 
 median(T1D_application_data$RA_p[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
 median(T1D_application_data$RA_p)
