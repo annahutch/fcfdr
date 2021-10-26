@@ -5,18 +5,37 @@
 
 <img src="man/figures/logo.png" align="right" />
 
-`fcfdr` is an R package that implements the cFDR framework for a variety
-of auxiliary covariates. As input it requires GWAS p-values for a trait
-of interest and auxiliary data values. It then outputs “v-values” which
-can be interpreted as GWAS p-values that have been adjusted using the
-auxiliary data values.
+`fcfdr` is an all-encompassing R package to implement the cFDR approach
+for a variety of auxiliary covariates. As input it requires GWAS
+p-values for a trait of interest and auxiliary data values. It then
+outputs “v-values” which can be interpreted as GWAS p-values that have
+been adjusted using the auxiliary data values.
 
 If you have any questions please do not hesitate to contact me:
 `anna.hutchinson@mrc-bsu.cam.ac.uk`
 
 Webpage: <https://annahutch.github.io/fcfdr/>
 
------
+GitHub repository: <https://github.com/annahutch/fcfdr>
+
+------------------------------------------------------------------------
+
+## Manuscripts
+
+**Flexible cFDR:**
+
+Hutchinson A, Reales G, Willis T, Wallace C (2021) Leveraging auxiliary
+data from arbitrary distributions to boost GWAS discovery with Flexible
+cFDR. PLoS Genet 17(10): e1009853.
+<https://doi.org/10.1371/journal.pgen.1009853>
+
+**Binary cFDR:**
+
+Hutchinson A, Liley J, Wallace C (2021) fcfdr: an R package to leverage
+continuous and binary functional genomic data in GWAS. bioRxiv
+2021.10.21.465274. <https://doi.org/10.1101/2021.10.21.465274>
+
+------------------------------------------------------------------------
 
 ## Installation
 
@@ -27,50 +46,22 @@ You can install `fcfdr` from [GitHub](https://github.com/) with:
 devtools::install_github("annahutch/fcfdr")
 ```
 
------
+------------------------------------------------------------------------
 
 ## Examples
 
 See the vignettes for examples of usage.
 
------
-
-## Abstract
-
-Genome-wide association studies (GWAS) have identified thousands of
-genetic variants that are associated with complex traits. However, a
-stringent significance threshold is required to identify robust genetic
-associations. Leveraging relevant auxiliary covariates has the potential
-to boost statistical power to exceed the significance threshold.
-Particularly, abundant pleiotropy and the non-random distribution of
-SNPs across various functional categories suggests that leveraging GWAS
-test statistics from related traits and/or functional genomic data may
-boost GWAS discovery. While type 1 error rate control has become
-standard in GWAS, control of the false discovery rate can be a more
-powerful approach. The conditional false discovery rate (cFDR) extends
-the standard FDR framework by conditioning on auxiliary data to call
-significant associations, but current implementations are restricted to
-auxiliary data satisfying specific parametric distributions, typically
-GWAS p-values for related traits. We relax these distributional
-assumptions, enabling an extension of the cFDR framework that supports
-auxiliary covariates from arbitrary continuous distributions (“Flexible
-cFDR”). Our method can be applied iteratively, thereby supporting
-multi-dimensional covariate data. Through simulations we show that
-Flexible cFDR increases sensitivity whilst controlling FDR after one or
-several iterations. We further demonstrate its practical potential
-through application to an asthma GWAS, leveraging various functional
-genomic data to find additional genetic associations for asthma, which
-we validate in the larger, independent, UK Biobank data resource.
-
------
+------------------------------------------------------------------------
 
 ## Brief history of cFDR
 
-The cFDR framework was first introduced by [Andreassen and colleagues
-in 2013](https://doi.org/10.1371/journal.pgen.1003455). They also
+The cFDR framework was first introduced by [Andreassen and colleagues in
+2013](https://doi.org/10.1371/journal.pgen.1003455). The group also
 applied the approach to uncover new genetic associations for [blood
 pressure](https://doi.org/10.1161/HYPERTENSIONAHA.113.02077) and
-[multiple sclerosis](https://doi.org/10.1038/mp.2013.195).
+[multiple sclerosis](https://doi.org/10.1038/mp.2013.195) by leveraging
+GWAS test statistics for related traits.
 
 In 2015, [Liley and
 Wallace](https://doi.org/10.1371/journal.pgen.1004926) showed that the
@@ -87,10 +78,11 @@ used directly in any error-rate controlling procedure
 Up until this point, the cFDR framework was designed for a very specific
 setting, that is to increase GWAS discovery (in the “principal trait”)
 by leveraging GWAS test statistics from a genetically related
-(“conditional”) trait. In 2021 we described an extention of the cFDR
-framework, [“Flexible cFDR”](https://doi.org/10.1101/2020.12.04.411710),
-that allows for auxiliary covariates sampled from arbitrary
-distributions to be leveraged with GWAS test statistics - thus enabling
-broader applicability. In practice, Flexible cFDR can be used to
-leverage functional genomic data with GWAS results to boost power for
-GWAS discovery whilst controlling the FDR.
+(“conditional”) trait. In 2021 we described an extension of the cFDR
+framework called Flexible cFDR that allows for auxiliary covariates
+sampled from arbitrary continuous distributions to be leveraged with
+GWAS test statistics - thus enabling broader applicability. We also
+describe an extension for binary covariates, called Binary cFDR. In
+practice, Flexible cFDR and Binary cFDR can be used to leverage
+functional genomic data with GWAS results to boost power for GWAS
+discovery whilst controlling the FDR.
