@@ -38,6 +38,10 @@ Firstly, we download the data:
 ```{r}
 set.seed(1)
 library(fcfdr)
+library(cowplot)
+library(ggplot2)
+library(dplyr)
+
 data(T1D_application_data, package = "fcfdr")
 head(T1D_application_data)
 ```
@@ -76,6 +80,17 @@ v1 <- iter1_res[[1]]$v
 
 ---
 
+Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the Benjamini-Hochberg (BH) procedure to derive FDR-adjusted $v$-values and plot the resultant FDR values.
+
+```{r}
+res1 <- data.frame(p = orig_p, q1, v1)
+mid1 <- median(res1$q1)
+
+ggplot(res1, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v1, method = "BH"), col = q1)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("Original FDR") + ylab("V1 (FDR)") + ggtitle(paste0("Iteration 1")) + scale_color_gradient2(midpoint = mid1, low = "blue", mid = "white", high = "red", space = "Lab")
+```
+
+---
+
 The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with regulatory factor binding sites. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
 
 ```{r}
@@ -84,6 +99,13 @@ iter2_res <- binary_cfdr(p = v1,
                          group = chr)
 
 v2 <- iter2_res$v
+```
+
+```{r}
+res2 <- data.frame(p = v1, v2, q2)
+res2$q2 <- as.factor(res2$q2)
+
+ggplot(res2, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v2, method = "BH"), col = q2)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V1 (FDR)") + ylab("V2 (FDR)") + ggtitle(paste0("Iteration 2")) + scale_colour_manual(values = c("grey", "black"))
 ```
 
 ---
@@ -98,6 +120,12 @@ iter3_res <- flexible_cfdr(p = v2,
 v3 <- iter3_res[[1]]$v
 ```
 
+```{r}
+res3 <- data.frame(p = v2, q3, v3)
+
+ggplot(res3, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v3, method = "BH"), col = q3)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V2 (FDR)") + ylab("V3 (FDR)") + ggtitle(paste0("Iteration 3")) + scale_color_gradient2(midpoint = 1, low = "blue", mid = "white", high = "red", space = "Lab")
+```
+
 ---
 
 We then create a final data frame containing the results from our analysis. Note that the sign is flipped for $q2$ and $q3$. This is because these are negatively correlated with `p` and the flexible cFDR software automatically flips the sign of `q` to ensure that low `p` are enriched for low `q`.
@@ -110,44 +138,21 @@ head(res)
 
 ---
 
-We inspect the resultant $v$-values after each iteration by plotting these against the values used as `p` in that iteration.
-
-```{r}
-library(ggplot2)
-library(cowplot)
-
-mid1 <- median(res$q1)
-
-ggplot(res, aes(x = orig_p, y = v1, col = q1)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("P") + ylab("V1") + ggtitle(paste0("Iteration 1")) + scale_color_gradient2(midpoint = mid1, low = "blue", mid = "white", high = "red", space = "Lab")
-```
-
-```{r}
-ggplot(res, aes(x = v1, y = v2, col = q2)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V1") + ylab("V2") + ggtitle(paste0("Iteration 2"))
-```
-
-```{r}
-mid3 <- median(res$q3)
-
-ggplot(res, aes(x = v2, y = v3, col = q3)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V2") + ylab("V3") + ggtitle(paste0("Iteration 3")) + scale_color_gradient2(midpoint = mid3, low = "blue", mid = "white", high = "red", space = "Lab")
-```
-
----
-
-We can also plot the original $p$-values for T1D against the final adjusted $v$-values.
+We can plot the original $p$-values for T1D against the final adjusted $v$-values.
 
 ```{r}
 mid1 <- median(res$q1)
 
-ggplot(res, aes(x = orig_p, y = v3)) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P") + ylab("V3") + ggtitle(paste0("V3 against original p-values"))
+ggplot(res, aes(x = p.adjust(orig_p, method = "BH"), y = p.adjust(v3, method = "BH"))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("Original P (FDR)") + ylab("V3 (FDR)") + ggtitle(paste0("FDR adjusted v-values\nagainst original FDR values"))
 ```
 
 ```{r}
-ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("P (-log10)") + ylab("V3 (-log10)") + ggtitle(paste0("V3 against original p-values (-log10)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
+ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("Original P (FDR) (-log10)") + ylab("V3 (FDR) (-log10)") + ggtitle(paste0("FDR adjusted v-values against\noriginal FDR values (FDR)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
 ```
 
 ---
 
-Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the Benjamini-Hochberg (BH) procedure to derive FDR-adjusted $v$-values. We find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where regulatory factors bind and have relatively high H3K27ac counts in T1D relevant cell types.
+We find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where regulatory factors bind and have relatively high H3K27ac counts in T1D relevant cell types.
 
 ```{r}
 p_fdr <- p.adjust(orig_p, method = "BH")
@@ -164,4 +169,30 @@ mean(T1D_application_data$DGF)
 
 median(T1D_application_data$H3K27ac[which(v3_fdr < fdr_thr & p_fdr > fdr_thr)])
 median(T1D_application_data$H3K27ac)
+```
+
+---
+
+Side comment: code to create the Manhattan plot in the manuscript:
+
+```{r, eval = FALSE}
+T1D_application_data$v3_fdr <- v3_fdr
+
+nCHR <- length(unique(T1D_application_data$CHR19))
+T1D_application_data$BPcum <- NA
+s <- 0
+nbp <- c()
+T1D_application_data <- data.frame(T1D_application_data)
+for (i in unique(T1D_application_data$CHR19)){
+  nbp[i] <- max(T1D_application_data[T1D_application_data$CHR19 == i,]$BP19)
+  T1D_application_data[T1D_application_data$CHR19 == i,"BPcum"] <- T1D_application_data[T1D_application_data$CHR19 == i,"BP19"] + s
+  s <- s + nbp[i]
+}
+
+axis.set <- T1D_application_data %>% 
+  group_by(CHR19) %>% 
+  summarize(center = (max(BPcum) + min(BPcum)) / 2)
+
+ggplot(T1D_application_data, aes(x = BPcum, y = -log10(v3_fdr), col = as.factor(CHR19))) + geom_point(cex = 0.75) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_hline(yintercept = -log10(fdr_thr), linetype = "dashed") + xlab("Position") +  scale_color_manual(values = rep(c("#276FBF", "#183059"), nCHR)) +
+  scale_x_continuous(label = axis.set$CHR19, breaks = axis.set$center) + theme(legend.position = "none")+ theme(axis.text.x = element_text(size = 6, angle = 0)) + coord_cartesian(ylim=c(0,10)) + ylab(expression(paste("-log"[10],"(FDR)")))
 ```
