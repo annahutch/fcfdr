@@ -126,6 +126,10 @@ stratified_qqplot <- function(data_frame, prin_value_label, cond_value_label = N
     daf <- do.call(rbind, dafs)
   }
   
+  # Avoid notes in R CMD CHECK
+  pp=NULL; negLogP=NULL; threshold=NULL;
+  
+  # Output
   ggplot(data=daf) + geom_line(aes(x = pp, y = negLogP, group = threshold, colour = threshold)) + geom_abline(intercept=0,slope=1, linetype="dashed") + theme_cowplot(12) + background_grid(major = "xy", minor = "none")
 
 }

@@ -40,7 +40,7 @@ The distinguishing feature of `fcfdr` compared to earlier cFDR methods is that i
 
 * **Per-SNP scores of pathogenicity/ functionality/ deleteriousness.** Many tools have been developed that integrate various genomic and epigenomic annotation data to quantify the pathogenicity, functionality and/or deleteriousness of both coding and non-coding GWAS variants. For example tissue-specific [GenoSkyline scores](https://pubmed.ncbi.nlm.nih.gov/28742084/]) or [PINES scoring](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1546-6).
 
-* **LD score annotations** The latest and recommended baseline-LD model v2.2 contains 97 annotations ranging from binary synonymous/non-synonymous annotations to continuous functional genomic annotations. The annotations for all 1000 genomes phase 3 SNPs (note: now extended to 19,476,620 UK Biobank SNPs with $MAF\geq 0.1%$) can be downloaded from [https://alkesgroup.broadinstitute.org/LDSCORE/](https://alkesgroup.broadinstitute.org/LDSCORE/).
+* **LD score annotations** The latest and recommended baseline-LD model v2.2 contains 97 annotations ranging from binary synonymous/non-synonymous annotations to continuous functional genomic annotations. The annotations for all 1000 genomes phase 3 SNPs (note: now extended to 19,476,620 UK Biobank SNPs with $MAF\geq 0.1%$) can be downloaded readily online.
 
 ---
 

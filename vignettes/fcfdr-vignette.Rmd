@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r, include = FALSE,eval=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -44,7 +44,7 @@ For further details, including instructions to generate `indep_index`, examples 
 
 Firstly, load the Flexible cFDR R package:
 
-```{r}
+```{r,eval=FALSE}
 library(fcfdr)
 ```
 
@@ -52,7 +52,7 @@ library(fcfdr)
 
 Next, simulate $p$-values for 50,000 genetic variants, including 500 associated variants.
 
-```{r}
+```{r,eval=FALSE}
 set.seed(1)
 n = 50000
 n1p = 500 # associated variants
@@ -65,7 +65,7 @@ hist(p)
 
 We simulate relevant auxiliary data from a mixture normal distribution ($q$). The associated SNPs (with indices 1-500) are sampled from $N(-0.5, 0.5^2)$ and the non-associated SNPs (with indices 500-50000) are sampled from $N(2,1)$.
 
-```{r}
+```{r,eval=FALSE}
 mixture_comp1 <- function(x) rnorm(x, mean = -0.5, sd = 0.5)
 mixture_comp2 <- function(x) rnorm(x, mean = 2, sd = 1)
 n = length(p)
@@ -79,31 +79,31 @@ hist(q)
 
 We can use the `corr_plot` function to visualise the relationship between $p$ and $q$. We observe that low $p$-values (i.e. high $-log10(p)$) are enriched for low $q$ values.
 
-```{r, fig.width = 6, fig.height = 5}
+```{r, fig.width = 6, fig.height = 5,eval=FALSE}
 corr_plot(p, q)
 ```
 
 This is also clear from the stratified QQ plot.
 
-```{r, fig.width = 6, fig.height = 5}
+```{r, fig.width = 6, fig.height = 5,eval=FALSE}
 stratified_qqplot(data_frame = data.frame(p, q), prin_value_label = "p", cond_value_label = "q", thresholds = quantile(q)[-1])
 ```
 
 ---
 
-We are now ready to use the `flexible_cfdr` function to derive the $v$-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the [vignette for deriving LDAK weights here](http://dougspeed.com/calculate-weightings/). 
+We are now ready to use the `flexible_cfdr` function to derive the $v$-values. Note that for the purpose of the vignette, we do not specify an independent subset of SNPs, however for real analyses this parameter should be specified appropriately to avoid biased bandwidth estimations when fitting the KDE. Subsets of independent SNPs can be readily found using PLINK or LDAK - see the [vignette for deriving LDAK weights here](https://dougspeed.com/calculate-weightings/). 
 
 By default, `flexible_cfdr` prints some useful plots so that users can evaluate the accuracy of the KDE that is estimated in the method.
 
 (This line of code will take approximately 4 minutes to run.)
 
-```{r}
+```{r,eval=FALSE}
 res <- flexible_cfdr(p, q, indep_index = seq(1, n, 1))
 ```
 
 The output from the function is a list of length two. The first element is a data.frame containing the $p$-values (input parameter `p`), the auxiliary data values (input parameter `q`) and the generated $v$-values. The second element contains auxiliary data, such as how many data-points were left-censored in the method and/or spline corrected. In this example, we can see that a value of $q=-0.169$ was used for left censoring (any auxiliary data values smaller than this were set to this value) which results in 1108/50000 (2% of) data points being left censored. We also see that 109 (0.2% of) data points were spline corrected.
 
-```{r}
+```{r,eval=FALSE}
 str(res)
 
 p = res[[1]]$p
@@ -119,7 +119,7 @@ We can then visualise the results using the `pv_plot` and `log10pv_plot` functio
 
 We observe that $v$-values for SNPs with high $q$ values are increased, whilst those for SNPs with low $q$ values are decreased.
 
-```{r}
+```{r,eval=FALSE}
 pv_plot(p = p, q = q, v = v)
 log10pv_plot(p = p, q = q, v = v, 
              axis_lim = c(0, 10)) # zoom in to interesting region
@@ -129,19 +129,19 @@ log10pv_plot(p = p, q = q, v = v,
 
 Finally, we run the Benjamini-Hochberg procedure on the $v$-values and control the FDR at 0.05. This means that we are willing to accept up to 5% of the associations to be false positives.
 
-```{r}
+```{r,eval=FALSE}
 hit = which(p.adjust(v, method = "BH") <= 0.05)
 ```
 
 For comparison, we do the same to the raw p-values:
 
-```{r}
+```{r,eval=FALSE}
 hit_p = which(p.adjust(p, method = "BH") <= 0.05)
 ```
 
 'True' associations are those with indices 1-500, so the proportions of false discoveries are
 
-```{r}
+```{r,eval=FALSE}
 # cFDR
 1 - (length(intersect(hit,c(1:500)))/length(hit)) 
 
@@ -153,7 +153,7 @@ hit_p = which(p.adjust(p, method = "BH") <= 0.05)
 
 Altogether, the cFDR method has found 47 new associations that are true whilst controlling the FDR.
 
-```{r}
+```{r,eval=FALSE}
 # number of extra true associations identified by flexible cFDR
 length(which(hit[!hit %in% hit_p] <= 500))
 ```

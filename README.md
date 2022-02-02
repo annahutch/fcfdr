@@ -12,7 +12,7 @@ outputs “v-values” which can be interpreted as GWAS p-values that have
 been adjusted using the auxiliary data values.
 
 If you have any questions please do not hesitate to contact me:
-`anna.hutchinson@mrc-bsu.cam.ac.uk`
+`annahutchinson1995@gmail.com`
 
 Webpage: <https://annahutch.github.io/fcfdr/>
 

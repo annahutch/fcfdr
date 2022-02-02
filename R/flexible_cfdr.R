@@ -76,7 +76,7 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
   # find optimal mlests parameter values
   N = length(c(zp_ind, -zp_ind)); b = 4.3 * exp(-0.26 * log(N, 10)); med = median(c(zp_ind, -zp_ind))
   sc = diff(quantile(c(zp_ind, -zp_ind))[c(2,4)])/(2*qnorm(.75))
-  mlests = locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
+  mlests = locmle_local(c(zp_ind, -zp_ind), xlim=c(med, b*sc)) #locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
   names(mlests) = NULL
   
   # local FDR = P(H0|ZP=zp)
@@ -273,27 +273,29 @@ flexible_cfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, nxbin = 1
 #' @return indices of independent SNP in chosen in sample
 match_ind_maf <- function(maf, indep_index) {
   breaks <- seq(0, 0.5, length=51)
-
+  
   daf <- data.frame(indep_index = indep_index, maf = maf[indep_index])
-
+  
   maf_interval <- as.character(cut(maf, breaks = breaks, include.lowest = T))
-
+  
   daf$maf_interval <- maf_interval[indep_index]
-
+  
   maf_interval_freq.whole <- table(maf_interval)
-
-  maf_interval_freq.ind <- table(daf$maf_interval)
-
+  
+  maf_interval_freq.ind <- table(factor(daf$maf_interval,levels=unique(maf_interval)))[names( maf_interval_freq.whole)]
+  
   maf_interval_freq.whole.relative <- maf_interval_freq.whole/sum(maf_interval_freq.whole)
-
+  
   maf_interval_freq.ind.relative <- maf_interval_freq.ind/sum(maf_interval_freq.ind)
-
-  max_sample_size <- floor(min(maf_interval_freq.ind/maf_interval_freq.whole.relative))
-
+  
+  w=which(maf_interval_freq.ind>0)
+  
+  max_sample_size <- floor(min(maf_interval_freq.ind[w]/maf_interval_freq.whole.relative[w]))
+  
   scaled_interval_sample_sizes <- floor(maf_interval_freq.whole.relative*max_sample_size)
-
+  
   indep_sample_index <- unlist(lapply(names(scaled_interval_sample_sizes), function(x) sample(subset(daf, maf_interval==x)$indep_index, size=scaled_interval_sample_sizes[x])))
-
+  
   indep_sample_index
 }
 
@@ -302,6 +304,8 @@ match_ind_maf <- function(maf, indep_index) {
 #' @param p p values for principal trait (vector of length n)
 #' @param q continuous auxiliary data values (vector of length n)
 #' @param indep_index indices of independent SNPs
+#' @param res_p resolution for p
+#' @param res_q resolution for q
 #' @param maf minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)
 #' @param check_indep_cor check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole
 #' @param enforce_p_q_cor if \code{p} and \code{q} are negatively correlated, flip the sign on \code{q} values
@@ -355,7 +359,7 @@ parameters_in_locfdr <- function(p, q, indep_index, res_p = 300, res_q = 500, ma
   # find optimal mlests parameter values
   N = length(c(zp_ind, -zp_ind)); b = 4.3 * exp(-0.26 * log(N, 10)); med = median(c(zp_ind, -zp_ind))
   sc = diff(quantile(c(zp_ind, -zp_ind))[c(2,4)])/(2*qnorm(.75))
-  mlests = locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
+  mlests = locmle_local(c(zp_ind, -zp_ind), xlim=c(med, b*sc)) #locfdr:::locmle(c(zp_ind, -zp_ind), xlim=c(med, b*sc))
   names(mlests) = NULL
   
   return(list("zz" = c(zp_ind, -zp_ind), "bre" = c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2, -c(kpq$x[-length(kpq$x)] + diff(kpq$x)/2, kpq$x[length(kpq$x)] + diff(kpq$x)[length(diff(kpq$x))]/2)), "mlests" = c(mlests[1], b*mlests[2])))

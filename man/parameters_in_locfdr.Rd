@@ -22,6 +22,10 @@ parameters_in_locfdr(
 
 \item{indep_index}{indices of independent SNPs}
 
+\item{res_p}{resolution for p}
+
+\item{res_q}{resolution for q}
+
 \item{maf}{minor allele frequencies for SNPs to which \code{p} and \code{q} relate (optional and used to perform MAF matching)}
 
 \item{check_indep_cor}{check that sign of the correlation between \code{p} and \code{q} is the same in the independent subset as in the whole}
