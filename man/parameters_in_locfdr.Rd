@@ -38,3 +38,28 @@ list of values used as input into \code{locfdr::locfdr} function intrinsically i
 \description{
 parameters_in_locfdr
 }
+\examples{
+
+# In this example, we generate some p-values (representing GWAS p-values)
+# and some arbitrary auxiliary data values (e.g. representing functional genomic data).
+# We use the parameters_in_locfdr() function to extract the parameters estimated by
+# the locfdr function.
+
+# generate p
+set.seed(1)
+n <- 1000
+n1p <- 50 
+zp <- c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1))
+p <- 2*pnorm(-abs(zp))
+
+# generate q
+mixture_comp1 <- function(x) rnorm(x, mean = -0.5, sd = 0.5)
+mixture_comp2 <- function(x) rnorm(x, mean = 2, sd = 1)
+q <- c(mixture_comp1(n1p), mixture_comp2(n-n1p))
+
+n_indep <- n
+
+parameters_in_locfdr(p, q, indep_index = 1:n_indep)
+
+
+}

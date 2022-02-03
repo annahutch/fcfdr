@@ -31,3 +31,25 @@ Can be used to investigate the relationship between p and q
 
 Note that this function does not do the heavy lifting of styling the plot's aesthetics.
 }
+\examples{
+
+# In this example, we generate some p-values (representing GWAS p-values)
+# and some arbitrary auxiliary data values (e.g. representing GWAS p-values for a related trait).
+# We use the stratified_qqplot() function to examine the relationship between p and q
+
+# generate p
+set.seed(1)
+n <- 1000
+n1p <- 50 
+zp <- c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1))
+p <- 2*pnorm(-abs(zp))
+
+# generate q
+zq <- c(rnorm(n1p, sd=4), rnorm(n-n1p, sd=1.2))
+q <- 2*pnorm(-abs(zq))
+
+df <- data.frame(p, q)
+
+stratified_qqplot(data_frame = df, prin_value_label = "p", cond_value_label = "q")
+
+}
