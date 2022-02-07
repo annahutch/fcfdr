@@ -69,7 +69,7 @@
   <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -103,27 +103,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/extra-information.html">Extra Information</a>
+    </li>
+    <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">LDAK vignette</a>
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D Application</a>
     </li>
-    <li>
-      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
-    </li>
-    <li>
-      <a href="../articles/extra-information.html">Extra information</a>
-    </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/annahutch/fcfdr">
-    <span class=" github"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -176,6 +174,35 @@
 
     <p>Can be used to visualise the results from Flexible cFDR</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+ <span class='co'># this is a long running example</span>
+ 
+<span class='co'># In this example, we generate some p-values (representing GWAS p-values)</span>
+<span class='co'># and some arbitrary auxiliary data values (e.g. representing functional genomic data).</span>
+<span class='co'># We use the flexible_cfdr() function to generate v-values and then the pv_plot() function</span>
+<span class='co'># to visualise the results.</span>
+
+<span class='co'># generate p</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1000</span>
+<span class='va'>n1p</span> <span class='op'>&lt;-</span> <span class='fl'>50</span> 
+<span class='va'>zp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>-</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>pnorm</a></span><span class='op'>(</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>zp</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># generate q</span>
+<span class='va'>mixture_comp1</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>x</span>, mean <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.5</span>, sd <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
+<span class='va'>mixture_comp2</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>x</span>, mean <span class='op'>=</span> <span class='fl'>2</span>, sd <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>q</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'>mixture_comp1</span><span class='op'>(</span><span class='va'>n1p</span><span class='op'>)</span>, <span class='fu'>mixture_comp2</span><span class='op'>(</span><span class='va'>n</span><span class='op'>-</span><span class='va'>n1p</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>n_indep</span> <span class='op'>&lt;-</span> <span class='va'>n</span>
+
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='flexible_cfdr.html'>flexible_cfdr</a></span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span>, indep_index <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='va'>n_indep</span><span class='op'>)</span>
+</div><div class='img'><img src='pv_plot-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='pv_plot-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='pv_plot-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>pv_plot</span><span class='op'>(</span>p <span class='op'>=</span> <span class='va'>res</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>p</span>, q <span class='op'>=</span> <span class='va'>res</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>q</span>, v <span class='op'>=</span> <span class='va'>res</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>$</span><span class='va'>v</span><span class='op'>)</span>
+</div><div class='img'><img src='pv_plot-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

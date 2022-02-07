@@ -69,7 +69,7 @@
   <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -103,27 +103,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/extra-information.html">Extra Information</a>
+    </li>
+    <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">LDAK vignette</a>
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D Application</a>
     </li>
-    <li>
-      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
-    </li>
-    <li>
-      <a href="../articles/extra-information.html">Extra information</a>
-    </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/annahutch/fcfdr">
-    <span class=" github"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -182,6 +180,28 @@
     <p>Can be used to investigate the relationship between p and q</p>
 <p>Note that this function does not do the heavy lifting of styling the plot's aesthetics.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='co'># In this example, we generate some p-values (representing GWAS p-values)</span>
+<span class='co'># and some arbitrary auxiliary data values (e.g. representing GWAS p-values for a related trait).</span>
+<span class='co'># We use the stratified_qqplot() function to examine the relationship between p and q</span>
+
+<span class='co'># generate p</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1000</span>
+<span class='va'>n1p</span> <span class='op'>&lt;-</span> <span class='fl'>50</span> 
+<span class='va'>zp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>-</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>pnorm</a></span><span class='op'>(</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>zp</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># generate q</span>
+<span class='va'>zq</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>4</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>-</span><span class='va'>n1p</span>, sd<span class='op'>=</span><span class='fl'>1.2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>q</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>pnorm</a></span><span class='op'>(</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>zq</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>p</span>, <span class='va'>q</span><span class='op'>)</span>
+
+<span class='fu'>stratified_qqplot</span><span class='op'>(</span>data_frame <span class='op'>=</span> <span class='va'>df</span>, prin_value_label <span class='op'>=</span> <span class='st'>"p"</span>, cond_value_label <span class='op'>=</span> <span class='st'>"q"</span><span class='op'>)</span>
+</div><div class='img'><img src='stratified_qqplot-1.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

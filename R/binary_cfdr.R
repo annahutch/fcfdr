@@ -7,6 +7,28 @@
 #' @importFrom Hmisc approxExtrap
 #' 
 #' @return data.frame of p, q and v values
+#' 
+#' @examples
+#' 
+#' # In this example, we generate some p-values (representing GWAS p-values)
+#' # and some arbitrary auxiliary data values (e.g. representing functional genomic data).
+#' # We use the parameters_in_locfdr() function to extract the parameters estimated by
+#' # the locfdr function.
+#' 
+#' # generate p
+#' set.seed(2)
+#' n <- 1000
+#' n1p <- 50 
+#' zp <- c(rnorm(n1p, sd=5), rnorm(n-n1p, sd=1))
+#' p <- 2*pnorm(-abs(zp))
+#'
+#' # generate q
+#' q <- rbinom(n, 1, 0.1)
+#'
+#' group <- c(rep("A", n/2), rep("B", n/2)) 
+#' 
+#' binary_cfdr(p, q, group)
+#' 
 #' @export
 #'
 binary_cfdr <- function(p, q, group){

@@ -68,7 +68,7 @@
   <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -102,27 +102,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/extra-information.html">Extra Information</a>
+    </li>
+    <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">LDAK vignette</a>
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D Application</a>
     </li>
-    <li>
-      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
-    </li>
-    <li>
-      <a href="../articles/extra-information.html">Extra information</a>
-    </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/annahutch/fcfdr">
-    <span class=" github"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -150,32 +148,7 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-cfdr-functions" class="hasAnchor"><a href="#section-cfdr-functions" class="anchor"></a>cFDR functions</h2>
-          <p class="section-desc"><p>Functions to perform cFDR for a range of auxilliary covariates</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="flexible_cfdr.html">flexible_cfdr()</a></code> </p>
-        </td>
-        <td><p>Perform Flexible cFDR</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="binary_cfdr.html">binary_cfdr()</a></code> </p>
-        </td>
-        <td><p>Perform cFDR leveraging binary auxiliary covariates</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-functions-to-generate-plots" class="hasAnchor"><a href="#section-functions-to-generate-plots" class="anchor"></a>Functions to generate plots</h2>
+          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -187,15 +160,45 @@
       <tr>
         
         <td>
+          <p><code><a href="T1D_application_data.html">T1D_application_data</a></code> </p>
+        </td>
+        <td><p>Data for T1D application</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="binary_cfdr.html">binary_cfdr()</a></code> </p>
+        </td>
+        <td><p>Perform cFDR leveraging binary auxiliary covariates</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="corr_plot.html">corr_plot()</a></code> </p>
         </td>
         <td><p>Violin plot of p-values for quantiles of q</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="stratified_qqplot.html">stratified_qqplot()</a></code> </p>
+          <p><code><a href="flexible_cfdr.html">flexible_cfdr()</a></code> </p>
         </td>
-        <td><p>Stratified Q-Q plot.</p></td>
+        <td><p>Perform Flexible cFDR</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="log10pv_plot.html">log10pv_plot()</a></code> </p>
+        </td>
+        <td><p>Plot -log10(p) against -log10(v) and colour by q</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="match_ind_maf.html">match_ind_maf()</a></code> </p>
+        </td>
+        <td><p>Function to downsample independent SNPs to match MAF distribution of whole set.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="parameters_in_locfdr.html">parameters_in_locfdr()</a></code> </p>
+        </td>
+        <td><p>parameters_in_locfdr</p></td>
       </tr><tr>
         
         <td>
@@ -205,9 +208,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="log10pv_plot.html">log10pv_plot()</a></code> </p>
+          <p><code><a href="stratified_qqplot.html">stratified_qqplot()</a></code> </p>
         </td>
-        <td><p>Plot -log10(p) against -log10(v) and colour by q</p></td>
+        <td><p>Stratified Q-Q plot.</p></td>
       </tr>
     </tbody>
     </table>

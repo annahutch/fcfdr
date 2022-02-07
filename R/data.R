@@ -13,3 +13,14 @@
 #' @format A data frame with 113543 rows and 11 variables:
 #' 
 "T1D_application_data"
+
+
+
+
+# Suppress R CMD check notes
+#' @importFrom graphics hist
+#' @importFrom graphics image
+#' @importFrom graphics lines
+#' @importFrom dplyr transmute
+#' @importFrom data.table as.xts.data.table
+NULL

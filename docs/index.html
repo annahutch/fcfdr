@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Flexible cFDR">
-<meta property="og:description" content="An R Package to implement Flexible cFDR. Can be used to leverage auxiliary data from arbitrary distributions with GWAS p-values to generate re-weighted p-values.">
+<meta property="og:description" content="Provides functions to implement the Flexible cFDR (Hutchinson et al. (2021) &lt;doi:10.1371/journal.pgen.1009853&gt;) and Binary cFDR (Hutchinson et al. (2021) &lt;doi:10.1101/2021.10.21.465274&gt;) methodologies to leverage auxiliary data from arbitrary distributions, for example functional genomic data, with GWAS p-values to generate re-weighted p-values. ">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
 </head>
 <body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
-      <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -61,28 +61,24 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="articles/extra-information.html">Extra Information</a>
+    </li>
+    <li>
       <a href="articles/fcfdr-vignette.html">Introductory vignette</a>
+    </li>
+    <li>
+      <a href="articles/ldak-vignette.html">LDAK vignette</a>
     </li>
     <li>
       <a href="articles/t1d_app.html">T1D Application</a>
     </li>
-    <li>
-      <a href="articles/ldak-vignette.html">Generating independent SNP set</a>
-    </li>
-    <li>
-      <a href="articles/extra-information.html">Extra information</a>
-    </li>
   </ul>
 </li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/annahutch/fcfdr">
-    <span class=" github"></span>
-     
-  </a>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
+<ul class="nav navbar-nav navbar-right"></ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -99,7 +95,7 @@
 <a href="#fcfdr" class="anchor"></a>fcfdr</h1></div>
 <p><img src="reference/figures/logo.png" align="right"></p>
 <p><code>fcfdr</code> is an all-encompassing R package to implement the cFDR approach for a variety of auxiliary covariates. As input it requires GWAS p-values for a trait of interest and auxiliary data values. It then outputs “v-values” which can be interpreted as GWAS p-values that have been adjusted using the auxiliary data values.</p>
-<p>If you have any questions please do not hesitate to contact me: <code>anna.hutchinson@mrc-bsu.cam.ac.uk</code></p>
+<p>If you have any questions please do not hesitate to contact me: <code>annahutchinson1995@gmail.com</code></p>
 <p>Webpage: <a href="https://annahutch.github.io/fcfdr/" class="uri">https://annahutch.github.io/fcfdr/</a></p>
 <p>GitHub repository: <a href="https://github.com/annahutch/fcfdr" class="uri">https://github.com/annahutch/fcfdr</a></p>
 <hr>
@@ -138,11 +134,19 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2>Links</h2>
+<ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=fcfdr">https://​cloud.r-project.org/​package=fcfdr</a>
+</li>
+</ul>
+</div>
+<div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li>
+<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
 <div class="developers">

@@ -27,7 +27,7 @@
 </head>
 <body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
-      <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -61,28 +61,24 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/extra-information.html">Extra Information</a>
+    </li>
+    <li>
       <a href="../articles/fcfdr-vignette.html">Introductory vignette</a>
+    </li>
+    <li>
+      <a href="../articles/ldak-vignette.html">LDAK vignette</a>
     </li>
     <li>
       <a href="../articles/t1d_app.html">T1D Application</a>
     </li>
-    <li>
-      <a href="../articles/ldak-vignette.html">Generating independent SNP set</a>
-    </li>
-    <li>
-      <a href="../articles/extra-information.html">Extra information</a>
-    </li>
   </ul>
 </li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/annahutch/fcfdr">
-    <span class=" github"></span>
-     
-  </a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
+<ul class="nav navbar-nav navbar-right"></ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -106,9 +102,9 @@
     
     
 <p>The <code>flexible_cfdr</code> function requires as input the indices of an independent subset of SNPs. These indices indicate the <code>(p,q)</code> pairs considered independent observations for the purpose of the KDE fitting procedure.</p>
-<p>In practice, we identify independent SNPs as those assigned a non-zero weighting by the <a href="http://dougspeed.com/ldak/">LDAK package’s</a> weighting calculation <a href="http://dougspeed.com/calculate-weightings/">procedure</a>. These weightings were originally developed as a means of adjusting for the unequal tagging of (causal) SNPs across the genome when estimating heritability. The calculation procedure requires haplotype information, which we obtain in the form of the 1000 Genomes (1000G) Phase 3 data.</p>
+<p>In practice, we identify independent SNPs as those assigned a non-zero weighting by the <a href="https://dougspeed.com/ldak/">LDAK package’s</a> weighting calculation <a href="https://dougspeed.com/calculate-weightings/">procedure</a>. These weightings were originally developed as a means of adjusting for the unequal tagging of (causal) SNPs across the genome when estimating heritability. The calculation procedure requires haplotype information, which we obtain in the form of the 1000 Genomes (1000G) Phase 3 data.</p>
 <p>The purpose of this vignette is to sketch out our own approach to generating LDAK weightings for use in <code>fcfdr</code>. Whilst RMarkdown was used to generate this HTML document, the code snippets contained in this vignette are intended to serve as static illustrations and are not intended to be run without further modification.</p>
-<p>This workflow was written with the use of LDAK <code>v5.1</code> (download <a href="http://dougspeed.com/downloads/">here</a>) and PLINK <code>v1.90b6.21 64-bit (19 Oct 2020)</code> (download <a href="https://www.cog-genomics.org/plink/2.0/">here</a>). We also use code from the R packages <a href="https://privefl.github.io/bigsnpr/">bigsnpr</a> and <a href="https://rdatatable.gitlab.io/data.table/">data.table</a>.</p>
+<p>This workflow was written with the use of LDAK <code>v5.1</code> (download <a href="https://dougspeed.com/downloads/">here</a>) and PLINK <code>v1.90b6.21 64-bit (19 Oct 2020)</code> (download <a href="https://www.cog-genomics.org/plink/2.0/">here</a>). We also use code from the R packages <a href="https://privefl.github.io/bigsnpr/">bigsnpr</a> and <a href="https://rdatatable.gitlab.io/data.table/">data.table</a>.</p>
 <hr>
 <div id="optional-obtaining-and-processing-the-1000g-data" class="section level2">
 <h2 class="hasAnchor">
@@ -167,7 +163,7 @@
 <li>SNP ID (i.e. rsID); or</li>
 <li>SNP genomic coordinates</li>
 </ol>
-<p>rsIDs are not always consistent between data sets and we have found that extracting SNPs using genomic coordinates typically yields a larger intersection of 1000G and GWAS SNPs. Thus we use <code>plink --extract</code> with the <code>--range</code> argument (<a href="http://zzz.bwh.harvard.edu/plink/dataman.shtml#extract">documentation here</a>), which requires that we pass a white space-separated text file specifying a list of genomic ‘ranges’ (hereafter the ‘range file’) in rows in the format <code>chr bp bp ID</code>. In our use case, each SNP corresponds to a range, albeit one of length one: the first and second <code>bp</code> columns which give the start and end coordinates of the range are duplicated. We use rsIDs as range identifiers, but these are essentially superfluous when using the <code>--range</code> argument and will not be used by <code>plink</code> to filter the SNPs.</p>
+<p>rsIDs are not always consistent between data sets and we have found that extracting SNPs using genomic coordinates typically yields a larger intersection of 1000G and GWAS SNPs. Thus we use <code>plink --extract</code> with the <code>--range</code> argument (<a href="https://zzz.bwh.harvard.edu/plink/dataman.shtml#extract">documentation here</a>), which requires that we pass a white space-separated text file specifying a list of genomic ‘ranges’ (hereafter the ‘range file’) in rows in the format <code>chr bp bp ID</code>. In our use case, each SNP corresponds to a range, albeit one of length one: the first and second <code>bp</code> columns which give the start and end coordinates of the range are duplicated. We use rsIDs as range identifiers, but these are essentially superfluous when using the <code>--range</code> argument and will not be used by <code>plink</code> to filter the SNPs.</p>
 <p>The coordinates of the GWAS SNPs are usually readily available and a simple approach to generating the requisite range files for <code>plink --extract</code> would copy the genomic coordinates of each SNP to the appropriate chromosome-specific range file (albeit in the <code>plink</code>-compliant <code>chr bp bp rsID</code> format). However, this approach overlooks the possibility that there exist multiple SNPs with different reference/alternative allele pairings at the same locus, that is, duplicates.</p>
 <p>We can account for this when preparing the range files by first joining the 1000G SNPs in each chromosome’s <code>bim</code> file data to our GWAS SNPs and checking that the allele pairings match. This approach also allows us to remove duplicated rows in the range files; as noted above, it is not essential for a good fit that we retain <em>every</em> SNP.</p>
 <p>The following exemplifies the sort of R code one can use to write out the range files whilst carrying out the aforementioned checks.</p>
@@ -212,7 +208,7 @@
 <div id="running-the-ldak-weighting-calculation-procedure" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-the-ldak-weighting-calculation-procedure" class="anchor"></a>Running the LDAK weighting calculation procedure</h2>
-<p>The weighting calculation procedure entails a preprocessing step, <code>ldak --cut-weights</code>, and a calculation step, <code>ldak --calc-weights-all</code>. We refer the reader to the <a href="http://dougspeed.com/calculate-weightings/">LDAK documentation</a> for further guidance. An idiosyncracy of our approach is that we process the data in a set of chromosome-specific files. This is an artifact of the format of the 1000G data.</p>
+<p>The weighting calculation procedure entails a preprocessing step, <code>ldak --cut-weights</code>, and a calculation step, <code>ldak --calc-weights-all</code>. We refer the reader to the <a href="https://dougspeed.com/calculate-weightings/">LDAK documentation</a> for further guidance. An idiosyncracy of our approach is that we process the data in a set of chromosome-specific files. This is an artifact of the format of the 1000G data.</p>
 <p>We create the directory <code>ldak</code> and within it subdirectories labelled <code>chrx</code>, where x ranges from 1 to 22, to hold the results of the procedure. (note that you may have to replace the executable <code>ldak</code> with <code>ldak5.1.linux</code> depending on how you downloaded the LDAK software).</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">22</span><span class="dt">}</span><span class="kw">;</span> <span class="cf">do</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">ldak</span> <span class="at">--cut-weights</span> <span class="st">"ldak/chr"</span><span class="va">$i</span> <span class="at">--bfile</span> <span class="st">"filtered/chr"</span><span class="va">$i</span></span>
