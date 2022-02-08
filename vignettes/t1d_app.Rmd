@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE,eval=FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -35,7 +35,7 @@ The data required for this example is available to download within the `fcfdr` R
 
 Firstly, we download the data:
 
-```{r,eval=FALSE}
+```{r}
 set.seed(1)
 library(fcfdr)
 library(cowplot)
@@ -48,7 +48,7 @@ head(T1D_application_data)
 
 In this application we leverage GWAS $p$-values for RA, binary SNP overlap with regulatory factor binding sites and H3K27ac counts in T1D-relevant cell types with GWAS $p$-values for T1D to generate adjusted $p$-values (called $v$-values). 
 
-```{r,eval=FALSE}
+```{r}
 orig_p <- T1D_application_data$T1D_pval
 chr <- T1D_application_data$CHR19
 MAF <- T1D_application_data$MAF
@@ -61,7 +61,7 @@ q3 <- log(T1D_application_data$H3K27ac+1) # deal with long tail
 
 The data frame also contains a column of LDAK weights for each SNP (https://dougspeed.com/calculate-weightings/). An LDAK weight of zero means that the signal is (almost) perfectly captured by neighbouring SNPs, and so we use the subset of SNPs with non-zero LDAK weights as our independent subset of SNPs.
 
-```{r,eval=FALSE}
+```{r}
 ind_snps <- which(T1D_application_data$LDAK_weight != 0)
 ```
 
@@ -69,7 +69,7 @@ ind_snps <- which(T1D_application_data$LDAK_weight != 0)
 
 We are now ready to use the `fcfdr` R package to generate $v$-values. Firstly, we generate $v$-values by leveraging GWAS $p$-values for RA. We supply MAF values to prevent a bias of the KDE fit towards the behaviour of rarer SNPs (the function intrinsically down-samples the independent subset of SNPs to match the MAF distribution in this subset to that in the whole set of SNPs).
 
-```{r,eval=FALSE}
+```{r}
 iter1_res <- flexible_cfdr(p = orig_p, 
                            q = q1, 
                            indep_index = ind_snps,
@@ -82,7 +82,7 @@ v1 <- iter1_res[[1]]$v
 
 Since the outputted $v$-values are analogous to $p$-values, they can be used directly in any error-rate controlling procedure. Here, we use the Benjamini-Hochberg (BH) procedure to derive FDR-adjusted $v$-values and plot the resultant FDR values.
 
-```{r,eval=FALSE}
+```{r}
 res1 <- data.frame(p = orig_p, q1, v1)
 mid1 <- median(res1$q1)
 
@@ -93,7 +93,7 @@ ggplot(res1, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v1, method = "BH")
 
 The resultant $v$-values for this first iteration (`v1`) are then used in the next iteration to leverage binary data on SNP overlap with regulatory factor binding sites. Note that the binary cFDR function implements a leave-one-out procedure and therefore requires a group index for each SNP. This will generally be the chromosome on which that SNP resides but can also be indices relating to LD blocks, for example.
 
-```{r,eval=FALSE}
+```{r}
 iter2_res <- binary_cfdr(p = v1,
                          q = q2,
                          group = chr)
@@ -101,7 +101,7 @@ iter2_res <- binary_cfdr(p = v1,
 v2 <- iter2_res$v
 ```
 
-```{r,eval=FALSE}
+```{r}
 res2 <- data.frame(p = v1, v2, q2)
 res2$q2 <- as.factor(res2$q2)
 
@@ -112,7 +112,7 @@ ggplot(res2, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v2, method = "BH")
 
 The resultant $v$-values for this second iteration (`v2`) are then used in the next iteration to leverage H3K27ac counts.
 
-```{r,eval=FALSE}
+```{r}
 iter3_res <- flexible_cfdr(p = v2, 
                            q = q3, 
                            indep_index = ind_snps,
@@ -120,7 +120,7 @@ iter3_res <- flexible_cfdr(p = v2,
 v3 <- iter3_res[[1]]$v
 ```
 
-```{r,eval=FALSE}
+```{r}
 res3 <- data.frame(p = v2, q3, v3)
 
 ggplot(res3, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v3, method = "BH"), col = q3)) + geom_point(cex = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed") + xlab("V2 (FDR)") + ylab("V3 (FDR)") + ggtitle(paste0("Iteration 3")) + scale_color_gradient2(midpoint = 1, low = "blue", mid = "white", high = "red", space = "Lab")
@@ -130,7 +130,7 @@ ggplot(res3, aes(x = p.adjust(p, method = "BH"), y = p.adjust(v3, method = "BH")
 
 We then create a final data frame containing the results from our analysis. Note that the sign is flipped for $q2$ and $q3$. This is because these are negatively correlated with `p` and the flexible cFDR software automatically flips the sign of `q` to ensure that low `p` are enriched for low `q`.
 
-```{r,eval=FALSE}
+```{r}
 res <- data.frame(orig_p, q1 = iter1_res[[1]]$q, q2 = as.factor(iter2_res$q), q3 = iter3_res[[1]]$q, v1, v2, v3)
 
 head(res)
@@ -140,13 +140,13 @@ head(res)
 
 We can plot the original $p$-values for T1D against the final adjusted $v$-values.
 
-```{r,eval=FALSE}
+```{r}
 mid1 <- median(res$q1)
 
 ggplot(res, aes(x = p.adjust(orig_p, method = "BH"), y = p.adjust(v3, method = "BH"))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("Original P (FDR)") + ylab("V3 (FDR)") + ggtitle(paste0("FDR adjusted v-values\nagainst original FDR values"))
 ```
 
-```{r,eval=FALSE}
+```{r}
 ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alpha = 0.5) + theme_cowplot(12) + background_grid(major = "xy", minor = "none") + geom_abline(intercept = 0, slope = 1,  linetype="dashed", col = "red") + xlab("Original P (FDR) (-log10)") + ylab("V3 (FDR) (-log10)") + ggtitle(paste0("FDR adjusted v-values against\noriginal FDR values (FDR)")) + coord_cartesian(ylim = c(0,10), xlim = c(0,10))
 ```
 
@@ -154,7 +154,7 @@ ggplot(res, aes(x = -log10(orig_p), y = -log10(v3))) + geom_point(cex = 0.5, alp
 
 We find that our implementation of cFDR identifies newly FDR significant SNPs that have relatively small GWAS $p$-values for rheumatoid arthritis, are more likely to be found in genomic regions where regulatory factors bind and have relatively high H3K27ac counts in T1D relevant cell types.
 
-```{r,eval=FALSE}
+```{r}
 p_fdr <- p.adjust(orig_p, method = "BH")
 v3_fdr <- p.adjust(v3, method = "BH")
 
@@ -175,7 +175,7 @@ median(T1D_application_data$H3K27ac)
 
 Side comment: code to create the Manhattan plot in the manuscript:
 
-```{r, eval = FALSE}
+```{r eval = FALSE}
 T1D_application_data$v3_fdr <- v3_fdr
 
 nCHR <- length(unique(T1D_application_data$CHR19))
